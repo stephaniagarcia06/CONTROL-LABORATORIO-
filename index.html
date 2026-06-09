@@ -6,78 +6,95 @@
     <title>CalibPro - CI RENTELCOM</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
+        :root {
+            --primary: #0a2b4e;
+            --primary-dark: #051a30;
+            --primary-light: #1e4a76;
+            --secondary: #e8f0fe;
+            --gray-light: #f5f7fa;
+            --gray-border: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --white: #ffffff;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: #1e293b; }
+        body { background: var(--gray-light); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: var(--text-dark); }
         .container { max-width: 1400px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid #0a2b4e; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid var(--primary); }
         .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-placeholder { width: 50px; height: 50px; background: #0a2b4e; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
-        h1 { font-size: 1.6rem; color: #0a2b4e; font-weight: 600; }
-        .badge { background: #1e4a76; color: white; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; font-weight: 500; }
+        .logo-placeholder { width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
+        h1 { font-size: 1.6rem; color: var(--primary); font-weight: 600; }
+        .badge { background: var(--primary-light); color: white; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; font-weight: 500; }
         
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
-        .card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s; }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); background: #e8f0fe; }
-        .card h3 { font-size: 0.85rem; font-weight: 500; color: #64748b; margin-bottom: 12px; text-transform: uppercase; }
-        .card .number { font-size: 2.2rem; font-weight: 700; color: #0a2b4e; }
+        .card { background: var(--white); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-border); transition: all 0.2s; cursor: pointer; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); background: var(--secondary); }
+        .card h3 { font-size: 0.85rem; font-weight: 500; color: var(--text-gray); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .card .number { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
         
-        .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 28px; }
-        .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: #64748b; border-radius: 30px; }
-        .tab-btn:hover { background: #e8f0fe; color: #0a2b4e; }
-        .tab-btn.active { background: #0a2b4e; color: white; }
+        .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid var(--gray-border); margin-bottom: 28px; }
+        .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: var(--text-gray); border-radius: 30px; transition: all 0.2s; }
+        .tab-btn:hover { background: var(--secondary); color: var(--primary); }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(10,43,78,0.3); }
         
         .tab-pane { display: none; }
         .tab-pane.active-pane { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .form-card, .table-card { background: white; border-radius: 20px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 32px; }
-        .form-card h3, .table-card h3 { margin-bottom: 20px; color: #0a2b4e; font-size: 1.2rem; border-left: 4px solid #0a2b4e; padding-left: 12px; }
+        .form-card, .table-card { background: var(--white); border-radius: 20px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-border); margin-bottom: 32px; }
+        .form-card h3, .table-card h3 { margin-bottom: 20px; color: var(--primary); font-size: 1.2rem; border-left: 4px solid var(--primary); padding-left: 12px; }
         
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
-        label { font-weight: 600; font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
-        input, select, textarea { padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 12px; font-size: 0.9rem; font-family: inherit; }
+        label { font-weight: 600; font-size: 0.8rem; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea { padding: 12px 14px; border: 1px solid var(--gray-border); border-radius: 12px; font-size: 0.9rem; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,43,78,0.1); }
         textarea { resize: vertical; min-height: 60px; }
         
-        button { background: #0a2b4e; border: none; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; }
-        button:hover { background: #051a30; }
-        .btn-outline { background: transparent; border: 2px solid #0a2b4e; color: #0a2b4e; }
-        .btn-outline:hover { background: #0a2b4e; color: white; }
-        .btn-danger { background: #dc2626; }
+        button { background: var(--primary); border: none; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        button:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); }
         .btn-danger:hover { background: #b91c1c; }
-        .btn-success { background: #10b981; }
+        .btn-success { background: var(--success); }
         .btn-success:hover { background: #059669; }
         
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
-        th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #e2e8f0; font-size: 0.8rem; vertical-align: middle; }
-        th { background: #e8f0fe; font-weight: 600; color: #0a2b4e; }
+        th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
+        th { background: var(--secondary); font-weight: 600; color: var(--primary); }
         
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .badge-pendiente { background: #fef3c7; color: #d97706; }
         .badge-aprobado { background: #d1fae5; color: #059669; }
         
-        .pdf-btn { background: #dc2626; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
-        .edit-btn { background: #f59e0b; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
-        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; }
+        .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
+        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
+        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--gray-border); }
         .logo-preview { max-width: 150px; max-height: 60px; margin-top: 5px; }
-        .next-id-info { background: #e8f0fe; padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; color: #0a2b4e; }
+        .next-id-info { background: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; color: var(--primary); }
         .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
         
-        .app-footer { text-align: center; padding: 20px; color: #64748b; font-size: 0.7rem; border-top: 1px solid #e2e8f0; margin-top: 20px; }
+        .app-footer { text-align: center; padding: 20px; color: var(--text-gray); font-size: 0.7rem; border-top: 1px solid var(--gray-border); margin-top: 20px; }
         
-        .historial-item { background: #f8fafc; border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid #0a2b4e; }
-        .historial-fecha { font-weight: bold; color: #0a2b4e; margin-bottom: 8px; }
+        .historial-item { background: var(--gray-light); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--primary); }
+        .historial-fecha { font-weight: bold; color: var(--primary); margin-bottom: 8px; }
         .btn-exportar { background: #10b981; margin-top: 15px; }
-        .filtro-activo { background: #0a2b4e; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; margin-left: 10px; }
-        .import-area { border: 2px dashed #cbd5e1; padding: 30px; text-align: center; border-radius: 16px; margin: 20px 0; cursor: pointer; transition: all 0.2s; }
-        .import-area:hover { border-color: #0a2b4e; background: #e8f0fe; }
-        .delete-section { border-top: 1px solid #e2e8f0; margin-top: 20px; padding-top: 20px; }
+        .filtro-activo { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; margin-left: 10px; }
+        .import-area { border: 2px dashed var(--gray-border); padding: 30px; text-align: center; border-radius: 16px; margin: 20px 0; cursor: pointer; transition: all 0.2s; }
+        .import-area:hover { border-color: var(--primary); background: var(--secondary); }
+        .delete-section { border-top: 1px solid var(--gray-border); margin-top: 20px; padding-top: 20px; }
         
-        .traza-select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 15px; }
-        .export-section { background: #e8f0fe; padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        .traza-select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--gray-border); margin-bottom: 15px; }
+        .export-section { background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
         
-        .serial-link { color: #0a2b4e; font-weight: bold; cursor: pointer; text-decoration: underline; }
-        .serial-link:hover { color: #051a30; }
+        .serial-link { color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline; }
+        .serial-link:hover { color: var(--primary-dark); }
         
         .busqueda-serial { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
         .busqueda-serial .input-group { flex: 1; margin-bottom: 0; }
@@ -203,7 +220,7 @@
         <div class="table-card">
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
-            </table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead>
+            <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th><tr></thead>
                 <tbody id="equiposBody"></tbody>
             </table>
         </div>
@@ -241,10 +258,10 @@
     <div id="importar" class="tab-pane">
         <div class="form-card">
             <h3>Importar datos desde archivo</h3>
-            <div style="background: #e8f0fe; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-                <h4>📋 Tu archivo debe tener estas columnas EXACTAMENTE:</h4>
+            <div style="background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                <h4>📋 Tu archivo debe tener estas columnas:</h4>
                 <p>✅ <strong>fecha</strong> - Fecha del informe</p>
-                <p>✅ <strong>CLIENTE</strong> - Nombre del cliente (en mayúsculas)</p>
+                <p>✅ <strong>CLIENTE</strong> - Nombre del cliente</p>
                 <p>✅ <strong>equipo</strong> - Tipo de equipo</p>
                 <p>✅ <strong>marca</strong> - Marca</p>
                 <p>✅ <strong>modelo</strong> - Modelo</p>
@@ -276,7 +293,7 @@
             <div id="logoPreview"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
             <div class="delete-section">
-                <h3 style="color: #dc2626;">⚠️ Peligro - Eliminar datos</h3>
+                <h3 style="color: var(--danger);">⚠️ Peligro - Eliminar datos</h3>
                 <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
             </div>
         </div>
@@ -310,7 +327,6 @@
         setTimeout(() => msg.style.display = "none", 4000);
     }
 
-    // DATOS DE EJEMPLO CON LA ESTRUCTURA CORRECTA
     function cargarDatosEjemplo() {
         equipos = [
             { serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller" },
@@ -366,7 +382,7 @@
         renderInformesConFiltro();
         
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td>' + '</tr>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registradosNeo' + '<tr>';
         else eb.innerHTML = equipos.map((e, idx) => `<tr><td style="font-weight:bold;">${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>`).join('');
         
         cargarSelectsSeriales();
@@ -379,7 +395,7 @@
         filtrados.sort((a, b) => b.id - a.id);
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
+        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registradosNeo' + '</tr>'; return; }
         tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
@@ -617,28 +633,37 @@
         mostrarMensaje("✅ Datos exportados");
     };
 
-    // IMPORTAR DATOS CORREGIDO
+    // IMPORTAR DATOS - CORREGIDO PARA LEER CORRECTAMENTE TU EXCEL
     function setupImport() {
         const importArea = document.getElementById("importArea");
         const fileInput = document.getElementById("fileInput");
         importArea.onclick = () => fileInput.click();
-        importArea.ondragover = (e) => { e.preventDefault(); importArea.style.borderColor = "#0a2b4e"; };
-        importArea.ondragleave = () => importArea.style.borderColor = "#cbd5e1";
-        importArea.ondrop = (e) => { e.preventDefault(); importArea.style.borderColor = "#cbd5e1"; handleFile(e.dataTransfer.files[0]); };
+        importArea.ondragover = (e) => { e.preventDefault(); importArea.style.borderColor = "var(--primary)"; };
+        importArea.ondragleave = () => importArea.style.borderColor = "var(--gray-border)";
+        importArea.ondrop = (e) => { e.preventDefault(); importArea.style.borderColor = "var(--gray-border)"; handleFile(e.dataTransfer.files[0]); };
         fileInput.onchange = (e) => { if(e.target.files[0]) handleFile(e.target.files[0]); };
     }
 
     async function handleFile(file) {
         const preview = document.getElementById("importPreview");
         const btnConfirmar = document.getElementById("btnConfirmarImport");
-        let datos = [];
         
+        // Leer el archivo con opciones para preservar los datos
         const data = await file.arrayBuffer();
-        const workbook = XLSX.read(data);
+        const workbook = XLSX.read(data, { type: 'array', cellDates: false, defval: "" });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        datos = XLSX.utils.sheet_to_json(sheet);
         
-        if(datos.length === 0) { preview.innerHTML = '<p>❌ No se encontraron datos.</p>'; btnConfirmar.style.display = "none"; return; }
+        // Convertir a JSON respetando los encabezados originales
+        let datos = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+        
+        // Filtrar filas vacías (sin ID o sin serial)
+        datos = datos.filter(row => row.ID || row.serial);
+        
+        if(datos.length === 0) { 
+            preview.innerHTML = '<p>❌ No se encontraron datos válidos. Asegúrate de que tu archivo tenga las columnas: fecha, CLIENTE, equipo, marca, modelo, serial, ID, diagnostico</p>'; 
+            btnConfirmar.style.display = "none"; 
+            return; 
+        }
         
         const primerRegistro = datos[0];
         preview.innerHTML = `<h4>✅ Vista previa (${datos.length} registros)</h4>
@@ -651,6 +676,7 @@
                 <p>📟 modelo: ${primerRegistro.modelo || 'No'}</p>
                 <p>🔢 serial: ${primerRegistro.serial || 'No'}</p>
                 <p>🔢 ID: ${primerRegistro.ID || 'No'}</p>
+                <p>📋 diagnostico: ${primerRegistro.diagnostico ? 'Sí' : 'No'}</p>
             </div>
             <p>Se importarán <strong>${datos.length}</strong> informes.</p>`;
         btnConfirmar.style.display = "block";
@@ -658,16 +684,27 @@
         btnConfirmar.onclick = () => {
             let nuevos = 0, maxId = 0;
             for(const row of datos) {
+                // Obtener serial (obligatorio)
                 const serial = row.serial || "";
                 if(!serial) continue;
                 
+                // Obtener ID
                 let id = row.ID || row.id;
-                if(id && !isNaN(parseInt(id))) { id = parseInt(id); if(id > maxId) maxId = id; } 
-                else id = nextId++;
+                if(id && !isNaN(parseInt(id))) { 
+                    id = parseInt(id); 
+                    if(id > maxId) maxId = id; 
+                } else { 
+                    id = nextId++;
+                }
                 
+                // Formatear fecha
                 let fecha = row.fecha;
                 if(fecha) {
-                    if(fecha.includes('/')) {
+                    if(typeof fecha === 'number') {
+                        // Si es número de Excel, convertirlo
+                        const date = XLSX.SSF.parse_date_code(fecha);
+                        fecha = `${date.y}-${String(date.m).padStart(2,'0')}-${String(date.d).padStart(2,'0')}`;
+                    } else if(fecha.includes('/')) {
                         let partes = fecha.split('/');
                         fecha = `${partes[2]}-${partes[1]}-${partes[0]}`;
                     }
@@ -684,15 +721,25 @@
                 
                 if(!cliente || !diagnostico) continue;
                 
-                informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
+                // Agregar informe
+                informes.push({ 
+                    id, fecha, serial, marca, modelo, cliente, tipo, 
+                    diagnostico, valores: "", notaFinal: "", foto: "", 
+                    estado: "Pendiente", fechaEnvio: "", obsCliente: "" 
+                });
                 nuevos++;
                 
+                // Agregar o actualizar equipo
                 const equipoExistente = equipos.find(e => e.serial === serial);
                 if(equipoExistente) {
                     if(!equipoExistente.marca && marca) equipoExistente.marca = marca;
                     if(!equipoExistente.modelo && modelo) equipoExistente.modelo = modelo;
+                    if(!equipoExistente.cliente && cliente) equipoExistente.cliente = cliente;
                 } else {
-                    equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
+                    equipos.push({ 
+                        serial, equipo: tipo, marca, modelo, cliente, 
+                        estado: "Pendiente diagnóstico" 
+                    });
                 }
             }
             if(maxId > 0 && maxId >= nextId) nextId = maxId + 1;
