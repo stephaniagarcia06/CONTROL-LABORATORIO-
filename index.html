@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>CalibPro - Informes Técnicos con Fotos</title>
+    <title>CalibPro - Informes con Fotos y Observaciones</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,15 +23,14 @@
         .tab-pane.active-pane { display: block; }
         .form-card, .table-card { background: white; border-radius: 28px; padding: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border: 1px solid #eef2f8; margin-bottom: 32px; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
         label { font-weight: 600; font-size: 0.85rem; color: #334155; }
         input, select, textarea { padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 18px; font-size: 0.9rem; font-family: inherit; }
         textarea { resize: vertical; min-height: 60px; }
         button { background: #2563eb; border: none; color: white; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; margin-top: 8px; }
         .btn-danger { background: #dc2626; }
-        .btn-danger:hover { background: #b91c1c; }
         .btn-warning { background: #f59e0b; }
-        .btn-warning:hover { background: #d97706; }
+        .btn-success { background: #10b981; }
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #ecf3fa; font-size: 0.8rem; vertical-align: top; }
         th { background: #f8fafc; font-weight: 700; }
@@ -42,8 +41,8 @@
         .observation-item { background: #f8fafc; padding: 15px; border-radius: 16px; margin-bottom: 15px; border-left: 4px solid #2563eb; }
         .observation-img { max-width: 100%; max-height: 150px; margin-top: 10px; border-radius: 12px; border: 1px solid #ddd; }
         .pdf-btn { background: #dc2626; margin-left: 8px; padding: 6px 14px; font-size: 0.75rem; }
-        .pdf-btn:hover { background: #b91c1c; }
-        .img-preview { max-width: 80px; max-height: 80px; border-radius: 8px; margin: 5px; border: 1px solid #ccc; }
+        .img-preview { max-width: 100px; max-height: 100px; border-radius: 8px; margin: 5px; border: 1px solid #ccc; }
+        .obs-image { max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
@@ -70,7 +69,8 @@
 
     <!-- EQUIPOS -->
     <div id="equipos" class="tab-pane active-pane">
-        <div class="table-card"><button id="btnAgregarEquipo">+ Agregar equipo</button>
+        <div class="table-card">
+            <button id="btnAgregarEquipo">+ Agregar equipo</button>
             <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Acciones</th></tr></thead><tbody id="equiposBody"></tbody></table>
         </div>
     </div>
@@ -80,29 +80,21 @@
         <div class="form-card">
             <h3>📝 Nuevo informe técnico</h3>
             <div class="form-grid">
-                <div><label>📅 Fecha</label><input type="date" id="fecha"></div>
-                <div><label>🔧 Serial</label><input id="serial" placeholder="Ej: 1095120"></div>
-                <div><label>🏷️ Marca</label><input id="marca" placeholder="EXFO"></div>
-                <div><label>📟 Modelo</label><input id="modelo" placeholder="MAX715"></div>
-                <div><label>👤 Cliente</label><input id="cliente" placeholder="INMEL INGENIERIA"></div>
-                <div><label>🔧 Servicio</label><select id="tipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
+                <div class="input-group"><label>📅 Fecha</label><input type="date" id="fecha"></div>
+                <div class="input-group"><label>🔧 Serial</label><input id="serial" placeholder="Ej: 1095120"></div>
+                <div class="input-group"><label>🏷️ Marca</label><input id="marca" placeholder="EXFO"></div>
+                <div class="input-group"><label>📟 Modelo</label><input id="modelo" placeholder="MAX715"></div>
+                <div class="input-group"><label>👤 Cliente</label><input id="cliente" placeholder="INMEL INGENIERIA"></div>
+                <div class="input-group"><label>🔧 Servicio</label><select id="tipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
             </div>
             
-            <div style="margin: 20px 0;">
-                <label>📋 Diagnóstico principal</label>
-                <textarea id="diagnostico" rows="3" placeholder="Descripción técnica del diagnóstico..."></textarea>
-            </div>
-            
-            <div style="margin: 20px 0;">
-                <label>💰 Valores (desglose)</label>
-                <textarea id="valores" rows="2" placeholder="Ej: Calibración: $583.333 + IVA"></textarea>
-            </div>
+            <div class="input-group"><label>📋 Diagnóstico principal</label><textarea id="diagnostico" rows="3" placeholder="Descripción técnica del diagnóstico..."></textarea></div>
+            <div class="input-group"><label>💰 Valores (desglose)</label><textarea id="valores" rows="2" placeholder="Ej: Calibración: $583.333 + IVA"></textarea></div>
             
             <hr style="margin: 20px 0;">
             <h4>📌 Observaciones múltiples (cada una con foto opcional)</h4>
-            <div id="observacionesContainer"></div>
-            <button id="btnAgregarObs" class="btn-warning" style="background:#10b981;">+ Agregar observación</button>
-            
+            <div id="observacionesContainer" style="margin-bottom: 20px;"></div>
+            <button id="btnAgregarObs" class="btn-success" style="background:#10b981;">+ Agregar observación</button>
             <button id="btnGuardarInforme" style="margin-top: 20px; width:100%">💾 Guardar informe completo</button>
         </div>
     </div>
@@ -117,10 +109,10 @@
     <!-- APROBACIÓN COMERCIAL -->
     <div id="aprobacion" class="tab-pane">
         <div class="form-card">
-            <div><label>Seleccionar informe</label><select id="selectAprobacion"></select></div>
-            <div><label>Fecha envío cliente</label><input type="date" id="fechaEnvio"></div>
-            <div><label>Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
-            <div><label>Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
+            <div class="input-group"><label>Seleccionar informe</label><select id="selectAprobacion"></select></div>
+            <div class="input-group"><label>Fecha envío cliente</label><input type="date" id="fechaEnvio"></div>
+            <div class="input-group"><label>Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
+            <div class="input-group"><label>Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
             <button id="btnActualizarAprobacion">Actualizar</button>
         </div>
     </div>
@@ -128,8 +120,7 @@
     <!-- TRAZABILIDAD -->
     <div id="trazabilidad" class="tab-pane">
         <div class="form-card">
-            <label>Ver historial por equipo</label>
-            <select id="selectTraza"></select>
+            <div class="input-group"><label>Ver historial por equipo</label><select id="selectTraza"></select></div>
             <div id="historialDiv" style="margin-top:20px;"></div>
         </div>
     </div>
@@ -138,12 +129,12 @@
 <div id="pdfContent" style="display:none;"></div>
 
 <script>
-    // Datos iniciales
+    // ========== DATOS INICIALES ==========
     let equipos = [];
     let informes = [];
     let nextId = 100;
     
-    // Helper: convertir archivo a Base64
+    // ========== FUNCIÓN PARA CONVERTIR ARCHIVO A BASE64 ==========
     function fileToBase64(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -153,101 +144,73 @@
         });
     }
     
-    // Renderizar todo
-    function renderAll() {
-        document.getElementById("totalEquipos").innerText = equipos.length;
-        document.getElementById("totalInformes").innerText = informes.length;
-        document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
-        document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
-        
-        // Equipos
-        const eb = document.getElementById("equiposBody");
-        if(equipos.length===0) eb.innerHTML='<tr><td colspan="6">Sin equipos</tr>';
-        else eb.innerHTML = equipos.map(e=>`<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td><button onclick="eliminarEquipo('${e.serial}')">🗑️</button></td></tr>`).join('');
-        
-        // Informes tabla
-        const ib = document.getElementById("informesBody");
-        if(informes.length===0) ib.innerHTML='<tr><td colspan="7">Sin informes</tr>';
-        else ib.innerHTML = informes.map(i=>`<tr><td>${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado==='Aprobado'?'badge-aprobado':'badge-pendiente'}">${i.estado}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">📄 PDF</button></td></tr>`).join('');
-        
-        // Select aprobacion
-        const sel = document.getElementById("selectAprobacion");
-        sel.innerHTML = '<option value="">Seleccionar</option>' + informes.map(i=>`<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
-        sel.onchange = () => {
-            const inf = informes.find(i=>i.id==sel.value);
-            if(inf){
-                document.getElementById("fechaEnvio").value = inf.fechaEnvio||'';
-                document.getElementById("estadoFinal").value = inf.estado;
-                document.getElementById("obsCliente").value = inf.obsCliente||'';
-            }
-        };
-        
-        // Select trazabilidad
-        const straza = document.getElementById("selectTraza");
-        straza.innerHTML = '<option value="">Seleccionar</option>' + equipos.map(e=>`<option value="${e.serial}">${e.serial} - ${e.equipo}</option>`).join('');
-        straza.onchange = () => verHistorial(straza.value);
-    }
-    
-    function verHistorial(serial){
-        const div = document.getElementById("historialDiv");
-        if(!serial){ div.innerHTML=""; return; }
-        const filtrados = informes.filter(i=>i.serial===serial);
-        if(filtrados.length===0){ div.innerHTML="Sin informes"; return; }
-        div.innerHTML = `<div style="background:#f8fafc;padding:16px;border-radius:20px;">
-            <strong>Historial de ${serial}</strong><br><br>
-            ${filtrados.map(i=>`📄 #${i.id} (${i.fecha}) - ${i.tipo} - ${i.estado}<br>Diagnóstico: ${i.diagnostico.substring(0,100)}...<br>Obs cliente: ${i.obsCliente||'Ninguna'}<br>Observaciones técnicas: ${i.observaciones?.length||0} registros<hr>`).join('')}
-        </div>`;
-    }
-    
-    window.eliminarEquipo = (serial) => {
-        equipos = equipos.filter(e=>e.serial!==serial);
-        renderAll();
-    };
-    
-    // Variables para observaciones dinámicas
+    // ========== VARIABLES PARA OBSERVACIONES TEMPORALES ==========
     let tempObservaciones = [];
     
+    // ========== RENDERIZAR OBSERVACIONES TEMPORALES ==========
     function renderTempObservaciones() {
         const container = document.getElementById("observacionesContainer");
-        if(tempObservaciones.length===0){
-            container.innerHTML = '<p style="color:#999;">Sin observaciones. Agrega una usando el botón.</p>';
+        if(tempObservaciones.length === 0) {
+            container.innerHTML = '<p style="color:#999; padding:10px;">Sin observaciones. Agrega una usando el botón.</p>';
             return;
         }
-        container.innerHTML = tempObservaciones.map((obs, idx) => `
-            <div class="observation-item">
-                <strong>📝 Observación ${idx+1}</strong> (${obs.fecha || 'sin fecha'})<br>
-                <strong>Texto:</strong> ${obs.texto}<br>
-                ${obs.imgBase64 ? `<img src="${obs.imgBase64}" class="observation-img"><br>` : ''}
-                <button class="btn-danger" style="margin-top:8px; padding:4px 12px;" onclick="eliminarObsTemp(${idx})">Eliminar</button>
-            </div>
-        `).join('');
+        let html = '';
+        for(let i = 0; i < tempObservaciones.length; i++) {
+            const obs = tempObservaciones[i];
+            html += `
+                <div class="observation-item">
+                    <strong>📝 Observación ${i+1}</strong><br>
+                    <strong>Fecha:</strong> ${obs.fecha}<br>
+                    <strong>Texto:</strong> ${obs.texto}<br>
+            `;
+            if(obs.imgBase64) {
+                html += `<img src="${obs.imgBase64}" class="obs-image"><br>`;
+            }
+            html += `<button class="btn-danger" style="margin-top:8px; padding:4px 12px;" onclick="eliminarObsTemp(${i})">Eliminar</button>`;
+            html += `</div>`;
+        }
+        container.innerHTML = html;
     }
     
+    // ========== ELIMINAR OBSERVACIÓN TEMPORAL ==========
     window.eliminarObsTemp = (idx) => {
-        tempObservaciones.splice(idx,1);
+        tempObservaciones.splice(idx, 1);
         renderTempObservaciones();
     };
     
+    // ========== AGREGAR OBSERVACIÓN (CON FOTO) ==========
     document.getElementById("btnAgregarObs").onclick = () => {
-        const fecha = prompt("Fecha de la observación (YYYY-MM-DD):", new Date().toISOString().slice(0,10));
+        // Crear un modal simple con prompt para fecha y texto
+        const fecha = prompt("📅 Fecha de la observación (YYYY-MM-DD):", new Date().toISOString().slice(0,10));
         if(!fecha) return;
-        const texto = prompt("Escriba la observación técnica:");
+        
+        const texto = prompt("📝 Escriba la observación técnica:");
         if(!texto) return;
-        // Opción de imagen
-        const inputFile = document.createElement('input');
-        inputFile.type = 'file';
-        inputFile.accept = 'image/*';
-        inputFile.onchange = async (e) => {
-            const file = e.target.files[0];
-            let imgBase64 = '';
-            if(file) imgBase64 = await fileToBase64(file);
-            tempObservaciones.push({ fecha, texto, imgBase64 });
+        
+        // Ahora preguntar si quiere agregar foto
+        const agregarFoto = confirm("¿Desea agregar una foto a esta observación?");
+        if(agregarFoto) {
+            const inputFile = document.createElement('input');
+            inputFile.type = 'file';
+            inputFile.accept = 'image/*';
+            inputFile.onchange = async (e) => {
+                const file = e.target.files[0];
+                if(file) {
+                    const imgBase64 = await fileToBase64(file);
+                    tempObservaciones.push({ fecha, texto, imgBase64 });
+                } else {
+                    tempObservaciones.push({ fecha, texto, imgBase64: '' });
+                }
+                renderTempObservaciones();
+            };
+            inputFile.click();
+        } else {
+            tempObservaciones.push({ fecha, texto, imgBase64: '' });
             renderTempObservaciones();
-        };
-        inputFile.click();
+        }
     };
     
-    // Guardar informe
+    // ========== GUARDAR INFORME ==========
     document.getElementById("btnGuardarInforme").onclick = async () => {
         const fecha = document.getElementById("fecha").value || new Date().toISOString().slice(0,10);
         const serial = document.getElementById("serial").value.trim();
@@ -258,21 +221,33 @@
         const diagnostico = document.getElementById("diagnostico").value.trim();
         const valores = document.getElementById("valores").value.trim();
         
-        if(!serial || !cliente || !diagnostico){
-            alert("Complete serial, cliente y diagnóstico");
+        if(!serial || !cliente || !diagnostico) {
+            alert("❌ Complete serial, cliente y diagnóstico");
             return;
         }
         
         const observacionesFinal = [...tempObservaciones];
         const nuevoId = nextId++;
+        
         informes.push({
-            id: nuevoId, fecha, serial, marca, modelo, cliente, tipo,
-            diagnostico, valores, observaciones: observacionesFinal,
-            estado: "Pendiente", fechaEnvio: "", obsCliente: ""
+            id: nuevoId,
+            fecha: fecha,
+            serial: serial,
+            marca: marca,
+            modelo: modelo,
+            cliente: cliente,
+            tipo: tipo,
+            diagnostico: diagnostico,
+            valores: valores,
+            observaciones: observacionesFinal,
+            estado: "Pendiente",
+            fechaEnvio: "",
+            obsCliente: ""
         });
         
-        if(!equipos.find(e=>e.serial===serial)){
-            equipos.push({ serial, equipo: tipo, marca, modelo, cliente });
+        // Agregar equipo si no existe
+        if(!equipos.find(e => e.serial === serial)) {
+            equipos.push({ serial: serial, equipo: tipo, marca: marca, modelo: modelo, cliente: cliente });
         }
         
         // Limpiar formulario
@@ -284,39 +259,126 @@
         document.getElementById("valores").value = "";
         tempObservaciones = [];
         renderTempObservaciones();
+        
         renderAll();
-        alert(`Informe #${nuevoId} guardado con ${observacionesFinal.length} observaciones.`);
+        alert(`✅ Informe #${nuevoId} guardado con ${observacionesFinal.length} observaciones.`);
     };
     
-    // Actualizar aprobación
+    // ========== RENDERIZAR TODO ==========
+    function renderAll() {
+        document.getElementById("totalEquipos").innerText = equipos.length;
+        document.getElementById("totalInformes").innerText = informes.length;
+        document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
+        document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
+        
+        // Tabla equipos
+        const eb = document.getElementById("equiposBody");
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="6" class="empty-row">Sin equipos</td></tr>';
+        else {
+            eb.innerHTML = equipos.map(e => `
+                <tr>
+                    <td>${e.serial}</td>
+                    <td>${e.equipo}</td>
+                    <td>${e.marca}</td>
+                    <td>${e.modelo}</td>
+                    <td>${e.cliente}</td>
+                    <td><button onclick="eliminarEquipo('${e.serial}')">🗑️</button></td>
+                </tr>
+            `).join('');
+        }
+        
+        // Tabla informes
+        const ib = document.getElementById("informesBody");
+        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="7" class="empty-row">Sin informes</td></tr>';
+        else {
+            ib.innerHTML = informes.map(i => {
+                let badgeClass = i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente';
+                return `
+                    <tr>
+                        <td>${i.id}</td>
+                        <td>${i.fecha}</td>
+                        <td>${i.serial}</td>
+                        <td>${i.cliente}</td>
+                        <td>${i.tipo}</td>
+                        <td class="status-badge ${badgeClass}">${i.estado}</td>
+                        <td><button class="pdf-btn" onclick="generarPDF(${i.id})">📄 PDF</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        // Select aprobación
+        const sel = document.getElementById("selectAprobacion");
+        sel.innerHTML = '<option value="">Seleccionar</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
+        sel.onchange = () => {
+            const inf = informes.find(i => i.id == sel.value);
+            if(inf) {
+                document.getElementById("fechaEnvio").value = inf.fechaEnvio || '';
+                document.getElementById("estadoFinal").value = inf.estado;
+                document.getElementById("obsCliente").value = inf.obsCliente || '';
+            }
+        };
+        
+        // Select trazabilidad
+        const straza = document.getElementById("selectTraza");
+        straza.innerHTML = '<option value="">Seleccionar</option>' + equipos.map(e => `<option value="${e.serial}">${e.serial} - ${e.equipo}</option>`).join('');
+        straza.onchange = () => verHistorial(straza.value);
+    }
+    
+    function verHistorial(serial) {
+        const div = document.getElementById("historialDiv");
+        if(!serial) { div.innerHTML = ""; return; }
+        const filtrados = informes.filter(i => i.serial === serial);
+        if(filtrados.length === 0) { div.innerHTML = "<p>Sin informes para este equipo.</p>"; return; }
+        let html = `<div style="background:#f8fafc;padding:16px;border-radius:20px;"><strong>📜 Historial de ${serial}</strong><br><br>`;
+        for(let inf of filtrados) {
+            html += `<div style="margin-bottom:15px; border-bottom:1px solid #ddd; padding-bottom:10px;">
+                <strong>Informe #${inf.id}</strong> (${inf.fecha})<br>
+                <strong>Servicio:</strong> ${inf.tipo}<br>
+                <strong>Estado:</strong> ${inf.estado}<br>
+                <strong>Diagnóstico:</strong> ${inf.diagnostico.substring(0,100)}...<br>
+                <strong>Observaciones técnicas:</strong> ${inf.observaciones?.length || 0} registros<br>
+                <strong>Obs cliente:</strong> ${inf.obsCliente || 'Ninguna'}<br>
+            </div>`;
+        }
+        html += `</div>`;
+        div.innerHTML = html;
+    }
+    
+    window.eliminarEquipo = (serial) => {
+        equipos = equipos.filter(e => e.serial !== serial);
+        renderAll();
+    };
+    
+    // ========== ACTUALIZAR APROBACIÓN ==========
     document.getElementById("btnActualizarAprobacion").onclick = () => {
         const id = parseInt(document.getElementById("selectAprobacion").value);
-        if(!id) return;
-        const inf = informes.find(i=>i.id===id);
-        if(inf){
+        if(!id) { alert("Seleccione un informe"); return; }
+        const inf = informes.find(i => i.id === id);
+        if(inf) {
             inf.fechaEnvio = document.getElementById("fechaEnvio").value;
             inf.estado = document.getElementById("estadoFinal").value;
             inf.obsCliente = document.getElementById("obsCliente").value;
             renderAll();
-            alert("Actualizado");
+            alert("✅ Aprobación actualizada");
         }
     };
     
-    // Generar PDF con todas las observaciones y fotos
+    // ========== GENERAR PDF CON TODAS LAS OBSERVACIONES Y FOTOS ==========
     window.generarPDF = async (id) => {
-        const inf = informes.find(i=>i.id===id);
+        const inf = informes.find(i => i.id === id);
         if(!inf) return;
         
         const fechaActual = new Date().toLocaleDateString('es-CO');
         let observacionesHtml = '';
-        if(inf.observaciones && inf.observaciones.length>0){
+        if(inf.observaciones && inf.observaciones.length > 0) {
             observacionesHtml = '<div style="margin:20px 0;"><strong>📋 Registro de observaciones técnicas:</strong><br>';
-            for(let i=0; i<inf.observaciones.length; i++){
+            for(let i = 0; i < inf.observaciones.length; i++) {
                 const obs = inf.observaciones[i];
                 observacionesHtml += `<div style="margin-bottom:15px; border-left:2px solid #2563eb; padding-left:12px;">
                     <strong>Fecha:</strong> ${obs.fecha}<br>
                     <strong>Observación:</strong> ${obs.texto}<br>`;
-                if(obs.imgBase64){
+                if(obs.imgBase64) {
                     observacionesHtml += `<img src="${obs.imgBase64}" style="max-width:100%; max-height:200px; margin-top:8px; border-radius:8px;"><br>`;
                 }
                 observacionesHtml += `</div>`;
@@ -352,25 +414,35 @@
         const container = document.getElementById("pdfContent");
         container.style.display = "block";
         container.innerHTML = pdfHtml;
-        const opt = { margin: [0.5,0.5,0.5,0.5], filename: `INFORME_${inf.id}_${inf.serial}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+        const opt = {
+            margin: [0.5, 0.5, 0.5, 0.5],
+            filename: `INFORME_${inf.id}_${inf.serial}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
         await html2pdf().set(opt).from(container).save();
         container.style.display = "none";
         container.innerHTML = "";
     };
     
+    // ========== AGREGAR EQUIPO ==========
     document.getElementById("btnAgregarEquipo").onclick = () => {
         const serial = prompt("Serial:"); if(!serial) return;
-        const equipo = prompt("Equipo:"); const marca = prompt("Marca:"); const modelo = prompt("Modelo:"); const cliente = prompt("Cliente:");
+        const equipo = prompt("Tipo de equipo:"); 
+        const marca = prompt("Marca:"); 
+        const modelo = prompt("Modelo:"); 
+        const cliente = prompt("Cliente:");
         equipos.push({ serial, equipo, marca, modelo, cliente });
         renderAll();
     };
     
-    // Tabs
+    // ========== CAMBIO DE PESTAÑAS ==========
     document.querySelectorAll(".tab-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-            document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
             btn.classList.add("active");
-            document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active-pane"));
+            document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active-pane"));
             document.getElementById(btn.dataset.tab).classList.add("active-pane");
         });
     });
