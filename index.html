@@ -7,11 +7,11 @@
     <style>
         /* ==================== VARIABLES CORPORATIVAS ==================== */
         :root {
-            --primary: #0a2b4e;      /* Azul marino corporativo */
-            --primary-dark: #051a30; /* Azul más oscuro */
-            --primary-light: #1e4a76; /* Azul medio */
-            --secondary: #e8f0fe;    /* Azul muy claro para fondos */
-            --accent: #2c7da0;       /* Azul acento */
+            --primary: #0a2b4e;
+            --primary-dark: #051a30;
+            --primary-light: #1e4a76;
+            --secondary: #e8f0fe;
+            --accent: #2c7da0;
             --gray-light: #f5f7fa;
             --gray-border: #e2e8f0;
             --text-dark: #1e293b;
@@ -26,27 +26,23 @@
         body { background: var(--gray-light); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: var(--text-dark); }
         .container { max-width: 1400px; margin: 0 auto; }
         
-        /* HEADER */
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid var(--primary); }
         .logo-area { display: flex; align-items: center; gap: 15px; }
         .logo-placeholder { width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
         h1 { font-size: 1.6rem; color: var(--primary); font-weight: 600; }
         .badge { background: var(--primary-light); color: white; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; font-weight: 500; }
         
-        /* DASHBOARD */
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
         .card { background: var(--white); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-border); transition: transform 0.2s; }
         .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
         .card h3 { font-size: 0.85rem; font-weight: 500; color: var(--text-gray); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
         .card .number { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
         
-        /* TABS */
         .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid var(--gray-border); margin-bottom: 28px; }
         .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: var(--text-gray); border-radius: 30px; transition: all 0.2s; }
         .tab-btn:hover { background: var(--secondary); color: var(--primary); }
         .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(10,43,78,0.3); }
         
-        /* PANELES */
         .tab-pane { display: none; }
         .tab-pane.active-pane { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -63,14 +59,9 @@
         
         button { background: var(--primary); border: none; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         button:hover { background: var(--primary-dark); transform: translateY(-1px); }
-        .btn-danger { background: var(--danger); }
-        .btn-danger:hover { background: #b91c1c; }
-        .btn-warning { background: var(--warning); }
-        .btn-warning:hover { background: #d97706; }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: var(--primary); color: white; }
         
-        /* TABLAS */
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
         th { background: var(--secondary); font-weight: 600; color: var(--primary); }
@@ -78,7 +69,6 @@
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .badge-pendiente { background: #fef3c7; color: #d97706; }
         .badge-aprobado { background: #d1fae5; color: #059669; }
-        .badge-diagnostico { background: #dbeafe; color: #2563eb; }
         
         .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
         .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
@@ -87,7 +77,6 @@
         .next-id-info { background: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; color: var(--primary); }
         .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
         
-        /* FOOTER APP */
         .app-footer { text-align: center; padding: 20px; color: var(--text-gray); font-size: 0.7rem; border-top: 1px solid var(--gray-border); margin-top: 20px; }
     </style>
 </head>
@@ -119,7 +108,6 @@
         <button class="tab-btn" data-tab="configuracion">Configuración</button>
     </div>
 
-    <!-- INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card">
             <h3>Listado de informes técnicos</h3>
@@ -129,7 +117,6 @@
         </div>
     </div>
 
-    <!-- NUEVO INFORME -->
     <div id="nuevo" class="tab-pane">
         <div class="form-card">
             <h3>Registrar nuevo informe</h3>
@@ -151,7 +138,6 @@
         </div>
     </div>
 
-    <!-- EDITAR INFORME -->
     <div id="editar" class="tab-pane">
         <div class="form-card">
             <h3>Editar informe existente</h3>
@@ -176,7 +162,6 @@
         </div>
     </div>
 
-    <!-- APROBACIÓN -->
     <div id="aprobacion" class="tab-pane">
         <div class="form-card">
             <h3>Aprobación comercial</h3>
@@ -188,7 +173,6 @@
         </div>
     </div>
 
-    <!-- EQUIPOS -->
     <div id="equipos" class="tab-pane">
         <div class="table-card">
             <h3>Gestión de equipos</h3>
@@ -199,7 +183,6 @@
         </div>
     </div>
 
-    <!-- CONFIGURACIÓN -->
     <div id="configuracion" class="tab-pane">
         <div class="form-card">
             <h3>Configuración - Logo corporativo</h3>
@@ -305,7 +288,7 @@
         if(selEditar) selEditar.innerHTML = options;
         
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td>' + '</tr>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td></tr>';
         else eb.innerHTML = equipos.map((e, idx) => `
             <tr>
                 <td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td>
@@ -417,7 +400,7 @@
         } else alert("Seleccione un informe");
     };
 
-    // PDF EN BLANCO Y NEGRO / ESCALA DE GRISES - PROFESIONAL
+    // ==================== PDF CORREGIDO - SIN about:blank ====================
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
@@ -427,12 +410,13 @@
         let fotoHtml = inf.foto ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Evidencia fotográfica</div><img src="${inf.foto}" style="max-width:100%; max-height:250px; border:1px solid #ddd;"></div>` : '';
         let notaHtml = inf.notaFinal ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Nota final / Recomendaciones</div><div>${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : '';
         
-        const pdfHtml = `
+        // Crear un documento HTML completo con título y estilos
+        const docHtml = `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
-                <title>Informe Tecnico ${inf.id}</title>
+                <title>Informe Tecnico N° ${inf.id}</title>
                 <style>
                     * { margin: 0; padding: 0; box-sizing: border-box; }
                     body { 
@@ -507,15 +491,22 @@
                     </div>
                 </div>
                 <script>
-                    window.onload = function() { window.print(); };
+                    window.onload = function() {
+                        window.print();
+                    };
                 <\/script>
             </body>
             </html>
         `;
         
+        // Abrir ventana con el contenido, evitando about:blank
         const ventana = window.open('', '_blank');
-        ventana.document.write(pdfHtml);
-        ventana.document.close();
+        if (ventana) {
+            ventana.document.write(docHtml);
+            ventana.document.close();
+        } else {
+            alert("Por favor, permita ventanas emergentes para generar el PDF");
+        }
     };
 
     document.getElementById("btnAgregarEquipo").onclick = () => {
