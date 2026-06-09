@@ -5,21 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalibPro - CI RENTELCOM</title>
     <style>
-        /* ==================== VARIABLES CORPORATIVAS ==================== */
         :root {
             --primary: #0a2b4e;
             --primary-dark: #051a30;
             --primary-light: #1e4a76;
             --secondary: #e8f0fe;
-            --accent: #2c7da0;
             --gray-light: #f5f7fa;
             --gray-border: #e2e8f0;
             --text-dark: #1e293b;
             --text-gray: #64748b;
             --white: #ffffff;
-            --success: #10b981;
-            --warning: #f59e0b;
             --danger: #dc2626;
+            --warning: #f59e0b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -61,6 +58,8 @@
         button:hover { background: var(--primary-dark); transform: translateY(-1px); }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); }
+        .btn-warning { background: var(--warning); }
         
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
@@ -78,6 +77,10 @@
         .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
         
         .app-footer { text-align: center; padding: 20px; color: var(--text-gray); font-size: 0.7rem; border-top: 1px solid var(--gray-border); margin-top: 20px; }
+        
+        .historial-item { background: var(--gray-light); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--primary); }
+        .historial-fecha { font-weight: bold; color: var(--primary); margin-bottom: 8px; }
+        .btn-exportar { background: #10b981; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -105,9 +108,11 @@
         <button class="tab-btn" data-tab="editar">Editar informe</button>
         <button class="tab-btn" data-tab="aprobacion">Aprobación comercial</button>
         <button class="tab-btn" data-tab="equipos">Equipos</button>
+        <button class="tab-btn" data-tab="trazabilidad">Trazabilidad</button>
         <button class="tab-btn" data-tab="configuracion">Configuración</button>
     </div>
 
+    <!-- INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card">
             <h3>Listado de informes técnicos</h3>
@@ -117,6 +122,7 @@
         </div>
     </div>
 
+    <!-- NUEVO INFORME -->
     <div id="nuevo" class="tab-pane">
         <div class="form-card">
             <h3>Registrar nuevo informe</h3>
@@ -138,6 +144,7 @@
         </div>
     </div>
 
+    <!-- EDITAR INFORME -->
     <div id="editar" class="tab-pane">
         <div class="form-card">
             <h3>Editar informe existente</h3>
@@ -162,6 +169,7 @@
         </div>
     </div>
 
+    <!-- APROBACIÓN COMERCIAL -->
     <div id="aprobacion" class="tab-pane">
         <div class="form-card">
             <h3>Aprobación comercial</h3>
@@ -173,6 +181,7 @@
         </div>
     </div>
 
+    <!-- EQUIPOS -->
     <div id="equipos" class="tab-pane">
         <div class="table-card">
             <h3>Gestión de equipos</h3>
@@ -183,6 +192,24 @@
         </div>
     </div>
 
+    <!-- TRAZABILIDAD - NUEVA PESTAÑA -->
+    <div id="trazabilidad" class="tab-pane">
+        <div class="form-card">
+            <h3>Trazabilidad de equipos</h3>
+            <p style="margin-bottom: 15px; color: var(--text-gray);">Seleccione un equipo para ver todo su historial de servicios e informes.</p>
+            <div class="input-group">
+                <label>Seleccionar equipo por serial</label>
+                <select id="selectEquipoTraza">
+                    <option value="">— Seleccionar equipo —</option>
+                </select>
+            </div>
+            <button id="btnCargarTraza" class="btn-outline" style="margin-top: 0;">Ver historial</button>
+            <div id="historialEquipo" style="margin-top: 25px;"></div>
+            <button id="btnExportarTraza" class="btn-exportar" style="display: none;">Exportar trazabilidad a PDF</button>
+        </div>
+    </div>
+
+    <!-- CONFIGURACIÓN -->
     <div id="configuracion" class="tab-pane">
         <div class="form-card">
             <h3>Configuración - Logo corporativo</h3>
@@ -199,7 +226,7 @@
 </div>
 
 <script>
-    // LOCALSTORAGE
+    // ==================== LOCALSTORAGE ====================
     let equipos = [];
     let informes = [];
     let nextId = 100;
@@ -225,6 +252,7 @@
         
         actualizarVistaLogo();
         renderAll();
+        cargarSelectEquiposTraza();
     }
 
     function mostrarMensaje(texto) {
@@ -262,6 +290,138 @@
         });
     }
 
+    function cargarSelectEquiposTraza() {
+        const select = document.getElementById("selectEquipoTraza");
+        select.innerHTML = '<option value="">— Seleccionar equipo —</option>' + 
+            equipos.map(e => `<option value="${e.serial}">${e.serial} - ${e.equipo} (${e.marca} ${e.modelo})</option>`).join('');
+    }
+
+    function verHistorialEquipo() {
+        const serial = document.getElementById("selectEquipoTraza").value;
+        const div = document.getElementById("historialEquipo");
+        const btnExportar = document.getElementById("btnExportarTraza");
+        
+        if(!serial) {
+            div.innerHTML = '<p style="color: var(--text-gray);">Seleccione un equipo para ver su historial.</p>';
+            btnExportar.style.display = "none";
+            return;
+        }
+        
+        const infoEquipo = equipos.find(e => e.serial === serial);
+        const informesEquipo = informes.filter(i => i.serial === serial).sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+        
+        if(informesEquipo.length === 0) {
+            div.innerHTML = `<p style="color: var(--text-gray);">No hay informes registrados para el equipo ${serial}.</p>`;
+            btnExportar.style.display = "none";
+            return;
+        }
+        
+        let html = `<div style="margin-bottom: 20px; padding: 15px; background: var(--secondary); border-radius: 12px;">
+                        <strong>Equipo:</strong> ${infoEquipo?.equipo || 'N/A'} ${infoEquipo?.marca || ''} ${infoEquipo?.modelo || ''}<br>
+                        <strong>Cliente:</strong> ${infoEquipo?.cliente || 'N/A'}<br>
+                        <strong>Estado actual:</strong> ${infoEquipo?.estado || 'Pendiente'}<br>
+                        <strong>Total de intervenciones:</strong> ${informesEquipo.length}
+                    </div>`;
+        
+        html += `<h4 style="margin-bottom: 15px;">Historial de informes (${informesEquipo.length})</h4>`;
+        
+        for(const inf of informesEquipo) {
+            html += `
+                <div class="historial-item">
+                    <div class="historial-fecha">📄 Informe #${inf.id} - ${inf.fecha}</div>
+                    <div><strong>Servicio:</strong> ${inf.tipo}</div>
+                    <div><strong>Diagnóstico:</strong> ${inf.diagnostico.substring(0, 150)}${inf.diagnostico.length > 150 ? '...' : ''}</div>
+                    <div><strong>Valores:</strong> ${inf.valores ? inf.valores.substring(0, 100) : 'No especificado'}</div>
+                    <div><strong>Estado comercial:</strong> <span class="status-badge ${inf.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${inf.estado}</span></div>
+                    ${inf.obsCliente ? `<div><strong>Observaciones cliente:</strong> ${inf.obsCliente}</div>` : ''}
+                    <div style="margin-top: 8px;"><button class="pdf-btn" onclick="generarPDF(${inf.id})">Ver informe completo</button></div>
+                </div>
+            `;
+        }
+        
+        div.innerHTML = html;
+        btnExportar.style.display = "block";
+        btnExportar.onclick = () => exportarTrazabilidad(serial, infoEquipo, informesEquipo);
+    }
+    
+    function exportarTrazabilidad(serial, infoEquipo, informesEquipo) {
+        const fechaActual = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+        
+        let informesHtml = '';
+        for(const inf of informesEquipo) {
+            informesHtml += `
+                <div style="margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
+                    <div style="font-weight: bold; background: #f0f0f0; padding: 8px; margin-bottom: 10px;">INFORME #${inf.id} - ${inf.fecha}</div>
+                    <div><strong>Servicio:</strong> ${inf.tipo}</div>
+                    <div><strong>Diagnóstico:</strong> ${inf.diagnostico}</div>
+                    <div><strong>Valores:</strong> ${inf.valores || 'No especificado'}</div>
+                    <div><strong>Estado comercial:</strong> ${inf.estado}</div>
+                    ${inf.obsCliente ? `<div><strong>Observaciones del cliente:</strong> ${inf.obsCliente}</div>` : ''}
+                    ${inf.notaFinal ? `<div><strong>Nota final:</strong> ${inf.notaFinal}</div>` : ''}
+                </div>
+            `;
+        }
+        
+        const docHtml = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Trazabilidad_${serial}</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background: white; color: #111; }
+                    .container { max-width: 900px; margin: 0 auto; }
+                    .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 15px; }
+                    .header h2 { color: #111; }
+                    .info-equipo { background: #f5f5f5; padding: 15px; margin-bottom: 25px; border-radius: 8px; }
+                    .fecha { text-align: right; margin-bottom: 20px; }
+                    .titulo-seccion { font-weight: bold; font-size: 16px; margin: 20px 0 10px 0; border-left: 3px solid #333; padding-left: 10px; }
+                    .footer { margin-top: 40px; text-align: center; font-size: 9px; color: #666; border-top: 1px solid #eee; padding-top: 15px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        ${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height: 60px;"><br><br>` : '<div style="font-weight:bold; font-size:18px;">CI RENTELCOM SAS</div>'}
+                        <h2>REPORTE DE TRAZABILIDAD</h2>
+                    </div>
+                    <div class="fecha">Fecha de generación: ${fechaActual}</div>
+                    
+                    <div class="info-equipo">
+                        <strong>EQUIPO:</strong> ${infoEquipo?.equipo || 'N/A'} ${infoEquipo?.marca || ''} ${infoEquipo?.modelo || ''}<br>
+                        <strong>SERIAL:</strong> ${serial}<br>
+                        <strong>CLIENTE:</strong> ${infoEquipo?.cliente || 'N/A'}<br>
+                        <strong>ESTADO ACTUAL:</strong> ${infoEquipo?.estado || 'Pendiente'}<br>
+                        <strong>TOTAL DE INTERVENCIONES:</strong> ${informesEquipo.length}
+                    </div>
+                    
+                    <div class="titulo-seccion">HISTORIAL COMPLETO DE SERVICIOS</div>
+                    ${informesHtml}
+                    
+                    <div class="footer">
+                        CI RENTELCOM SAS - Laboratorio de Calibración y Telecomunicaciones<br>
+                        Carrera 19A No. 150-50 - Bogotá D.C. | Teléfono: 9399167 - 3185586239
+                    </div>
+                </div>
+                <script>
+                    window.onload = function() { window.print(); };
+                <\/script>
+            </body>
+            </html>
+        `;
+        
+        const ventana = window.open('', '_blank');
+        if(ventana) {
+            ventana.document.write(docHtml);
+            ventana.document.close();
+        } else {
+            alert("Por favor, permita ventanas emergentes para exportar el PDF");
+        }
+    }
+    
+    document.getElementById("btnCargarTraza").onclick = verHistorialEquipo;
+
     function renderAll() {
         document.getElementById("totalEquipos").innerText = equipos.length;
         document.getElementById("totalInformes").innerText = informes.length;
@@ -270,7 +430,7 @@
         document.getElementById("nextIdDisplay").innerText = nextId;
         
         const ib = document.getElementById("informesBody");
-        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>';
+        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="8">No hay informes registrados</td></tr>';
         else ib.innerHTML = informes.map(i => `
             <tr>
                 <td>${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td>
@@ -298,11 +458,12 @@
             </tr>
         `).join('');
         
+        cargarSelectEquiposTraza();
         guardarDatos();
     }
 
     window.cambiarEstadoEquipo = (idx) => {
-        const nuevo = prompt("Nuevo estado:", equipos[idx].estado);
+        const nuevo = prompt("Nuevo estado (Ej: Pendiente diagnóstico, En taller, Entregado):", equipos[idx].estado);
         if(nuevo) { equipos[idx].estado = nuevo; renderAll(); mostrarMensaje("Estado actualizado"); }
     };
 
@@ -400,7 +561,7 @@
         } else alert("Seleccione un informe");
     };
 
-    // ==================== PDF CORREGIDO - SIN about:blank ====================
+    // GENERAR PDF INDIVIDUAL
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
@@ -410,26 +571,19 @@
         let fotoHtml = inf.foto ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Evidencia fotográfica</div><img src="${inf.foto}" style="max-width:100%; max-height:250px; border:1px solid #ddd;"></div>` : '';
         let notaHtml = inf.notaFinal ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Nota final / Recomendaciones</div><div>${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : '';
         
-        // Crear un documento HTML completo con título y estilos
         const docHtml = `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
-                <title>Informe Tecnico N° ${inf.id}</title>
+                <title>Informe Tecnico ${inf.id}</title>
                 <style>
                     * { margin: 0; padding: 0; box-sizing: border-box; }
-                    body { 
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-                        padding: 40px; 
-                        margin: 0; 
-                        background: white;
-                        color: #111;
-                    }
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background: white; color: #111; }
                     .container { max-width: 800px; margin: 0 auto; }
                     .header-logo { text-align: left; margin-bottom: 25px; }
                     .titulo-principal { text-align: center; margin-bottom: 25px; padding-bottom: 12px; border-bottom: 2px solid #333; }
-                    .titulo-principal h2 { color: #111; font-size: 20px; letter-spacing: 1px; }
+                    .titulo-principal h2 { color: #111; font-size: 20px; }
                     .info-linea { margin-bottom: 6px; }
                     .seccion { margin-top: 18px; margin-bottom: 18px; }
                     .seccion-titulo { font-weight: 700; margin-bottom: 8px; font-size: 13px; border-left: 3px solid #333; padding-left: 10px; }
@@ -446,67 +600,31 @@
                     <div class="header-logo">
                         ${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<div style="font-weight:bold; font-size:18px;">CI RENTELCOM SAS</div>'}
                     </div>
-                    
-                    <div class="titulo-principal">
-                        <h2>INFORME TÉCNICO DE LABORATORIO</h2>
-                    </div>
-                    
+                    <div class="titulo-principal"><h2>INFORME TÉCNICO DE LABORATORIO</h2></div>
                     <div class="info-linea"><span class="text-bold">Fecha de emisión:</span> ${fechaActual}</div>
                     <div class="info-linea"><span class="text-bold">Reporte N°:</span> ${inf.id}</div>
                     <div class="info-linea"><span class="text-bold">Cliente:</span> ${inf.cliente}</div>
-                    
                     <div class="equipo-datos">
                         <div><span class="text-bold">Equipo:</span> ${inf.marca} ${inf.modelo}</div>
                         <div><span class="text-bold">Serial:</span> ${inf.serial}</div>
                         <div><span class="text-bold">Servicio solicitado:</span> ${inf.tipo}</div>
                     </div>
-                    
-                    <div class="seccion">
-                        <div class="seccion-titulo">Observación inicial</div>
-                        <div class="seccion-contenido">Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para ${inf.tipo.toLowerCase()}.</div>
-                    </div>
-                    
-                    <div class="seccion">
-                        <div class="seccion-titulo">Diagnóstico</div>
-                        <div class="seccion-contenido">${inf.diagnostico.replace(/\n/g,'<br>')}</div>
-                    </div>
-                    
-                    <div class="seccion">
-                        <div class="seccion-titulo">Valores</div>
-                        <div class="seccion-contenido">${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div>
-                    </div>
-                    
+                    <div class="seccion"><div class="seccion-titulo">Observación inicial</div><div class="seccion-contenido">Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para ${inf.tipo.toLowerCase()}.</div></div>
+                    <div class="seccion"><div class="seccion-titulo">Diagnóstico</div><div class="seccion-contenido">${inf.diagnostico.replace(/\n/g,'<br>')}</div></div>
+                    <div class="seccion"><div class="seccion-titulo">Valores</div><div class="seccion-contenido">${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div></div>
                     ${fotoHtml}
                     ${notaHtml}
-                    
-                    <div class="firma">
-                        <div><span class="text-bold">Verificado por:</span></div>
-                        <div>Ing. Stephania Garcia</div>
-                        <div>Ingeniero de Laboratorio y Calidad</div>
-                        <div>Auditor ISO/IEC 17025:2017</div>
-                    </div>
-                    
-                    <div class="pie-pagina">
-                        Carrera 19A No. 150-50 - Bogotá D.C. | Teléfono: 9399167 - 3185586239
-                    </div>
+                    <div class="firma"><div><span class="text-bold">Verificado por:</span></div><div>Ing. Stephania Garcia</div><div>Ingeniero de Laboratorio y Calidad</div><div>Auditor ISO/IEC 17025:2017</div></div>
+                    <div class="pie-pagina">Carrera 19A No. 150-50 - Bogotá D.C. | Teléfono: 9399167 - 3185586239</div>
                 </div>
-                <script>
-                    window.onload = function() {
-                        window.print();
-                    };
-                <\/script>
+                <script>window.onload = function() { window.print(); };<\/script>
             </body>
             </html>
         `;
         
-        // Abrir ventana con el contenido, evitando about:blank
         const ventana = window.open('', '_blank');
-        if (ventana) {
-            ventana.document.write(docHtml);
-            ventana.document.close();
-        } else {
-            alert("Por favor, permita ventanas emergentes para generar el PDF");
-        }
+        if(ventana) { ventana.document.write(docHtml); ventana.document.close(); }
+        else alert("Permita ventanas emergentes para generar el PDF");
     };
 
     document.getElementById("btnAgregarEquipo").onclick = () => {
