@@ -73,8 +73,8 @@
         .badge-pendiente { background: #fef3c7; color: #d97706; }
         .badge-aprobado { background: #d1fae5; color: #059669; }
         
-        .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
-        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
+        .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
+        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; border: none; cursor: pointer; }
         .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--gray-border); }
         .logo-preview { max-width: 150px; max-height: 60px; margin-top: 5px; }
         .next-id-info { background: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; color: var(--primary); }
@@ -315,17 +315,22 @@
     }
 
     function cargarDatos() {
-        if(localStorage.getItem("calibpro_equipos")) equipos = JSON.parse(localStorage.getItem("calibpro_equipos"));
-        if(localStorage.getItem("calibpro_informes")) informes = JSON.parse(localStorage.getItem("calibpro_informes"));
-        if(localStorage.getItem("calibpro_nextId")) nextId = parseInt(localStorage.getItem("calibpro_nextId"));
-        if(localStorage.getItem("calibpro_logo")) logoEmpresaBase64 = localStorage.getItem("calibpro_logo");
+        const equiposG = localStorage.getItem("calibpro_equipos");
+        const informesG = localStorage.getItem("calibpro_informes");
+        const nextG = localStorage.getItem("calibpro_nextId");
+        const logoG = localStorage.getItem("calibpro_logo");
+        if(equiposG) equipos = JSON.parse(equiposG);
+        if(informesG) informes = JSON.parse(informesG);
+        if(nextG) nextId = parseInt(nextG);
+        if(logoG) logoEmpresaBase64 = logoG;
         actualizarVistaLogo();
         renderAll();
     }
 
     function mostrarMensaje(texto) {
         const msg = document.getElementById("mensajeExito");
-        msg.innerText = texto; msg.style.display = "block";
+        msg.innerText = texto;
+        msg.style.display = "block";
         setTimeout(() => msg.style.display = "none", 4000);
     }
 
@@ -334,12 +339,10 @@
             { consecutivo: "EQ-001", serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller", foto: "", observaciones: "Equipo con golpes en la carcasa", registradoPor: "Stephania Garcia" },
             { consecutivo: "EQ-002", serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "", registradoPor: "Stephania Garcia" }
         ];
-        
         informes = [
             { id: 447, fecha: "2023-11-23", serial: "AA432002010275", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", tipo: "Reparación", diagnostico: "DAÑO MECANISMO DE AJUSTE DE FOCO", valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" },
             { id: 448, fecha: "2023-11-23", serial: "TF3C02PA010869", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", tipo: "Calibración", diagnostico: "REPOTENCIACION DE BATERIA", valores: "", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-11-25", obsCliente: "Cliente autorizó" }
         ];
-        
         nextId = 449;
         guardarDatos();
         renderAll();
@@ -369,10 +372,14 @@
     };
 
     function fileToBase64(file) {
-        return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+        });
     }
 
-    // Renderizar equipos (tarjetas)
+    // ==================== RENDER EQUIPOS ====================
     function renderEquipos() {
         const container = document.getElementById("listaEquipos");
         if(equipos.length === 0) {
@@ -380,43 +387,45 @@
             return;
         }
         
-        container.innerHTML = equipos.map((eq, idx) => `
-            <div class="equipo-card">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
-                    <div style="flex: 2;">
-                        <div><strong style="font-size:1.1rem;">📟 ${eq.equipo} ${eq.marca} ${eq.modelo}</strong></div>
-                        <div><strong>🔢 Consecutivo:</strong> <input type="text" value="${eq.consecutivo || 'EQ-'+(idx+1)}" class="edit-consecutivo" data-idx="${idx}" style="width:100px; padding:4px; border-radius:8px; border:1px solid var(--gray-border);"></div>
-                        <div><strong>🔧 Serial:</strong> ${eq.serial}</div>
-                        <div><strong>🏢 Cliente:</strong> ${eq.cliente}</div>
-                        <div><strong>📍 Estado:</strong> <span class="status-badge">${eq.estado || "Pendiente"}</span></div>
-                        <div><strong>📝 Accesorios / Observaciones:</strong><br>${eq.observaciones || "Ninguna"}</div>
-                        <div><strong>👤 Registrado por:</strong> ${eq.registradoPor || "No especificado"}</div>
-                    </div>
-                    <div style="flex: 1; text-align: center;">
-                        ${eq.foto ? `<img src="${eq.foto}" class="equipo-foto"><br>` : '<div style="width:150px; height:100px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border-radius:8px;">Sin foto</div>'}
-                        <div style="margin-top: 10px;">
-                            <button class="edit-btn" onclick="editarEquipo(${idx})">✏️ Editar</button>
-                            <button class="pdf-btn" onclick="generarPDFEquipo(${idx})" style="background:#10b981;">📄 PDF Equipo</button>
+        let html = '';
+        for(let idx = 0; idx < equipos.length; idx++) {
+            const eq = equipos[idx];
+            html += `
+                <div class="equipo-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                        <div style="flex: 2;">
+                            <div><strong style="font-size:1.1rem;">📟 ${eq.equipo} ${eq.marca} ${eq.modelo}</strong></div>
+                            <div><strong>🔢 Consecutivo:</strong> <input type="text" value="${eq.consecutivo || 'EQ-'+(idx+1)}" class="edit-consecutivo" data-idx="${idx}" style="width:100px; padding:4px; border-radius:8px; border:1px solid var(--gray-border);"></div>
+                            <div><strong>🔧 Serial:</strong> ${eq.serial}</div>
+                            <div><strong>🏢 Cliente:</strong> ${eq.cliente}</div>
+                            <div><strong>📍 Estado:</strong> <span class="status-badge">${eq.estado || "Pendiente"}</span></div>
+                            <div><strong>📝 Accesorios / Observaciones:</strong><br>${eq.observaciones || "Ninguna"}</div>
+                            <div><strong>👤 Registrado por:</strong> ${eq.registradoPor || "No especificado"}</div>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            ${eq.foto ? `<img src="${eq.foto}" class="equipo-foto"><br>` : '<div style="width:150px; height:100px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border-radius:8px;">Sin foto</div>'}
+                            <div style="margin-top: 10px;">
+                                <button class="edit-btn" onclick="editarEquipo(${idx})">✏️ Editar</button>
+                                <button class="pdf-btn" onclick="generarPDFEquipo(${idx})" style="background:#10b981;">📄 PDF Equipo</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }
+        container.innerHTML = html;
         
         document.querySelectorAll('.edit-consecutivo').forEach(input => {
-            input.removeEventListener('change', guardarConsecutivo);
-            input.addEventListener('change', guardarConsecutivo);
+            input.onchange = function(e) {
+                const idx = e.target.dataset.idx;
+                const nuevoValor = e.target.value;
+                if(equipos[idx]) {
+                    equipos[idx].consecutivo = nuevoValor;
+                    guardarDatos();
+                    mostrarMensaje("✅ Consecutivo actualizado");
+                }
+            };
         });
-    }
-    
-    function guardarConsecutivo(e) {
-        const idx = e.target.dataset.idx;
-        const nuevoConsecutivo = e.target.value;
-        if(equipos[idx]) {
-            equipos[idx].consecutivo = nuevoConsecutivo;
-            guardarDatos();
-            mostrarMensaje("✅ Consecutivo actualizado");
-        }
     }
 
     window.editarEquipo = async (idx) => {
@@ -548,6 +557,7 @@
         }
     };
 
+    // ==================== RENDER INFORMES - CORREGIDO ====================
     function renderAll() {
         document.getElementById("totalEquipos").innerText = equipos.length;
         document.getElementById("totalInformes").innerText = informes.length;
@@ -555,31 +565,35 @@
         document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
         document.getElementById("nextIdDisplay").innerText = nextId;
         
-        // Tabla de informes
+        // Tabla de informes - construida correctamente
         const tbody = document.getElementById("informesBody");
         let filtrados = [...informes];
         filtrados.sort((a, b) => b.id - a.id);
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
         
+        tbody.innerHTML = '';
         if(filtrados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>';
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="8">No hay informes registrados</td>';
+            tbody.appendChild(row);
         } else {
-            tbody.innerHTML = filtrados.map(i => {
-                const estadoClass = i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente';
-                return `
-                    <tr>
-                        <td style="font-weight:bold;">${i.id}</td>
-                        <td>${i.fecha}</td>
-                        <td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td>
-                        <td>${i.cliente}</td>
-                        <td>${i.tipo}</td>
-                        <td><span class="status-badge ${estadoClass}">${i.estado}</span></td>
-                        <td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td>
-                        <td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>
-                    </tr>
+            for(let i = 0; i < filtrados.length; i++) {
+                const inf = filtrados[i];
+                const estadoClass = inf.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente';
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td style="font-weight:bold;">${inf.id}</td>
+                    <td>${inf.fecha}</td>
+                    <td class="serial-link" onclick="buscarPorSerial('${inf.serial}')">${inf.serial}</td>
+                    <td>${inf.cliente}</td>
+                    <td>${inf.tipo}</td>
+                    <td><span class="status-badge ${estadoClass}">${inf.estado}</span></td>
+                    <td>${inf.foto ? '<img src="'+inf.foto+'" class="foto-miniatura">' : '—'}</td>
+                    <td><button class="pdf-btn" onclick="generarPDF(${inf.id})">PDF</button></td>
                 `;
-            }).join('');
+                tbody.appendChild(row);
+            }
         }
         
         renderEquipos();
@@ -708,7 +722,15 @@
             equipos.push({ consecutivo: `EQ-${equipos.length+1}`, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Importación automática", foto: "" });
         }
         
-        document.getElementById("nuevoId").value = ""; document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = ""; document.getElementById("notaFinal").value = ""; document.getElementById("fotoEquipo").value = "";
+        document.getElementById("nuevoId").value = "";
+        document.getElementById("serial").value = "";
+        document.getElementById("marca").value = "";
+        document.getElementById("modelo").value = "";
+        document.getElementById("cliente").value = "";
+        document.getElementById("diagnostico").value = "";
+        document.getElementById("valores").value = "";
+        document.getElementById("notaFinal").value = "";
+        document.getElementById("fotoEquipo").value = "";
         
         renderAll();
         mostrarMensaje(`✅ Informe #${id} guardado`);
@@ -899,7 +921,6 @@
         };
     }
 
-    // TRAZABILIDAD
     function verHistorialEquipo() {
         const serial = document.getElementById("selectEquipoTraza").value;
         if(serial) {
