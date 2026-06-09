@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalibPro - Gestión de Calibraciones</title>
-    <!-- Librerías más confiables para PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: #1e293b; }
@@ -33,29 +31,15 @@
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #ecf3fa; font-size: 0.8rem; vertical-align: top; }
         th { background: #f8fafc; font-weight: 700; }
-        .status-badge { padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; display: inline-block; }
+        .status-badge { padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; display: inline-block; cursor: pointer; }
         .badge-pendiente { background: #fff3e0; color: #e67e22; }
         .badge-aprobado { background: #e6f7e6; color: #2e7d32; }
+        .badge-diagnostico { background: #e0f2fe; color: #0369a1; }
+        .badge-alistamiento { background: #fef9c3; color: #854d0e; }
+        .badge-entrega { background: #dbeafe; color: #1e40af; }
         .pdf-btn { background: #dc2626; margin-left: 8px; padding: 6px 14px; font-size: 0.75rem; }
-        
-        /* Estilos para el PDF (se usan solo al generar) */
-        .pdf-container {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 40px;
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-        }
-        .pdf-container h2 { color: #1e40af; margin-bottom: 10px; }
-        .pdf-header { text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 25px; }
-        .pdf-fecha { text-align: right; margin-bottom: 20px; }
-        .pdf-destinatario { margin-bottom: 15px; }
-        .pdf-reporte { margin-bottom: 20px; font-weight: bold; }
-        .pdf-diagnostico { margin-bottom: 20px; }
-        .pdf-diagnostico p { margin: 5px 0; }
-        .pdf-valores { margin-bottom: 25px; }
-        .pdf-firma { margin-top: 40px; border-top: 1px solid #ccc; padding-top: 15px; }
-        .pdf-pie { margin-top: 25px; font-size: 10px; text-align: center; color: #666; }
+        .foto-miniatura { max-width: 50px; max-height: 50px; border-radius: 6px; border: 1px solid #ccc; }
+        .estado-select { padding: 4px 8px; border-radius: 20px; border: 1px solid #ccc; font-size: 0.7rem; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -82,13 +66,14 @@
     <!-- LISTA DE INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card">
-            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>PDF</th></tr></thead>
+            <table>
+                <thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>PDF</th></tr></thead>
                 <tbody id="informesBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- NUEVO INFORME -->
+    <!-- NUEVO INFORME CON FOTO -->
     <div id="nuevo" class="tab-pane">
         <div class="form-card">
             <div class="form-grid">
@@ -101,6 +86,7 @@
             </div>
             <div class="input-group"><label>📋 Diagnóstico</label><textarea id="diagnostico" rows="3" placeholder="Descripción técnica del diagnóstico..."></textarea></div>
             <div class="input-group"><label>💰 Valores</label><textarea id="valores" rows="2" placeholder="Ej: Calibración: $583.333 + IVA&#10;Cambio de pigtail: $180.000 + IVA"></textarea></div>
+            <div class="input-group"><label>📷 Evidencia fotográfica (opcional)</label><input type="file" id="fotoEquipo" accept="image/*"></div>
             <button id="btnGuardar" style="width:100%">💾 Guardar informe</button>
         </div>
     </div>
@@ -116,28 +102,53 @@
         </div>
     </div>
 
-    <!-- EQUIPOS -->
+    <!-- EQUIPOS CON ESTADO Y CAMBIO DE ESTADO -->
     <div id="equipos" class="tab-pane">
         <div class="table-card">
             <button id="btnAgregarEquipo">+ Agregar equipo</button>
-            <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th></tr></thead><tbody id="equiposBody"></tbody></table>
+            <table>
+                <thead>
+                    <tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr>
+                </thead>
+                <tbody id="equiposBody"></tbody>
+            </table>
         </div>
     </div>
 </div>
 
 <script>
+    // Función para convertir foto a Base64
+    function fileToBase64(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+        });
+    }
+
+    // Estados posibles para los equipos
+    const estadosEquipo = [
+        "📝 Pendiente diagnóstico",
+        "⏳ Pendiente aprobación", 
+        "🔧 Pendiente alistamiento",
+        "🚚 Pendiente entrega",
+        "✅ Entregado"
+    ];
+
     let equipos = [];
     let informes = [];
     let nextId = 100;
 
     function renderAll() {
+        // Dashboard
         document.getElementById("totalEquipos").innerText = equipos.length;
         document.getElementById("totalInformes").innerText = informes.length;
         document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
         document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
         
+        // Tabla de informes
         const ib = document.getElementById("informesBody");
-        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="7">Sin informes</td></tr>';
+        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="8">Sin informes</td></tr>';
         else {
             ib.innerHTML = informes.map(i => `
                 <tr>
@@ -146,21 +157,50 @@
                     <td>${i.serial}</td>
                     <td>${i.cliente}</td>
                     <td>${i.tipo}</td>
-                    <td class="${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td>
+                    <td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td>
+                    <td>${i.foto ? `<img src="${i.foto}" class="foto-miniatura">` : 'Sin foto'}</td>
                     <td><button class="pdf-btn" onclick="generarPDF(${i.id})">📄 PDF</button></td>
                 </tr>
             `).join('');
         }
         
+        // Select aprobación
         const sel = document.getElementById("selectInforme");
         sel.innerHTML = '<option value="">Seleccionar</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
         
+        // Tabla de equipos con estado y botón para cambiar
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="5">Sin equipos</td></tr>';
-        else eb.innerHTML = equipos.map(e => `<td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td></tr>`).join('');
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">Sin equipos</td></tr>';
+        else {
+            eb.innerHTML = equipos.map((e, idx) => `
+                <tr>
+                    <td>${e.serial}</td>
+                    <td>${e.equipo}</td>
+                    <td>${e.marca}</td>
+                    <td>${e.modelo}</td>
+                    <td>${e.cliente}</td>
+                    <td class="status-badge" style="background:#e2e8f0; color:#1e293b;">${e.estado || "📝 Pendiente diagnóstico"}</td>
+                    <td><button class="pdf-btn" style="background:#f59e0b;" onclick="cambiarEstadoEquipo(${idx})">🔄 Cambiar estado</button></td>
+                </tr>
+            `).join('');
+        }
     }
 
-    document.getElementById("btnGuardar").onclick = () => {
+    // Función para cambiar el estado de un equipo
+    window.cambiarEstadoEquipo = (idx) => {
+        const equipo = equipos[idx];
+        const estadoActual = equipo.estado || "📝 Pendiente diagnóstico";
+        const nuevoEstado = prompt(`Estado actual: ${estadoActual}\n\nEscribe el nuevo estado:\n- Pendiente diagnóstico\n- Pendiente aprobación\n- Pendiente alistamiento\n- Pendiente entrega\n- Entregado`, estadoActual);
+        
+        if(nuevoEstado && nuevoEstado.trim() !== "") {
+            equipos[idx].estado = nuevoEstado.trim();
+            renderAll();
+            alert(`✅ Estado del equipo ${equipo.serial} actualizado a: ${nuevoEstado}`);
+        }
+    };
+
+    // Guardar informe
+    document.getElementById("btnGuardar").onclick = async () => {
         const fecha = document.getElementById("fecha").value || new Date().toISOString().slice(0,10);
         const serial = document.getElementById("serial").value.trim();
         const marca = document.getElementById("marca").value.trim();
@@ -170,27 +210,47 @@
         const diagnostico = document.getElementById("diagnostico").value.trim();
         const valores = document.getElementById("valores").value.trim();
         
+        const fileInput = document.getElementById("fotoEquipo");
+        let fotoBase64 = '';
+        if(fileInput.files.length > 0) {
+            fotoBase64 = await fileToBase64(fileInput.files[0]);
+        }
+        
         if(!serial || !cliente || !diagnostico) { alert("Complete serial, cliente y diagnóstico"); return; }
         
         const nuevoId = nextId++;
         informes.push({ 
-            id: nuevoId, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores,
+            id: nuevoId, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, 
+            foto: fotoBase64,
             estado: "Pendiente", fechaEnvio: "", obsCliente: "" 
         });
         
-        if(!equipos.find(e => e.serial === serial)) equipos.push({ serial, equipo: tipo, marca, modelo, cliente });
+        // Si el equipo no existe, lo agregamos con estado inicial
+        if(!equipos.find(e => e.serial === serial)) {
+            equipos.push({ 
+                serial, 
+                equipo: tipo, 
+                marca, 
+                modelo, 
+                cliente,
+                estado: "📝 Pendiente diagnóstico"
+            });
+        }
         
+        // Limpiar formulario
         document.getElementById("serial").value = "";
         document.getElementById("marca").value = "";
         document.getElementById("modelo").value = "";
         document.getElementById("cliente").value = "";
         document.getElementById("diagnostico").value = "";
         document.getElementById("valores").value = "";
+        document.getElementById("fotoEquipo").value = "";
         
         renderAll();
         alert(`Informe #${nuevoId} guardado`);
     };
 
+    // Actualizar aprobación comercial
     document.getElementById("btnActualizar").onclick = () => {
         const id = parseInt(document.getElementById("selectInforme").value);
         if(!id) { alert("Seleccione un informe"); return; }
@@ -204,108 +264,117 @@
         }
     };
 
-    // GENERAR PDF CON JSPDF + HTML2CANVAS (MÁS CONFIABLE)
+    // Generar PDF CON FOTO
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
         
         const fechaActual = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
         
-        // Crear el HTML del PDF
-        const pdfContent = document.createElement('div');
-        pdfContent.className = 'pdf-container';
-        pdfContent.style.position = 'absolute';
-        pdfContent.style.left = '-9999px';
-        pdfContent.style.top = '0';
-        pdfContent.style.backgroundColor = 'white';
-        pdfContent.style.width = '800px';
-        pdfContent.style.padding = '40px';
+        let fotoHtml = '';
+        if(inf.foto) {
+            fotoHtml = `<div style="margin-bottom: 20px;">
+                            <strong>📷 Evidencia fotográfica:</strong><br>
+                            <img src="${inf.foto}" style="max-width: 100%; max-height: 300px; margin-top: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                        </div>`;
+        }
         
-        pdfContent.innerHTML = `
-            <div class="pdf-header">
-                <h2>INFORME GENERAL</h2>
-                <p>CI RENTELCOM SAS - Laboratorio de Calibración</p>
-            </div>
-            <div class="pdf-fecha">${fechaActual}</div>
-            <div class="pdf-destinatario"><strong>Señores:</strong> ${inf.cliente}</div>
-            <div class="pdf-reporte">Reporte Técnico N° ${inf.id}</div>
-            <div class="pdf-diagnostico">
-                <strong>Revisión de entrada.</strong> Se recibe ${inf.marca} ${inf.modelo} con serie ${inf.serial}, se solicita ${inf.tipo.toLowerCase()}.
-            </div>
-            <div class="pdf-diagnostico">
-                <strong>Diagnóstico</strong><br>
-                ${inf.diagnostico.replace(/\n/g, '<br>')}
-            </div>
-            <div class="pdf-valores">
-                <strong>Valores</strong><br>
-                ${inf.valores ? inf.valores.replace(/\n/g, '<br>') : 'No especificado'}
-            </div>
-            <div class="pdf-firma">
-                <strong>Verificado por:</strong><br>
-                Ing. Stephania Garcia<br>
-                Ing. De Laboratorio y Calidad<br>
-                Auditor ISO/IEC 17025:2017
-            </div>
-            <div class="pdf-pie">
-                CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239
+        const pdfHtml = `
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; background: white;">
+                <div style="text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 25px;">
+                    <h2 style="color: #1e40af; margin: 0;">INFORME GENERAL</h2>
+                    <p style="margin: 5px 0 0;">CI RENTELCOM SAS - Laboratorio de Calibración</p>
+                </div>
+                
+                <div style="text-align: right; margin-bottom: 20px;">
+                    <p style="margin: 0;">${fechaActual}</p>
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <p style="margin: 0;"><strong>Señores:</strong> ${inf.cliente}</p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <p style="margin: 0;"><strong>Reporte Técnico N° ${inf.id}</strong></p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <p style="margin: 0;"><strong>Revisión de entrada.</strong> Se recibe ${inf.marca} ${inf.modelo} con serie ${inf.serial}, se solicita ${inf.tipo.toLowerCase()}.</p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <p style="margin: 0 0 5px 0;"><strong>Diagnóstico</strong></p>
+                    <p style="margin: 0;">${inf.diagnostico.replace(/\n/g, '<br>')}</p>
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <p style="margin: 0 0 5px 0;"><strong>Valores</strong></p>
+                    <p style="margin: 0;">${inf.valores ? inf.valores.replace(/\n/g, '<br>') : 'No especificado'}</p>
+                </div>
+                
+                ${fotoHtml}
+                
+                <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 15px;">
+                    <p style="margin: 0;"><strong>Verificado por:</strong></p>
+                    <p style="margin: 0;">Ing. Stephania Garcia</p>
+                    <p style="margin: 0;">Ing. De Laboratorio y Calidad</p>
+                    <p style="margin: 0;">Auditor ISO/IEC 17025:2017</p>
+                </div>
+                
+                <div style="margin-top: 25px; font-size: 10px; text-align: center; color: #666;">
+                    <p style="margin: 0;">CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239</p>
+                </div>
             </div>
         `;
         
-        document.body.appendChild(pdfContent);
+        const element = document.createElement('div');
+        element.style.position = 'absolute';
+        element.style.left = '-9999px';
+        element.style.top = '0';
+        element.style.backgroundColor = 'white';
+        element.innerHTML = pdfHtml;
+        document.body.appendChild(element);
+        
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const opt = {
+            margin: [0.5, 0.5, 0.5, 0.5],
+            filename: `INFORME_${inf.id}_${inf.serial}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, logging: false },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
         
         try {
-            // Usar html2canvas para capturar el contenido
-            const canvas = await html2canvas(pdfContent, {
-                scale: 2,
-                backgroundColor: '#ffffff',
-                logging: false
-            });
-            
-            const imgData = canvas.toDataURL('image/png');
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({
-                unit: 'mm',
-                format: 'letter',
-                orientation: 'portrait'
-            });
-            
-            const imgWidth = 210; // Ancho A4 en mm
-            const pageHeight = 297;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let position = 0;
-            
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            
-            // Si la imagen es más larga que una página, agregar otra
-            if (imgHeight > pageHeight) {
-                let remainingHeight = imgHeight - pageHeight;
-                while (remainingHeight > 0) {
-                    position -= pageHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    remainingHeight -= pageHeight;
-                }
-            }
-            
-            pdf.save(`INFORME_${inf.id}_${inf.serial}.pdf`);
+            await html2pdf().set(opt).from(element).save();
         } catch (error) {
-            console.error("Error generando PDF:", error);
-            alert("Error al generar el PDF. Intenta de nuevo.");
+            console.error("Error:", error);
+            alert("Error al generar PDF. Intenta de nuevo.");
         }
         
-        document.body.removeChild(pdfContent);
+        document.body.removeChild(element);
     };
 
+    // Agregar equipo manualmente
     document.getElementById("btnAgregarEquipo").onclick = () => {
         const serial = prompt("Serial:"); if(!serial) return;
         const equipo = prompt("Tipo de equipo:"); 
         const marca = prompt("Marca:"); 
         const modelo = prompt("Modelo:"); 
         const cliente = prompt("Cliente:");
-        equipos.push({ serial, equipo, marca, modelo, cliente }); 
+        equipos.push({ 
+            serial, 
+            equipo, 
+            marca, 
+            modelo, 
+            cliente,
+            estado: "📝 Pendiente diagnóstico"
+        }); 
         renderAll();
+        alert(`Equipo ${serial} agregado con estado "Pendiente diagnóstico"`);
     };
 
+    // Cambio de pestañas
     document.querySelectorAll(".tab-btn").forEach(btn => { 
         btn.addEventListener("click", () => { 
             document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); 
