@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalibPro - CI RENTELCOM</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --primary: #0a2b4e;
@@ -61,6 +62,8 @@
         .btn-outline:hover { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); }
         .btn-danger:hover { background: #b91c1c; }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #059669; }
         
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
@@ -87,8 +90,9 @@
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
         .delete-section { border-top: 1px solid var(--gray-border); margin-top: 20px; padding-top: 20px; }
         
-        /* Estilo para el select de trazabilidad */
         .traza-select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--gray-border); margin-bottom: 15px; }
+        
+        .export-section { background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -121,12 +125,10 @@
         <button class="tab-btn" data-tab="configuracion">Configuración</button>
     </div>
 
-    <!-- INFORMES (ordenados de mayor a menor ID) -->
+    <!-- INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card"><h3>Listado de informes técnicos <span id="filtroInfo" style="font-size:0.7rem;"></span></h3>
-            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead>
-                <tbody id="informesBody"></tbody>
-            </table>
+            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead><tbody id="informesBody"></tbody></table>
         </div>
     </div>
 
@@ -194,13 +196,13 @@
         <div class="table-card">
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
-            </table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead>
+            <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead>
                 <tbody id="equiposBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- TRAZABILIDAD - BÚSQUEDA POR SERIAL -->
+    <!-- TRAZABILIDAD -->
     <div id="trazabilidad" class="tab-pane">
         <div class="form-card">
             <h3>Trazabilidad de equipos</h3>
@@ -246,7 +248,16 @@
     <!-- CONFIGURACIÓN -->
     <div id="configuracion" class="tab-pane">
         <div class="form-card">
-            <h3>Configuración - Logo corporativo</h3>
+            <h3>Configuración</h3>
+            
+            <!-- EXPORTAR DATOS -->
+            <div class="export-section">
+                <h4 style="margin-bottom: 10px;">📤 Exportar datos</h4>
+                <p style="margin-bottom: 10px;">Exporta todos los informes y equipos a un archivo Excel.</p>
+                <button id="btnExportarDatos" class="btn-success">📊 Exportar a Excel</button>
+            </div>
+            
+            <h3>Logo corporativo</h3>
             <input type="file" id="logoEmpresa" accept="image/*">
             <div id="logoPreview"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
@@ -282,6 +293,59 @@
         renderAll();
         cargarSelectEquiposTraza();
     }
+
+    // EXPORTAR DATOS A EXCEL
+    function exportarDatosExcel() {
+        if(informes.length === 0 && equipos.length === 0) {
+            mostrarMensaje("No hay datos para exportar");
+            return;
+        }
+        
+        // Preparar datos de informes para exportar
+        const informesExport = informes.map(inf => ({
+            "ID": inf.id,
+            "FECHA": inf.fecha,
+            "SERIAL": inf.serial,
+            "CLIENTE": inf.cliente,
+            "MARCA": inf.marca,
+            "MODELO": inf.modelo,
+            "SERVICIO": inf.tipo,
+            "DIAGNOSTICO": inf.diagnostico,
+            "VALORES": inf.valores || "",
+            "NOTA_FINAL": inf.notaFinal || "",
+            "ESTADO_COMERCIAL": inf.estado,
+            "FECHA_ENVIO_CLIENTE": inf.fechaEnvio || "",
+            "OBSERVACIONES_CLIENTE": inf.obsCliente || ""
+        }));
+        
+        // Preparar datos de equipos para exportar
+        const equiposExport = equipos.map(eq => ({
+            "SERIAL": eq.serial,
+            "EQUIPO": eq.equipo,
+            "MARCA": eq.marca,
+            "MODELO": eq.modelo,
+            "CLIENTE": eq.cliente,
+            "ESTADO": eq.estado || "Pendiente"
+        }));
+        
+        // Crear libro de Excel
+        const wb = XLSX.utils.book_new();
+        const wsInformes = XLSX.utils.json_to_sheet(informesExport);
+        const wsEquipos = XLSX.utils.json_to_sheet(equiposExport);
+        
+        // Ajustar anchos de columnas
+        wsInformes['!cols'] = [{wch:10},{wch:12},{wch:18},{wch:25},{wch:12},{wch:12},{wch:15},{wch:40},{wch:20},{wch:20},{wch:15},{wch:15},{wch:25}];
+        wsEquipos['!cols'] = [{wch:18},{wch:15},{wch:12},{wch:12},{wch:25},{wch:15}];
+        
+        XLSX.utils.book_append_sheet(wb, wsInformes, "INFORMES");
+        XLSX.utils.book_append_sheet(wb, wsEquipos, "EQUIPOS");
+        
+        // Generar archivo
+        XLSX.writeFile(wb, `CalibPro_Datos_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
+        mostrarMensaje("✅ Datos exportados correctamente");
+    }
+    
+    document.getElementById("btnExportarDatos").onclick = exportarDatosExcel;
 
     function eliminarTodosLosDatos() {
         if(confirm("⚠️ ¿ESTÁS SEGURA?\n\nEsta acción eliminará TODOS los informes y equipos guardados.\n\nNo se puede deshacer.")) {
@@ -327,14 +391,14 @@
         const tbody = document.getElementById("informesBody");
         let filtrados = [...informes];
         
-        // ORDENAR DE MAYOR A MENOR ID (los números más grandes primero)
+        // ORDENAR DE MAYOR A MENOR ID
         filtrados.sort((a, b) => b.id - a.id);
         
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
         
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registradosNeo' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td></td>`).join('');
+        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</tr>'; return; }
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
     function renderAll() {
@@ -348,8 +412,8 @@
         document.getElementById("selectInforme").innerHTML = options;
         document.getElementById("selectEditar").innerHTML = options;
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registradosNeo' + '</tr>';
-        else eb.innerHTML = equipos.map((e, idx) => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td></tr>`).join('');
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</tr>';
+        else eb.innerHTML = equipos.map((e, idx) => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>`).join('');
         cargarSelectEquiposTraza();
         guardarDatos();
     }
