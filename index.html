@@ -53,6 +53,7 @@
         .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
         label { font-weight: 600; font-size: 0.8rem; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
         input, select, textarea { padding: 12px 14px; border: 1px solid var(--gray-border); border-radius: 12px; font-size: 0.9rem; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,43,78,0.1); }
         textarea { resize: vertical; min-height: 60px; }
         
         button { background: var(--primary); border: none; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
@@ -243,15 +244,15 @@
         <div class="form-card">
             <h3>Importar datos desde archivo</h3>
             <div style="background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-                <h4>📋 Columnas que tu archivo debe tener:</h4>
-                <p>✅ <strong>fecha</strong> → Fecha del informe</p>
-                <p>✅ <strong>CLIENTE</strong> → Nombre del cliente</p>
-                <p>✅ <strong>equipo</strong> → Tipo de equipo</p>
-                <p>✅ <strong>marca</strong> → Marca</p>
-                <p>✅ <strong>modelo</strong> → Modelo</p>
-                <p>✅ <strong>serial</strong> → Serial del equipo</p>
-                <p>✅ <strong>ID</strong> o <strong>ITEM</strong> → Número de informe</p>
-                <p>✅ <strong>diagnostico</strong> → Diagnóstico</p>
+                <h4>📋 Tu archivo debe tener estas columnas:</h4>
+                <p>✅ <strong>fecha</strong> - Fecha del informe</p>
+                <p>✅ <strong>CLIENTE</strong> - Nombre del cliente</p>
+                <p>✅ <strong>equipo</strong> - Tipo de equipo</p>
+                <p>✅ <strong>marca</strong> - Marca</p>
+                <p>✅ <strong>modelo</strong> - Modelo</p>
+                <p>✅ <strong>serial</strong> - Serial del equipo</p>
+                <p>✅ <strong>ID</strong> - Número de informe</p>
+                <p>✅ <strong>diagnostico</strong> - Diagnóstico</p>
             </div>
             <div class="import-area" id="importArea">
                 <div style="font-size: 48px;">📂</div>
@@ -362,7 +363,7 @@
         renderInformesConFiltro();
         
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td>' + '<tr>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registradosNeo' + '</tr>';
         else eb.innerHTML = equipos.map((e, idx) => `<tr><td style="font-weight:bold;">${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>`).join('');
         
         cargarSelectsSeriales();
@@ -375,8 +376,8 @@
         filtrados.sort((a, b) => b.id - a.id);
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}<tr><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
+        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registradosNeo' + '</tr>'; return; }
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
     function cargarSelectsSeriales() {
@@ -549,7 +550,7 @@
         mostrarMensaje("✅ Datos exportados");
     };
 
-    // IMPORTAR DATOS - CORREGIDO PARA TU MATRIZ
+    // IMPORTAR DATOS - CORREGIDO PARA LEER SERIAL CORRECTAMENTE
     function setupImport() {
         const importArea = document.getElementById("importArea");
         const fileInput = document.getElementById("fileInput");
@@ -597,7 +598,6 @@
                 <p>📟 modelo: ${primerRegistro.modelo || 'No'}</p>
                 <p>🔢 serial: ${primerRegistro.serial || 'No'}</p>
                 <p>🔢 ID: ${primerRegistro.ID || primerRegistro.ITEM || 'No'}</p>
-                <p>📋 diagnostico: ${primerRegistro.diagnostico ? 'Sí' : 'No'}</p>
             </div>
             <p>Se importarán <strong>${datos.length}</strong> informes.</p>`;
         btnConfirmar.style.display = "block";
@@ -605,6 +605,10 @@
         btnConfirmar.onclick = () => {
             let nuevos = 0, maxId = 0;
             for(const row of datos) {
+                // LEER SERIAL - CLAVE PRINCIPAL
+                const serial = row.serial || "";
+                if(!serial) continue;
+                
                 let id = row.ID || row.ITEM || row.id;
                 if(id && !isNaN(parseInt(id))) { id = parseInt(id); if(id > maxId) maxId = id; } 
                 else id = nextId++;
@@ -620,17 +624,23 @@
                     fecha = new Date().toISOString().slice(0,10);
                 }
                 
-                const serial = row.serial || `EQ-${id}`;
-                const cliente = row.CLIENTE || row.cliente || "CLIENTE GENERAL";
-                const diagnostico = row.diagnostico || "Diagnóstico registrado";
-                const tipo = row.equipo || "Calibración";
-                const marca = row.marca || "GENERICO";
-                const modelo = row.modelo || "MODELO";
+                const cliente = row.CLIENTE || row.cliente || "";
+                const diagnostico = row.diagnostico || "";
+                const tipo = row.equipo || "";
+                const marca = row.marca || "";
+                const modelo = row.modelo || "";
+                
+                if(!cliente || !diagnostico) continue;
                 
                 informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
                 nuevos++;
                 
-                if(!equipos.find(e => e.serial === serial)) {
+                const equipoExistente = equipos.find(e => e.serial === serial);
+                if(equipoExistente) {
+                    if(!equipoExistente.marca && marca) equipoExistente.marca = marca;
+                    if(!equipoExistente.modelo && modelo) equipoExistente.modelo = modelo;
+                    if(!equipoExistente.cliente && cliente) equipoExistente.cliente = cliente;
+                } else {
                     equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
                 }
             }
@@ -659,7 +669,7 @@
                         Serial: ${serial}<br>
                         Equipo: ${infoEquipo?.equipo || 'N/A'} ${infoEquipo?.marca || ''} ${infoEquipo?.modelo || ''}<br>
                         Cliente: ${infoEquipo?.cliente || 'N/A'}<br>
-                        Estado actual: ${infoEquipo?.estado || 'Pendiente'}<br>
+                        Estado: ${infoEquipo?.estado || 'Pendiente'}<br>
                         Total intervenciones: ${informesEquipo.length}
                     </div>
                     <h4>📋 HISTORIAL (${informesEquipo.length})</h4>`;
@@ -668,9 +678,8 @@
                         <div class="historial-fecha">INFORME #${inf.id} - ${inf.fecha}</div>
                         <div><strong>Servicio:</strong> ${inf.tipo}</div>
                         <div><strong>Diagnóstico:</strong> ${inf.diagnostico.substring(0,150)}${inf.diagnostico.length>150?'...':''}</div>
-                        <div><strong>Valores:</strong> ${inf.valores || 'No especificado'}</div>
+                        <div><strong>Valores:</strong> ${inf.valores || 'No'}</div>
                         <div><strong>Estado:</strong> <span class="status-badge ${inf.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${inf.estado}</span></div>
-                        ${inf.obsCliente ? `<div><strong>Obs cliente:</strong> ${inf.obsCliente}</div>` : ''}
                         <div><button class="pdf-btn" onclick="generarPDF(${inf.id})">Ver informe</button></div>
                     </div>`;
         }
@@ -684,14 +693,13 @@
         let informesHtml = '';
         for(const inf of informesEquipo) {
             informesHtml += `<div style="margin-bottom:20px; border-bottom:1px solid #ddd; padding-bottom:10px;">
-                                <strong>INFORME #${inf.id} - ${inf.fecha}</strong><br>
+                                <strong>INFORME #${inf.id}</strong> - ${inf.fecha}<br>
                                 Servicio: ${inf.tipo}<br>
                                 Diagnóstico: ${inf.diagnostico}<br>
-                                Valores: ${inf.valores || 'No'}<br>
                                 Estado: ${inf.estado}
                             </div>`;
         }
-        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Trazabilidad_${serial}</title><style>body{font-family:Segoe UI;padding:40px;}.header{text-align:center;border-bottom:2px solid #333;}.info-equipo{background:#f5f5f5;padding:15px;margin:20px 0;}</style></head><body><div class="header">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;"><br>` : '<h2>CI RENTELCOM SAS</h2>'}<h2>REPORTE DE TRAZABILIDAD</h2></div><div class="info-equipo"><strong>SERIAL:</strong> ${serial}<br><strong>EQUIPO:</strong> ${infoEquipo?.equipo || 'N/A'}<br><strong>CLIENTE:</strong> ${infoEquipo?.cliente || 'N/A'}<br><strong>INTERVENCIONES:</strong> ${informesEquipo.length}</div>${informesHtml}<div class="footer">Carrera 19A No. 150-50 Bogotá D.C.</div></body></html>`;
+        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Trazabilidad_${serial}</title><style>body{font-family:Segoe UI;padding:40px;}.header{text-align:center;border-bottom:2px solid #0a2b4e;}.info-equipo{background:#f5f5f5;padding:15px;margin:20px 0;}</style></head><body><div class="header">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;"><br>` : '<h2>CI RENTELCOM SAS</h2>'}<h2>REPORTE DE TRAZABILIDAD</h2></div><div class="info-equipo"><strong>SERIAL:</strong> ${serial}<br><strong>EQUIPO:</strong> ${infoEquipo?.equipo || 'N/A'}<br><strong>CLIENTE:</strong> ${infoEquipo?.cliente || 'N/A'}<br><strong>INTERVENCIONES:</strong> ${informesEquipo.length}</div>${informesHtml}<div class="footer">Carrera 19A No. 150-50 Bogotá D.C.</div></body></html>`;
         const blob = new Blob([docHtml], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
@@ -707,7 +715,7 @@
         const fechaActual = new Date().toLocaleDateString('es-CO');
         let fotoHtml = inf.foto ? `<div><strong>Foto:</strong><br><img src="${inf.foto}" style="max-width:100%; max-height:250px;"></div>` : '';
         let notaHtml = inf.notaFinal ? `<div><strong>Nota:</strong><br>${inf.notaFinal}</div>` : '';
-        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe ${inf.id}</title><style>body{font-family:Segoe UI;padding:40px;}.container{max-width:800px;margin:0 auto;}.header-logo{text-align:left;}.titulo{text-align:center;border-bottom:2px solid #333;}.equipo-datos{background:#f5f5f5;padding:15px;margin:15px 0;}.firma{margin-top:30px;border-top:1px solid #ccc;padding-top:15px;}</style></head><body><div class="container"><div class="header-logo">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<h3>CI RENTELCOM SAS</h3>'}</div><div class="titulo"><h2>INFORME TÉCNICO DE LABORATORIO</h2></div><div><strong>Fecha:</strong> ${fechaActual}</div><div><strong>Reporte N°:</strong> ${inf.id}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="equipo-datos"><div><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Servicio:</strong> ${inf.tipo}</div></div><div><strong>Observación inicial:</strong><br>Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para ${inf.tipo.toLowerCase()}.</div><div><strong>Diagnóstico:</strong><br>${inf.diagnostico}</div><div><strong>Valores:</strong><br>${inf.valores || 'No especificado'}</div>${fotoHtml}${notaHtml}<div class="firma"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div class="pie">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></div></body></html>`;
+        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe ${inf.id}</title><style>body{font-family:Segoe UI;padding:40px;}.container{max-width:800px;margin:0 auto;}.header-logo{text-align:left;}.titulo{text-align:center;border-bottom:2px solid #0a2b4e;}.equipo-datos{background:#f5f5f5;padding:15px;margin:15px 0;}.firma{margin-top:30px;border-top:1px solid #ccc;}</style></head><body><div class="container"><div class="header-logo">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<h3>CI RENTELCOM SAS</h3>'}</div><div class="titulo"><h2>INFORME TÉCNICO DE LABORATORIO</h2></div><div><strong>Fecha:</strong> ${fechaActual}</div><div><strong>Reporte N°:</strong> ${inf.id}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="equipo-datos"><div><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Servicio:</strong> ${inf.tipo}</div></div><div><strong>Diagnóstico:</strong><br>${inf.diagnostico}</div><div><strong>Valores:</strong><br>${inf.valores || 'No'}</div>${fotoHtml}${notaHtml}<div class="firma"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div class="pie">Carrera 19A No. 150-50 Bogotá D.C.</div></div></body></html>`;
         const blob = new Blob([docHtml], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
