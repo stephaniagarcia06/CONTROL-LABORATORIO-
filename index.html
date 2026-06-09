@@ -196,7 +196,7 @@
         <div class="table-card">
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
-            <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tr><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead>
                 <tbody id="equiposBody"></tbody>
             </table>
         </div>
@@ -273,7 +273,6 @@
     <div class="app-footer">CI RENTELCOM SAS - Laboratorio de Calibración y Telecomunicaciones | Carrera 19A No. 150-50 Bogotá D.C.</div>
 </div>
 
-<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script>
     let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "", filtroActual = "todos";
 
@@ -294,22 +293,22 @@
         cargarSelectEquiposTraza();
     }
 
-    // EXPORTAR DATOS A EXCEL
+    // EXPORTAR DATOS A EXCEL (CON COLUMNA EQUIPO)
     function exportarDatosExcel() {
         if(informes.length === 0 && equipos.length === 0) {
             mostrarMensaje("No hay datos para exportar");
             return;
         }
         
-        // Preparar datos de informes para exportar
+        // Preparar datos de informes para exportar - AHORA CON EQUIPO
         const informesExport = informes.map(inf => ({
             "ID": inf.id,
             "FECHA": inf.fecha,
             "SERIAL": inf.serial,
+            "EQUIPO": inf.tipo,
             "CLIENTE": inf.cliente,
             "MARCA": inf.marca,
             "MODELO": inf.modelo,
-            "SERVICIO": inf.tipo,
             "DIAGNOSTICO": inf.diagnostico,
             "VALORES": inf.valores || "",
             "NOTA_FINAL": inf.notaFinal || "",
@@ -334,7 +333,7 @@
         const wsEquipos = XLSX.utils.json_to_sheet(equiposExport);
         
         // Ajustar anchos de columnas
-        wsInformes['!cols'] = [{wch:10},{wch:12},{wch:18},{wch:25},{wch:12},{wch:12},{wch:15},{wch:40},{wch:20},{wch:20},{wch:15},{wch:15},{wch:25}];
+        wsInformes['!cols'] = [{wch:10},{wch:12},{wch:18},{wch:15},{wch:25},{wch:12},{wch:12},{wch:40},{wch:20},{wch:20},{wch:15},{wch:15},{wch:25}];
         wsEquipos['!cols'] = [{wch:18},{wch:15},{wch:12},{wch:12},{wch:25},{wch:15}];
         
         XLSX.utils.book_append_sheet(wb, wsInformes, "INFORMES");
@@ -397,8 +396,8 @@
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
         
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
+        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>'; return; }
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}NzAQ73${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}NzAQ73${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}NzAQ73<button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
     function renderAll() {
@@ -412,7 +411,7 @@
         document.getElementById("selectInforme").innerHTML = options;
         document.getElementById("selectEditar").innerHTML = options;
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</tr>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td>';
         else eb.innerHTML = equipos.map((e, idx) => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>`).join('');
         cargarSelectEquiposTraza();
         guardarDatos();
