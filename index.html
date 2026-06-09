@@ -3,48 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CalibPro - Gestión de Calibraciones</title>
+    <title>CalibPro - CI RENTELCOM</title>
     <style>
+        /* ==================== VARIABLES CORPORATIVAS ==================== */
+        :root {
+            --primary: #0a2b4e;      /* Azul marino corporativo */
+            --primary-dark: #051a30; /* Azul más oscuro */
+            --primary-light: #1e4a76; /* Azul medio */
+            --secondary: #e8f0fe;    /* Azul muy claro para fondos */
+            --accent: #2c7da0;       /* Azul acento */
+            --gray-light: #f5f7fa;
+            --gray-border: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --white: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: #1e293b; }
+        body { background: var(--gray-light); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: var(--text-dark); }
         .container { max-width: 1400px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
-        h1 { font-size: 1.8rem; background: linear-gradient(135deg, #2563eb, #1e40af); background-clip: text; -webkit-background-clip: text; color: transparent; }
-        .badge { background: #e2e8f0; padding: 8px 16px; border-radius: 40px; font-size: 0.85rem; font-weight: 500; }
+        
+        /* HEADER */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid var(--primary); }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-placeholder { width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
+        h1 { font-size: 1.6rem; color: var(--primary); font-weight: 600; }
+        .badge { background: var(--primary-light); color: white; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; font-weight: 500; }
+        
+        /* DASHBOARD */
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
-        .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e9eef3; }
-        .card h3 { font-size: 0.85rem; font-weight: 500; color: #5b6e8c; margin-bottom: 12px; }
-        .card .number { font-size: 2.2rem; font-weight: 700; color: #0f3b7a; }
-        .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 28px; }
-        .tab-btn { background: none; border: none; padding: 10px 20px; font-size: 1rem; font-weight: 600; cursor: pointer; color: #5b6e8c; border-radius: 30px; }
-        .tab-btn.active { background: #2563eb; color: white; }
+        .card { background: var(--white); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-border); transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .card h3 { font-size: 0.85rem; font-weight: 500; color: var(--text-gray); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .card .number { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
+        
+        /* TABS */
+        .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid var(--gray-border); margin-bottom: 28px; }
+        .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: var(--text-gray); border-radius: 30px; transition: all 0.2s; }
+        .tab-btn:hover { background: var(--secondary); color: var(--primary); }
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(10,43,78,0.3); }
+        
+        /* PANELES */
         .tab-pane { display: none; }
-        .tab-pane.active-pane { display: block; }
-        .form-card, .table-card { background: white; border-radius: 28px; padding: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.03); border: 1px solid #eef2f8; margin-bottom: 32px; }
+        .tab-pane.active-pane { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .form-card, .table-card { background: var(--white); border-radius: 20px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-border); margin-bottom: 32px; }
+        .form-card h3, .table-card h3 { margin-bottom: 20px; color: var(--primary); font-size: 1.2rem; border-left: 4px solid var(--primary); padding-left: 12px; }
+        
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
-        label { font-weight: 600; font-size: 0.85rem; color: #334155; }
-        input, select, textarea { padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 18px; font-size: 0.9rem; font-family: inherit; }
+        label { font-weight: 600; font-size: 0.8rem; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea { padding: 12px 14px; border: 1px solid var(--gray-border); border-radius: 12px; font-size: 0.9rem; font-family: inherit; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,43,78,0.1); }
         textarea { resize: vertical; min-height: 60px; }
-        button { background: #2563eb; border: none; color: white; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+        
+        button { background: var(--primary); border: none; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        button:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-warning { background: var(--warning); }
+        .btn-warning:hover { background: #d97706; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        
+        /* TABLAS */
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
-        th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #ecf3fa; font-size: 0.8rem; vertical-align: top; }
-        th { background: #f8fafc; font-weight: 700; }
-        .status-badge { padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; display: inline-block; cursor: pointer; }
-        .badge-pendiente { background: #fff3e0; color: #e67e22; }
-        .badge-aprobado { background: #e6f7e6; color: #2e7d32; }
-        .pdf-btn { background: #dc2626; padding: 6px 14px; font-size: 0.75rem; margin: 2px; }
-        .edit-btn { background: #f59e0b; padding: 6px 14px; font-size: 0.75rem; margin: 2px; }
-        .foto-miniatura { max-width: 50px; max-height: 50px; border-radius: 6px; border: 1px solid #ccc; }
+        th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
+        th { background: var(--secondary); font-weight: 600; color: var(--primary); }
+        
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .badge-pendiente { background: #fef3c7; color: #d97706; }
+        .badge-aprobado { background: #d1fae5; color: #059669; }
+        .badge-diagnostico { background: #dbeafe; color: #2563eb; }
+        
+        .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
+        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
+        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--gray-border); }
         .logo-preview { max-width: 150px; max-height: 60px; margin-top: 5px; }
-        .next-id-info { background: #e0e7ff; padding: 8px 12px; border-radius: 16px; font-size: 0.9rem; font-weight: bold; display: inline-block; margin-bottom: 15px; }
-        .alert-success { background: #d1fae5; color: #065f46; padding: 10px; border-radius: 12px; margin-bottom: 15px; display: none; }
+        .next-id-info { background: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; color: var(--primary); }
+        .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
+        
+        /* FOOTER APP */
+        .app-footer { text-align: center; padding: 20px; color: var(--text-gray); font-size: 0.7rem; border-top: 1px solid var(--gray-border); margin-top: 20px; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>🔬 CalibPro — Gestión de Calibraciones</h1>
+        <div class="logo-area">
+            <div class="logo-placeholder">CR</div>
+            <h1>CalibPro | CI RENTELCOM</h1>
+        </div>
         <div class="badge">Sistema de Gestión Técnica</div>
     </div>
 
@@ -66,9 +119,10 @@
         <button class="tab-btn" data-tab="configuracion">Configuración</button>
     </div>
 
-    <!-- LISTA DE INFORMES -->
+    <!-- INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card">
+            <h3>Listado de informes técnicos</h3>
             <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead>
                 <tbody id="informesBody"></tbody>
             </table>
@@ -78,6 +132,7 @@
     <!-- NUEVO INFORME -->
     <div id="nuevo" class="tab-pane">
         <div class="form-card">
+            <h3>Registrar nuevo informe</h3>
             <div class="next-id-info">Próximo número disponible: <span id="nextIdDisplay">100</span></div>
             <div class="form-grid">
                 <div class="input-group"><label>Número de informe</label><input type="number" id="nuevoId" placeholder="Automático"></div>
@@ -99,8 +154,9 @@
     <!-- EDITAR INFORME -->
     <div id="editar" class="tab-pane">
         <div class="form-card">
-            <div class="input-group"><label>Seleccionar informe a editar</label><select id="selectEditar"></select></div>
-            <button id="btnCargarEditar">Cargar datos</button>
+            <h3>Editar informe existente</h3>
+            <div class="input-group"><label>Seleccionar informe</label><select id="selectEditar"></select></div>
+            <button id="btnCargarEditar" class="btn-outline">Cargar datos</button>
             <div id="formEditar" style="display:none; margin-top:20px;">
                 <div class="form-grid">
                     <div class="input-group"><label>Número</label><input type="number" id="editId" readonly></div>
@@ -120,9 +176,10 @@
         </div>
     </div>
 
-    <!-- APROBACIÓN COMERCIAL -->
+    <!-- APROBACIÓN -->
     <div id="aprobacion" class="tab-pane">
         <div class="form-card">
+            <h3>Aprobación comercial</h3>
             <div class="input-group"><label>Seleccionar informe</label><select id="selectInforme"></select></div>
             <div class="input-group"><label>Fecha envío al cliente</label><input type="date" id="fechaEnvio"></div>
             <div class="input-group"><label>Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
@@ -134,7 +191,8 @@
     <!-- EQUIPOS -->
     <div id="equipos" class="tab-pane">
         <div class="table-card">
-            <button id="btnAgregarEquipo">+ Agregar equipo</button>
+            <h3>Gestión de equipos</h3>
+            <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
             <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead>
                 <tbody id="equiposBody"></tbody>
             </table>
@@ -144,16 +202,21 @@
     <!-- CONFIGURACIÓN -->
     <div id="configuracion" class="tab-pane">
         <div class="form-card">
-            <h3>Configuración - Logo de la empresa</h3>
+            <h3>Configuración - Logo corporativo</h3>
             <input type="file" id="logoEmpresa" accept="image/*">
             <div id="logoPreview"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
+            <p style="margin-top:15px; font-size:12px; color:var(--text-gray);">El logo aparecerá en la parte superior de los informes PDF.</p>
         </div>
+    </div>
+    
+    <div class="app-footer">
+        CI RENTELCOM SAS - Laboratorio de Calibración y Telecomunicaciones | Carrera 19A No. 150-50 Bogotá D.C.
     </div>
 </div>
 
 <script>
-    // ==================== LOCALSTORAGE ====================
+    // LOCALSTORAGE
     let equipos = [];
     let informes = [];
     let nextId = 100;
@@ -188,7 +251,6 @@
         setTimeout(() => { msg.style.display = "none"; }, 3000);
     }
 
-    // ==================== LOGO ====================
     function actualizarVistaLogo() {
         const previewDiv = document.getElementById("logoPreview");
         if(logoEmpresaBase64) previewDiv.innerHTML = `<img src="${logoEmpresaBase64}" class="logo-preview"><br><small>Logo actual</small>`;
@@ -217,7 +279,6 @@
         });
     }
 
-    // ==================== RENDER ====================
     function renderAll() {
         document.getElementById("totalEquipos").innerText = equipos.length;
         document.getElementById("totalInformes").innerText = informes.length;
@@ -226,36 +287,30 @@
         document.getElementById("nextIdDisplay").innerText = nextId;
         
         const ib = document.getElementById("informesBody");
-        if(informes.length === 0) ib.innerHTML = '</tr><td colspan="8">Sin informes</tr>';
+        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>';
         else ib.innerHTML = informes.map(i => `
             <tr>
-                <td>${i.id}</td>
-                <td>${i.fecha}</td>
-                <td>${i.serial}</td>
-                <td>${i.cliente}</td>
+                <td>${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td>
                 <td>${i.tipo}</td>
-                <td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td>
-                <td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : 'Sin foto'}</td>
+                <td><span class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</span></td>
+                <td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td>
                 <td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>
             </tr>
         `).join('');
         
         const selInformes = document.getElementById("selectInforme");
         const selEditar = document.getElementById("selectEditar");
-        const options = '<option value="">Seleccionar</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
+        const options = '<option value="">— Seleccionar —</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
         if(selInformes) selInformes.innerHTML = options;
         if(selEditar) selEditar.innerHTML = options;
         
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">Sin equipos</tr>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td>' + '</tr>';
         else eb.innerHTML = equipos.map((e, idx) => `
             <tr>
-                <td>${e.serial}</td>
-                <td>${e.equipo}</td>
-                <td>${e.marca}</td>
-                <td>${e.modelo}</td>
-                <td>${e.cliente}</td>
-                <td class="status-badge">${e.estado || "Pendiente"}</td>
+                <td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td>
+                <td>${e.modelo}</td><td>${e.cliente}</td>
+                <td><span class="status-badge">${e.estado || "Pendiente"}</span></td>
                 <td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>
             </tr>
         `).join('');
@@ -268,15 +323,11 @@
         if(nuevo) { equipos[idx].estado = nuevo; renderAll(); mostrarMensaje("Estado actualizado"); }
     };
 
-    // ==================== GUARDAR NUEVO INFORME ====================
     document.getElementById("btnGuardar").onclick = async () => {
         let id = parseInt(document.getElementById("nuevoId").value);
         if(isNaN(id)) { id = nextId++; }
         else { 
-            if(informes.find(i => i.id === id)) { 
-                alert("Ese número de informe ya existe"); 
-                return; 
-            }
+            if(informes.find(i => i.id === id)) { alert("Ese número ya existe"); return; }
             if(id >= nextId) nextId = id + 1;
         }
         
@@ -292,7 +343,7 @@
         const file = document.getElementById("fotoEquipo").files[0];
         let foto = file ? await fileToBase64(file) : "";
         
-        if(!serial || !cliente || !diagnostico) { alert("Complete serial, cliente y diagnóstico"); return; }
+        if(!serial || !cliente || !diagnostico) { alert("Complete campos obligatorios"); return; }
         
         informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
         
@@ -311,10 +362,9 @@
         document.getElementById("fotoEquipo").value = "";
         
         renderAll();
-        mostrarMensaje(`Informe #${id} guardado correctamente`);
+        mostrarMensaje(`Informe #${id} guardado`);
     };
 
-    // ==================== EDITAR INFORME ====================
     document.getElementById("btnCargarEditar").onclick = () => {
         const id = parseInt(document.getElementById("selectEditar").value);
         const inf = informes.find(i => i.id === id);
@@ -355,7 +405,6 @@
         }
     };
 
-    // ==================== APROBACIÓN ====================
     document.getElementById("btnActualizar").onclick = () => {
         const id = parseInt(document.getElementById("selectInforme").value);
         const inf = informes.find(i => i.id === id);
@@ -368,21 +417,15 @@
         } else alert("Seleccione un informe");
     };
 
-    // ==================== PDF PROFESIONAL (SIN EMOJIS) ====================
+    // PDF EN BLANCO Y NEGRO / ESCALA DE GRISES - PROFESIONAL
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
         
         const fechaActual = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
         
-        // Logo a la izquierda (sin emojis)
-        let logoHtml = logoEmpresaBase64 ? `<div style="text-align:left; margin-bottom:25px;"><img src="${logoEmpresaBase64}" style="max-height:70px;"></div>` : '';
-        
-        // Foto si existe (sin emojis)
-        let fotoHtml = inf.foto ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Evidencia fotográfica</div><img src="${inf.foto}" style="max-width:100%; max-height:250px; border-radius:4px; border:1px solid #ccc;"></div>` : '';
-        
-        // Nota final si existe (sin emojis)
-        let notaHtml = inf.notaFinal ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Nota final / Recomendaciones</div><div style="line-height:1.4;">${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : '';
+        let fotoHtml = inf.foto ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Evidencia fotográfica</div><img src="${inf.foto}" style="max-width:100%; max-height:250px; border:1px solid #ddd;"></div>` : '';
+        let notaHtml = inf.notaFinal ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Nota final / Recomendaciones</div><div>${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : '';
         
         const pdfHtml = `
             <!DOCTYPE html>
@@ -391,102 +434,42 @@
                 <meta charset="UTF-8">
                 <title>Informe Tecnico ${inf.id}</title>
                 <style>
-                    * {
-                        margin: 0;
-                        padding: 0;
-                        box-sizing: border-box;
-                    }
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
                     body { 
                         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
                         padding: 40px; 
                         margin: 0; 
                         background: white;
-                        color: #1a1a2e;
+                        color: #111;
                     }
-                    .container { 
-                        max-width: 800px; 
-                        margin: 0 auto; 
-                        background: white; 
-                    }
-                    .header-logo {
-                        text-align: left;
-                        margin-bottom: 30px;
-                    }
-                    .titulo-principal {
-                        text-align: center;
-                        margin-bottom: 30px;
-                        padding-bottom: 15px;
-                        border-bottom: 2px solid #1e40af;
-                    }
-                    .titulo-principal h2 {
-                        color: #1e40af;
-                        font-size: 22px;
-                        margin: 0;
-                        letter-spacing: 1px;
-                    }
-                    .info-linea {
-                        margin-bottom: 6px;
-                        line-height: 1.4;
-                    }
-                    .seccion {
-                        margin-top: 20px;
-                        margin-bottom: 20px;
-                    }
-                    .seccion-titulo {
-                        font-weight: 600;
-                        margin-bottom: 8px;
-                        font-size: 14px;
-                        color: #1e40af;
-                        border-left: 3px solid #1e40af;
-                        padding-left: 10px;
-                    }
-                    .seccion-contenido {
-                        margin-left: 13px;
-                        line-height: 1.45;
-                        text-align: justify;
-                    }
-                    .equipo-datos {
-                        background: #f8fafc;
-                        padding: 12px 15px;
-                        border-radius: 8px;
-                        margin: 15px 0;
-                    }
-                    .equipo-datos div {
-                        margin-bottom: 4px;
-                    }
-                    .firma {
-                        margin-top: 40px;
-                        border-top: 1px solid #ccc;
-                        padding-top: 20px;
-                    }
-                    .firma div {
-                        margin-bottom: 4px;
-                    }
-                    .pie-pagina {
-                        margin-top: 30px;
-                        font-size: 9px;
-                        text-align: center;
-                        color: #666;
-                        border-top: 1px solid #eee;
-                        padding-top: 15px;
-                    }
-                    .text-bold { font-weight: 600; }
-                    .text-small { font-size: 12px; }
+                    .container { max-width: 800px; margin: 0 auto; }
+                    .header-logo { text-align: left; margin-bottom: 25px; }
+                    .titulo-principal { text-align: center; margin-bottom: 25px; padding-bottom: 12px; border-bottom: 2px solid #333; }
+                    .titulo-principal h2 { color: #111; font-size: 20px; letter-spacing: 1px; }
+                    .info-linea { margin-bottom: 6px; }
+                    .seccion { margin-top: 18px; margin-bottom: 18px; }
+                    .seccion-titulo { font-weight: 700; margin-bottom: 8px; font-size: 13px; border-left: 3px solid #333; padding-left: 10px; }
+                    .seccion-contenido { margin-left: 13px; line-height: 1.45; text-align: justify; }
+                    .equipo-datos { background: #f5f5f5; padding: 12px 15px; margin: 15px 0; border-radius: 4px; }
+                    .firma { margin-top: 35px; border-top: 1px solid #ccc; padding-top: 18px; }
+                    .pie-pagina { margin-top: 25px; font-size: 9px; text-align: center; color: #555; border-top: 1px solid #eee; padding-top: 12px; }
+                    .text-bold { font-weight: 700; }
+                    img { max-width: 100%; height: auto; }
                 </style>
             </head>
             <body>
                 <div class="container">
-                    ${logoHtml}
+                    <div class="header-logo">
+                        ${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<div style="font-weight:bold; font-size:18px;">CI RENTELCOM SAS</div>'}
+                    </div>
                     
                     <div class="titulo-principal">
                         <h2>INFORME TÉCNICO DE LABORATORIO</h2>
                     </div>
                     
-                    <div class="seccion">
-                        <div class="info-linea"><span class="text-bold">Fecha de emisión:</span> ${fechaActual}</div>
-                        <div class="info-linea"><span class="text-bold">Reporte N°:</span> ${inf.id}</div>
-                        <div class="info-linea"><span class="text-bold">Cliente:</span> ${inf.cliente}</div>
-                    </div>
+                    <div class="info-linea"><span class="text-bold">Fecha de emisión:</span> ${fechaActual}</div>
+                    <div class="info-linea"><span class="text-bold">Reporte N°:</span> ${inf.id}</div>
+                    <div class="info-linea"><span class="text-bold">Cliente:</span> ${inf.cliente}</div>
                     
                     <div class="equipo-datos">
                         <div><span class="text-bold">Equipo:</span> ${inf.marca} ${inf.modelo}</div>
@@ -496,23 +479,17 @@
                     
                     <div class="seccion">
                         <div class="seccion-titulo">Observación inicial</div>
-                        <div class="seccion-contenido">
-                            Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para servicio de ${inf.tipo.toLowerCase()}.
-                        </div>
+                        <div class="seccion-contenido">Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para ${inf.tipo.toLowerCase()}.</div>
                     </div>
                     
                     <div class="seccion">
                         <div class="seccion-titulo">Diagnóstico</div>
-                        <div class="seccion-contenido">
-                            ${inf.diagnostico.replace(/\n/g,'<br>')}
-                        </div>
+                        <div class="seccion-contenido">${inf.diagnostico.replace(/\n/g,'<br>')}</div>
                     </div>
                     
                     <div class="seccion">
                         <div class="seccion-titulo">Valores</div>
-                        <div class="seccion-contenido">
-                            ${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}
-                        </div>
+                        <div class="seccion-contenido">${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div>
                     </div>
                     
                     ${fotoHtml}
@@ -530,9 +507,7 @@
                     </div>
                 </div>
                 <script>
-                    window.onload = function() {
-                        window.print();
-                    };
+                    window.onload = function() { window.print(); };
                 <\/script>
             </body>
             </html>
@@ -543,7 +518,6 @@
         ventana.document.close();
     };
 
-    // ==================== AGREGAR EQUIPO ====================
     document.getElementById("btnAgregarEquipo").onclick = () => {
         const serial = prompt("Serial:"); if(!serial) return;
         const equipo = prompt("Tipo de equipo:"); 
@@ -555,7 +529,6 @@
         mostrarMensaje(`Equipo ${serial} agregado`);
     };
 
-    // ==================== TABS ====================
     document.querySelectorAll(".tab-btn").forEach(btn => { 
         btn.addEventListener("click", () => { 
             document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); 
