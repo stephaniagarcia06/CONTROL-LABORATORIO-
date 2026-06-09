@@ -51,12 +51,12 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
         label { font-weight: 600; font-size: 0.8rem; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select, textarea { padding: 12px 14px; border: 1px solid var(--gray-border); border-radius: 12px; font-size: 0.9rem; font-family: inherit; transition: all 0.2s; }
+        input, select, textarea { padding: 12px 14px; border: 1px solid var(--gray-border); border-radius: 12px; font-size: 0.9rem; font-family: inherit; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,43,78,0.1); }
         textarea { resize: vertical; min-height: 60px; }
         
         button { background: var(--primary); border: none; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        button:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        button:hover { background: var(--primary-dark); }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); }
@@ -85,13 +85,7 @@
         .filtro-activo { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; margin-left: 10px; }
         .import-area { border: 2px dashed var(--gray-border); padding: 30px; text-align: center; border-radius: 16px; margin: 20px 0; cursor: pointer; transition: all 0.2s; }
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
-        
         .delete-section { border-top: 1px solid var(--gray-border); margin-top: 20px; padding-top: 20px; }
-        
-        /* Mapeo de columnas */
-        .column-mapping { background: var(--secondary); padding: 15px; border-radius: 12px; margin: 15px 0; }
-        .column-mapping h4 { margin-bottom: 10px; color: var(--primary); }
-        .column-mapping p { font-size: 13px; margin: 5px 0; }
     </style>
 </head>
 <body>
@@ -195,7 +189,7 @@
         <div class="table-card">
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
-            <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="equiposBody"></tbody></table>
+            <tr><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead><tbody id="equiposBody"></tbody></table>
         </div>
     </div>
 
@@ -203,7 +197,7 @@
     <div id="trazabilidad" class="tab-pane">
         <div class="form-card">
             <h3>Trazabilidad de equipos</h3>
-            <p style="margin-bottom: 15px; color: var(--text-gray);">Seleccione un equipo para ver todo su historial de servicios e informes.</p>
+            <p style="margin-bottom: 15px;">Seleccione un equipo para ver todo su historial de servicios e informes.</p>
             <div class="input-group"><label>Seleccionar equipo por serial</label><select id="selectEquipoTraza"><option value="">— Seleccionar equipo —</option></select></div>
             <button id="btnCargarTraza" class="btn-outline">Ver historial</button>
             <div id="historialEquipo" style="margin-top: 25px;"></div>
@@ -215,21 +209,21 @@
     <div id="importar" class="tab-pane">
         <div class="form-card">
             <h3>Importar datos desde archivo</h3>
-            <div class="column-mapping">
-                <h4>📋 Formato esperado para tu archivo (MATRIZ INFORMES)</h4>
-                <p>✅ <strong># informe</strong> → Número del informe</p>
+            <div style="background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                <h4>📋 Columnas que la app reconoce en tu archivo:</h4>
+                <p>✅ <strong>ID</strong> → Número de informe</p>
                 <p>✅ <strong>fecha</strong> → Fecha del informe</p>
-                <p>✅ <strong>con</strong> → Cliente</p>
-                <p>✅ <strong>equipo</strong> → Tipo de equipo</p>
-                <p>✅ <strong>marca</strong> → Marca</p>
-                <p>✅ <strong>modelo</strong> → Modelo</p>
+                <p>✅ <strong>CLIENTE</strong> → Nombre del cliente</p>
+                <p>✅ <strong>equipo</strong> → Tipo de equipo/servicio</p>
+                <p>✅ <strong>marca</strong> → Marca del equipo</p>
+                <p>✅ <strong>modelo</strong> → Modelo del equipo</p>
                 <p>✅ <strong>serial</strong> → Serial del equipo</p>
-                <p>✅ <strong>diagnostico</strong> → Diagnóstico</p>
+                <p>✅ <strong>diagnostico</strong> → Diagnóstico técnico</p>
             </div>
             <div class="import-area" id="importArea">
                 <div style="font-size: 48px;">📂</div>
                 <p>Arrastra tu archivo Excel (.xlsx) aquí o haz clic para seleccionar</p>
-                <p style="font-size: 12px; color: var(--text-gray); margin-top: 10px;">Tu archivo debe tener las columnas: # informe, fecha, con, equipo, marca, modelo, serial, diagnostico</p>
+                <p style="font-size: 12px; margin-top: 10px;">Tu archivo debe tener las columnas: ID, fecha, CLIENTE, equipo, marca, modelo, serial, diagnostico</p>
             </div>
             <input type="file" id="fileInput" accept=".csv,.xlsx" style="display: none;">
             <div id="importPreview" style="margin-top: 20px; display: none;"></div>
@@ -247,7 +241,7 @@
             
             <div class="delete-section">
                 <h3 style="color: var(--danger);">⚠️ Peligro - Eliminar datos</h3>
-                <p style="margin-bottom: 15px;">Esta acción eliminará TODOS los informes y equipos guardados. No se puede deshacer.</p>
+                <p>Esta acción eliminará TODOS los informes y equipos guardados.</p>
                 <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
             </div>
         </div>
@@ -278,22 +272,15 @@
     }
 
     function eliminarTodosLosDatos() {
-        const confirmar = confirm("⚠️ ¿ESTÁS SEGURA?\n\nEsta acción eliminará TODOS los informes y equipos guardados.\n\nNo se puede deshacer.");
-        if(confirmar) {
-            equipos = [];
-            informes = [];
-            nextId = 100;
-            guardarDatos();
-            renderAll();
-            cargarSelectEquiposTraza();
-            mostrarMensaje("✅ Todos los datos han sido eliminados correctamente");
+        if(confirm("⚠️ ¿ESTÁS SEGURA?\n\nEsta acción eliminará TODOS los informes y equipos guardados.\n\nNo se puede deshacer.")) {
+            equipos = []; informes = []; nextId = 100; guardarDatos(); renderAll(); cargarSelectEquiposTraza();
+            mostrarMensaje("✅ Todos los datos han sido eliminados");
         }
     }
 
-    function mostrarMensaje(texto, tipo = "success") {
+    function mostrarMensaje(texto) {
         const msg = document.getElementById("mensajeExito");
-        msg.innerText = texto;
-        msg.style.display = "block";
+        msg.innerText = texto; msg.style.display = "block";
         setTimeout(() => msg.style.display = "none", 4000);
     }
 
@@ -308,7 +295,7 @@
         if(file) {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = function() { logoEmpresaBase64 = reader.result; guardarDatos(); actualizarVistaLogo(); mostrarMensaje("Logo guardado correctamente"); };
+            reader.onload = function() { logoEmpresaBase64 = reader.result; guardarDatos(); actualizarVistaLogo(); mostrarMensaje("Logo guardado"); };
         }
     };
 
@@ -329,7 +316,7 @@
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
         if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td></tr>`).join('');
     }
 
     function renderAll() {
@@ -354,7 +341,7 @@
         if(nuevo) { equipos[idx].estado = nuevo; renderAll(); mostrarMensaje("Estado actualizado"); }
     };
 
-    // ==================== IMPORTAR DATOS - FORMATO MATRIZ ====================
+    // ==================== IMPORTAR DATOS - MAPEO EXACTO PARA TU MATRIZ ====================
     function setupImport() {
         const importArea = document.getElementById("importArea");
         const fileInput = document.getElementById("fileInput");
@@ -383,37 +370,33 @@
                     datos.push(row);
                 }
             }
-        } 
-        else if(file.name.endsWith('.xlsx')) {
+        } else if(file.name.endsWith('.xlsx')) {
             const data = await file.arrayBuffer();
             const workbook = XLSX.read(data);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             datos = XLSX.utils.sheet_to_json(sheet);
         }
         
-        // Mostrar vista previa del mapeo
-        preview.style.display = "block";
-        if(datos.length > 0) {
-            const primerRegistro = datos[0];
-            preview.innerHTML = `<h4>✅ Vista previa de la importación (${datos.length} registros encontrados)</h4>
-                <div class="column-mapping" style="margin:10px 0;">
-                    <p><strong>📌 Mapeo detectado:</strong></p>
-                    <p>🔢 # informe → ${primerRegistro["# informe"] || primerRegistro["#informe"] || 'No encontrado'}</p>
-                    <p>📅 fecha → ${primerRegistro.fecha || 'No encontrado'}</p>
-                    <p>🏢 con/cliente → ${primerRegistro.con || primerRegistro.CLIENTE || 'No encontrado'}</p>
-                    <p>🔧 equipo → ${primerRegistro.equipo || 'No encontrado'}</p>
-                    <p>🏷️ marca → ${primerRegistro.marca || 'No encontrado'}</p>
-                    <p>📟 modelo → ${primerRegistro.modelo || 'No encontrado'}</p>
-                    <p>🔢 serial → ${primerRegistro.serial || 'No encontrado'}</p>
-                    <p>📋 diagnostico → ${primerRegistro.diagnostico ? primerRegistro.diagnostico.substring(0,50)+'...' : 'No encontrado'}</p>
-                </div>
-                <p style="margin-top:10px;">Se importarán ${datos.length} informes.</p>`;
-        } else {
-            preview.innerHTML = `<p>❌ No se encontraron datos en el archivo. Asegúrate de que tenga las columnas correctas.</p>`;
+        if(datos.length === 0) {
+            preview.innerHTML = '<p>❌ No se encontraron datos en el archivo.</p>';
             btnConfirmar.style.display = "none";
             return;
         }
         
+        const primerRegistro = datos[0];
+        preview.innerHTML = `<h4>✅ Vista previa (${datos.length} registros encontrados)</h4>
+            <div style="background:#e8f0fe; padding:12px; border-radius:12px; margin:10px 0;">
+                <p><strong>📌 Mapeo detectado:</strong></p>
+                <p>🔢 <strong>ID</strong> (N° informe): ${primerRegistro.ID || primerRegistro.id || 'No encontrado'}</p>
+                <p>📅 <strong>fecha</strong>: ${primerRegistro.fecha || 'No encontrado'}</p>
+                <p>🏢 <strong>CLIENTE</strong>: ${primerRegistro.CLIENTE || primerRegistro.cliente || 'No encontrado'}</p>
+                <p>🔧 <strong>equipo</strong>: ${primerRegistro.equipo || 'No encontrado'}</p>
+                <p>🏷️ <strong>marca</strong>: ${primerRegistro.marca || 'No encontrado'}</p>
+                <p>📟 <strong>modelo</strong>: ${primerRegistro.modelo || 'No encontrado'}</p>
+                <p>🔢 <strong>serial</strong>: ${primerRegistro.serial || 'No encontrado'}</p>
+                <p>📋 <strong>diagnostico</strong>: ${primerRegistro.diagnostico ? primerRegistro.diagnostico.substring(0,50)+'...' : 'No encontrado'}</p>
+            </div>
+            <p>Se importarán <strong>${datos.length}</strong> informes.</p>`;
         btnConfirmar.style.display = "block";
         
         btnConfirmar.onclick = () => {
@@ -421,8 +404,7 @@
             let maxId = 0;
             
             for(const row of datos) {
-                // Obtener el número de informe de la columna "# informe"
-                let id = row["# informe"] || row["#informe"] || row["ITEM"] || row["id"];
+                let id = row.ID || row.id;
                 if(id && !isNaN(parseInt(id))) {
                     id = parseInt(id);
                     if(id > maxId) maxId = id;
@@ -430,17 +412,25 @@
                     id = nextId++;
                 }
                 
-                const fecha = row.fecha ? (row.fecha.includes('/') ? row.fecha.split('/').reverse().join('-') : row.fecha).substring(0,10) : new Date().toISOString().slice(0,10);
-                const serial = row.serial || row.Serial || `EQ-${id}`;
-                const cliente = row.con || row.CLIENTE || row.cliente || "CLIENTE GENERAL";
-                const diagnostico = row.diagnostico || row.DIAGNOSTICO || "Diagnóstico registrado en importación";
-                const tipo = row.equipo || row.TIPO || row.tipo || "Calibración";
-                const marca = row.marca || row.MARCA || "GENERICO";
-                const modelo = row.modelo || row.MODELO || "MODELO";
-                const estado = row["ESTADO INFORME"] || row.estado || "Pendiente";
-                const estadoFinal = (estado === "entregado" || estado === "Aprobado") ? "Aprobado" : "Pendiente";
+                let fecha = row.fecha;
+                if(fecha) {
+                    if(fecha.includes('/')) {
+                        let partes = fecha.split('/');
+                        fecha = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    }
+                    fecha = fecha.substring(0,10);
+                } else {
+                    fecha = new Date().toISOString().slice(0,10);
+                }
                 
-                informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores: "", notaFinal: "", foto: "", estado: estadoFinal, fechaEnvio: "", obsCliente: "" });
+                const serial = row.serial || `EQ-${id}`;
+                const cliente = row.CLIENTE || row.cliente || "CLIENTE GENERAL";
+                const diagnostico = row.diagnostico || "Diagnóstico registrado en importación";
+                const tipo = row.equipo || "Calibración";
+                const marca = row.marca || "GENERICO";
+                const modelo = row.modelo || "MODELO";
+                
+                informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
                 nuevosInformes++;
                 
                 if(!equipos.find(e => e.serial === serial)) {
@@ -454,7 +444,7 @@
             mostrarMensaje(`✅ Se importaron ${nuevosInformes} informes correctamente`);
             preview.style.display = "none";
             btnConfirmar.style.display = "none";
-            fileInput.value = "";
+            document.getElementById("fileInput").value = "";
         };
     }
 
@@ -463,9 +453,9 @@
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
         const fechaActual = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
-        let fotoHtml = inf.foto ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Evidencia fotográfica</div><img src="${inf.foto}" style="max-width:100%; max-height:250px; border:1px solid #ddd;"></div>` : '';
-        let notaHtml = inf.notaFinal ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Nota final / Recomendaciones</div><div>${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : '';
-        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe Tecnico ${inf.id}</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;padding:40px;background:white;color:#111;}.container{max-width:800px;margin:0 auto;}.header-logo{text-align:left;margin-bottom:25px;}.titulo-principal{text-align:center;margin-bottom:25px;padding-bottom:12px;border-bottom:2px solid #333;}.titulo-principal h2{color:#111;font-size:20px;}.info-linea{margin-bottom:6px;}.seccion{margin-top:18px;margin-bottom:18px;}.seccion-titulo{font-weight:700;margin-bottom:8px;font-size:13px;border-left:3px solid #333;padding-left:10px;}.seccion-contenido{margin-left:13px;line-height:1.45;text-align:justify;}.equipo-datos{background:#f5f5f5;padding:12px 15px;margin:15px 0;border-radius:4px;}.firma{margin-top:35px;border-top:1px solid #ccc;padding-top:18px;}.pie-pagina{margin-top:25px;font-size:9px;text-align:center;color:#555;border-top:1px solid #eee;padding-top:12px;}.text-bold{font-weight:700;}img{max-width:100%;height:auto;}</style></head><body><div class="container"><div class="header-logo">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<div style="font-weight:bold; font-size:18px;">CI RENTELCOM SAS</div>'}</div><div class="titulo-principal"><h2>INFORME TÉCNICO DE LABORATORIO</h2></div><div class="info-linea"><span class="text-bold">Fecha de emisión:</span> ${fechaActual}</div><div class="info-linea"><span class="text-bold">Reporte N°:</span> ${inf.id}</div><div class="info-linea"><span class="text-bold">Cliente:</span> ${inf.cliente}</div><div class="equipo-datos"><div><span class="text-bold">Equipo:</span> ${inf.marca} ${inf.modelo}</div><div><span class="text-bold">Serial:</span> ${inf.serial}</div><div><span class="text-bold">Servicio solicitado:</span> ${inf.tipo}</div></div><div class="seccion"><div class="seccion-titulo">Observación inicial</div><div class="seccion-contenido">Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para ${inf.tipo.toLowerCase()}.</div></div><div class="seccion"><div class="seccion-titulo">Diagnóstico</div><div class="seccion-contenido">${inf.diagnostico.replace(/\n/g,'<br>')}</div></div><div class="seccion"><div class="seccion-titulo">Valores</div><div class="seccion-contenido">${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div></div>${fotoHtml}${notaHtml}<div class="firma"><div><span class="text-bold">Verificado por:</span></div><div>Ing. Stephania Garcia</div><div>Ingeniero de Laboratorio y Calidad</div><div>Auditor ISO/IEC 17025:2017</div></div><div class="pie-pagina">Carrera 19A No. 150-50 - Bogotá D.C. | Teléfono: 9399167 - 3185586239</div></div></body></html>`;
+        let fotoHtml = inf.foto ? `<div style="margin:20px 0;"><div style="font-weight:bold;">Evidencia fotográfica</div><img src="${inf.foto}" style="max-width:100%; max-height:250px; border:1px solid #ddd;"></div>` : '';
+        let notaHtml = inf.notaFinal ? `<div style="margin:20px 0;"><div style="font-weight:bold;">Nota final / Recomendaciones</div><div>${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : '';
+        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe Tecnico ${inf.id}</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;padding:40px;background:white;color:#111;}.container{max-width:800px;margin:0 auto;}.header-logo{text-align:left;margin-bottom:25px;}.titulo-principal{text-align:center;margin-bottom:25px;padding-bottom:12px;border-bottom:2px solid #333;}.titulo-principal h2{color:#111;font-size:20px;}.info-linea{margin-bottom:6px;}.seccion{margin-top:18px;margin-bottom:18px;}.seccion-titulo{font-weight:700;margin-bottom:8px;font-size:13px;border-left:3px solid #333;padding-left:10px;}.seccion-contenido{margin-left:13px;line-height:1.45;text-align:justify;}.equipo-datos{background:#f5f5f5;padding:12px 15px;margin:15px 0;border-radius:4px;}.firma{margin-top:35px;border-top:1px solid #ccc;padding-top:18px;}.pie-pagina{margin-top:25px;font-size:9px;text-align:center;color:#555;border-top:1px solid #eee;padding-top:12px;}.text-bold{font-weight:700;}img{max-width:100%;height:auto;}</style></head><body><div class="container"><div class="header-logo">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<div style="font-weight:bold; font-size:18px;">CI RENTELCOM SAS</div>'}</div><div class="titulo-principal"><h2>INFORME TÉCNICO DE LABORATORIO</h2></div><div class="info-linea"><span class="text-bold">Fecha de emisión:</span> ${fechaActual}</div><div class="info-linea"><span class="text-bold">Reporte N°:</span> ${inf.id}</div><div class="info-linea"><span class="text-bold">Cliente:</span> ${inf.cliente}</div><div class="equipo-datos"><div><span class="text-bold">Equipo:</span> ${inf.marca} ${inf.modelo}</div><div><span class="text-bold">Serial:</span> ${inf.serial}</div><div><span class="text-bold">Servicio solicitado:</span> ${inf.tipo}</div></div><div class="seccion"><div class="seccion-titulo">Observación inicial</div><div class="seccion-contenido">Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para ${inf.tipo.toLowerCase()}.</div></div><div class="seccion"><div class="seccion-titulo">Diagnóstico</div><div class="seccion-contenido">${inf.diagnostico.replace(/\n/g,'<br>')}</div></div><div class="seccion"><div class="seccion-titulo">Valores</div><div class="seccion-contenido">${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div></div>${fotoHtml}${notaHtml}<div class="firma"><div><span class="text-bold">Verificado por:</span></div><div>Ing. Stephania Garcia</div><div>Ingeniero de Laboratorio y Calidad</div><div>Auditor ISO/IEC 17025:2017</div></div><div class="pie-pagina">Carrera 19A No. 150-50 - Bogotá D.C. | Teléfono: 9399167 - 3185586239</div></div></body></html>`;
         const blob = new Blob([docHtml], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         const ventana = window.open(url, '_blank');
