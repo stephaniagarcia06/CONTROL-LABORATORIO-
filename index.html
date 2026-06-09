@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CalibPro - Informes Técnicos</title>
+    <title>CalibPro - Gestión de Calibraciones</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,10 +12,10 @@
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
         h1 { font-size: 1.8rem; background: linear-gradient(135deg, #2563eb, #1e40af); background-clip: text; -webkit-background-clip: text; color: transparent; }
         .badge { background: #e2e8f0; padding: 8px 16px; border-radius: 40px; font-size: 0.85rem; font-weight: 500; }
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; margin-bottom: 32px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
         .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e9eef3; }
         .card h3 { font-size: 0.85rem; font-weight: 500; color: #5b6e8c; margin-bottom: 12px; }
-        .card .number { font-size: 2rem; font-weight: 700; color: #0f3b7a; }
+        .card .number { font-size: 2.2rem; font-weight: 700; color: #0f3b7a; }
         .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 28px; }
         .tab-btn { background: none; border: none; padding: 10px 20px; font-size: 1rem; font-weight: 600; cursor: pointer; color: #5b6e8c; border-radius: 30px; }
         .tab-btn.active { background: #2563eb; color: white; }
@@ -28,24 +28,20 @@
         input, select, textarea { padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 18px; font-size: 0.9rem; font-family: inherit; }
         textarea { resize: vertical; min-height: 60px; }
         button { background: #2563eb; border: none; color: white; padding: 12px 24px; border-radius: 40px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-        .btn-danger { background: #dc2626; }
-        .btn-success { background: #10b981; }
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #ecf3fa; font-size: 0.8rem; vertical-align: top; }
         th { background: #f8fafc; font-weight: 700; }
         .status-badge { padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; display: inline-block; }
         .badge-pendiente { background: #fff3e0; color: #e67e22; }
         .badge-aprobado { background: #e6f7e6; color: #2e7d32; }
-        .obs-item { background: #f8fafc; padding: 15px; border-radius: 16px; margin-bottom: 15px; border-left: 4px solid #2563eb; }
-        .obs-img { max-width: 150px; max-height: 150px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; }
-        .pdf-btn { background: #dc2626; padding: 6px 14px; font-size: 0.75rem; }
+        .pdf-btn { background: #dc2626; margin-left: 8px; padding: 6px 14px; font-size: 0.75rem; }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <h1>🔬 CalibPro — Informes Técnicos</h1>
-        <div class="badge">CI RENTELCOM SAS</div>
+        <h1>🔬 CalibPro — Gestión de Calibraciones</h1>
+        <div class="badge">CI RENTELCOM SAS | v3.0</div>
     </div>
 
     <div class="dashboard">
@@ -56,57 +52,52 @@
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" data-tab="tabInformes">🗂️ Informes</button>
-        <button class="tab-btn" data-tab="tabNuevo">📝 Nuevo Informe</button>
-        <button class="tab-btn" data-tab="tabAprobacion">✏️ Aprobación</button>
-        <button class="tab-btn" data-tab="tabEquipos">📋 Equipos</button>
+        <button class="tab-btn active" data-tab="informes">🗂️ Informes</button>
+        <button class="tab-btn" data-tab="nuevo">📝 Nuevo informe</button>
+        <button class="tab-btn" data-tab="aprobacion">✏️ Aprobación comercial</button>
+        <button class="tab-btn" data-tab="equipos">📋 Equipos</button>
     </div>
 
-    <!-- PESTAÑA INFORMES -->
-    <div id="tabInformes" class="tab-pane active-pane">
+    <!-- LISTA DE INFORMES -->
+    <div id="informes" class="tab-pane active-pane">
         <div class="table-card">
-            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>PDF</th></tr></thead>
-            <tbody id="informesBody"></tbody>
-        </table>
+            <table>
+                <thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>PDF</th></tr></thead>
+                <tbody id="informesBody"></tbody>
+            </table>
         </div>
     </div>
 
-    <!-- PESTAÑA NUEVO INFORME (con observaciones y fotos) -->
-    <div id="tabNuevo" class="tab-pane">
+    <!-- NUEVO INFORME -->
+    <div id="nuevo" class="tab-pane">
         <div class="form-card">
             <div class="form-grid">
-                <div><label>📅 Fecha</label><input type="date" id="fecha"></div>
-                <div><label>🔧 Serial</label><input id="serial" placeholder="Ej: 1095120"></div>
-                <div><label>🏷️ Marca</label><input id="marca" placeholder="EXFO"></div>
-                <div><label>📟 Modelo</label><input id="modelo" placeholder="MAX715"></div>
-                <div><label>👤 Cliente</label><input id="cliente" placeholder="Cliente"></div>
-                <div><label>🔧 Servicio</label><select id="tipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
+                <div class="input-group"><label>📅 Fecha</label><input type="date" id="fecha"></div>
+                <div class="input-group"><label>🔧 Serial</label><input id="serial" placeholder="Ej: 1095120"></div>
+                <div class="input-group"><label>🏷️ Marca</label><input id="marca" placeholder="EXFO"></div>
+                <div class="input-group"><label>📟 Modelo</label><input id="modelo" placeholder="MAX715"></div>
+                <div class="input-group"><label>👤 Cliente</label><input id="cliente" placeholder="INMEL INGENIERIA"></div>
+                <div class="input-group"><label>🔧 Servicio</label><select id="tipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option></select></div>
             </div>
-            <div><label>📋 Diagnóstico principal</label><textarea id="diagnostico" rows="3"></textarea></div>
-            <div><label>💰 Valores</label><textarea id="valores" rows="2" placeholder="Desglose de costos..."></textarea></div>
-            
-            <hr>
-            <h4>📌 Diagnósticos / Observaciones adicionales (con fotos)</h4>
-            <div id="observacionesContainer"></div>
-            <button id="btnAgregarObs" class="btn-success">+ Agregar diagnóstico adicional</button>
-            
-            <button id="btnGuardarInforme" style="width:100%; margin-top:20px;">💾 Guardar Informe</button>
+            <div class="input-group"><label>📋 Diagnóstico</label><textarea id="diagnostico" rows="3" placeholder="Descripción técnica..."></textarea></div>
+            <div class="input-group"><label>💰 Valores</label><textarea id="valores" rows="2" placeholder="Ej: Calibración: $583.333 + IVA"></textarea></div>
+            <button id="btnGuardar" style="width:100%">💾 Guardar informe</button>
         </div>
     </div>
 
-    <!-- PESTAÑA APROBACIÓN -->
-    <div id="tabAprobacion" class="tab-pane">
+    <!-- APROBACIÓN COMERCIAL -->
+    <div id="aprobacion" class="tab-pane">
         <div class="form-card">
-            <div><label>Seleccionar informe</label><select id="selectAprobacion"></select></div>
-            <div><label>Fecha envío cliente</label><input type="date" id="fechaEnvio"></div>
-            <div><label>Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
-            <div><label>Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
-            <button id="btnActualizarAprobacion">Actualizar</button>
+            <div class="input-group"><label>Seleccionar informe</label><select id="selectInforme"></select></div>
+            <div class="input-group"><label>📅 Fecha envío al cliente</label><input type="date" id="fechaEnvio"></div>
+            <div class="input-group"><label>📎 Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
+            <div class="input-group"><label>💬 Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
+            <button id="btnActualizar">Actualizar</button>
         </div>
     </div>
 
-    <!-- PESTAÑA EQUIPOS -->
-    <div id="tabEquipos" class="tab-pane">
+    <!-- EQUIPOS -->
+    <div id="equipos" class="tab-pane">
         <div class="table-card">
             <button id="btnAgregarEquipo">+ Agregar equipo</button>
             <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th></tr></thead><tbody id="equiposBody"></tbody></table>
@@ -115,74 +106,29 @@
 </div>
 
 <script>
-    // ========== DATOS ==========
     let equipos = [];
     let informes = [];
     let nextId = 100;
-    
-    // Variables para el formulario temporal
-    let obsTemp = []; // cada elemento: { fecha, texto, foto }
-    
-    // ========== FUNCIÓN PARA CONVERTIR FOTO ==========
-    function fotoToBase64(file) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-        });
+
+    function renderAll() {
+        document.getElementById("totalEquipos").innerText = equipos.length;
+        document.getElementById("totalInformes").innerText = informes.length;
+        document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
+        document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
+        
+        const ib = document.getElementById("informesBody");
+        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="7">Sin informes</td></tr>';
+        else ib.innerHTML = informes.map(i => `<tr><td>${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">📄 PDF</button></td></tr>`).join('');
+        
+        const sel = document.getElementById("selectInforme");
+        sel.innerHTML = '<option value="">Seleccionar</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
+        
+        const eb = document.getElementById("equiposBody");
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="5">Sin equipos</td></tr>';
+        else eb.innerHTML = equipos.map(e => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td></tr>`).join('');
     }
-    
-    // ========== RENDERIZAR OBSERVACIONES TEMPORALES ==========
-    function renderObsTemp() {
-        const container = document.getElementById("observacionesContainer");
-        if(obsTemp.length === 0) {
-            container.innerHTML = '<p style="color:#999;">Sin diagnósticos adicionales.</p>';
-            return;
-        }
-        let html = '';
-        for(let i=0; i<obsTemp.length; i++) {
-            const o = obsTemp[i];
-            html += `<div class="obs-item">
-                <strong>📝 Diagnóstico ${i+1}</strong><br>
-                <strong>Fecha:</strong> ${o.fecha}<br>
-                <strong>Texto:</strong> ${o.texto}<br>`;
-            if(o.foto) html += `<img src="${o.foto}" class="obs-img"><br>`;
-            html += `<button class="btn-danger" style="margin-top:8px;" onclick="eliminarObsTemp(${i})">Eliminar</button></div>`;
-        }
-        container.innerHTML = html;
-    }
-    
-    window.eliminarObsTemp = (idx) => {
-        obsTemp.splice(idx, 1);
-        renderObsTemp();
-    };
-    
-    // ========== AGREGAR OBSERVACIÓN ==========
-    document.getElementById("btnAgregarObs").onclick = () => {
-        const fecha = prompt("Fecha (YYYY-MM-DD):", new Date().toISOString().slice(0,10));
-        if(!fecha) return;
-        const texto = prompt("Diagnóstico u observación técnica:");
-        if(!texto) return;
-        const conFoto = confirm("¿Agregar una foto?");
-        if(conFoto) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                const fotoBase64 = file ? await fotoToBase64(file) : '';
-                obsTemp.push({ fecha, texto, foto: fotoBase64 });
-                renderObsTemp();
-            };
-            input.click();
-        } else {
-            obsTemp.push({ fecha, texto, foto: '' });
-            renderObsTemp();
-        }
-    };
-    
-    // ========== GUARDAR INFORME ==========
-    document.getElementById("btnGuardarInforme").onclick = () => {
+
+    document.getElementById("btnGuardar").onclick = () => {
         const fecha = document.getElementById("fecha").value || new Date().toISOString().slice(0,10);
         const serial = document.getElementById("serial").value.trim();
         const marca = document.getElementById("marca").value.trim();
@@ -191,154 +137,39 @@
         const tipo = document.getElementById("tipo").value;
         const diagnostico = document.getElementById("diagnostico").value.trim();
         const valores = document.getElementById("valores").value.trim();
-        
-        if(!serial || !cliente || !diagnostico) {
-            alert("Complete serial, cliente y diagnóstico");
-            return;
-        }
-        
+        if(!serial || !cliente || !diagnostico) { alert("Complete serial, cliente y diagnóstico"); return; }
         const nuevoId = nextId++;
-        informes.push({
-            id: nuevoId, fecha, serial, marca, modelo, cliente, tipo,
-            diagnostico, valores, observaciones: [...obsTemp],
-            estado: "Pendiente", fechaEnvio: "", obsCliente: ""
-        });
-        
-        if(!equipos.find(e => e.serial === serial)) {
-            equipos.push({ serial, equipo: tipo, marca, modelo, cliente });
-        }
-        
-        // Limpiar formulario
-        document.getElementById("serial").value = "";
-        document.getElementById("marca").value = "";
-        document.getElementById("modelo").value = "";
-        document.getElementById("cliente").value = "";
-        document.getElementById("diagnostico").value = "";
-        document.getElementById("valores").value = "";
-        obsTemp = [];
-        renderObsTemp();
-        
+        informes.push({ id: nuevoId, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
+        if(!equipos.find(e => e.serial === serial)) equipos.push({ serial, equipo: tipo, marca, modelo, cliente });
+        document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = "";
         renderAll();
-        alert(`✅ Informe #${nuevoId} guardado con ${informes[informes.length-1].observaciones.length} diagnósticos adicionales.`);
+        alert(`Informe #${nuevoId} guardado`);
     };
-    
-    // ========== RENDERIZAR TODO ==========
-    function renderAll() {
-        document.getElementById("totalEquipos").innerText = equipos.length;
-        document.getElementById("totalInformes").innerText = informes.length;
-        document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
-        document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
-        
-        // Tabla informes
-        const ib = document.getElementById("informesBody");
-        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="7">Sin informes</td></tr>';
-        else {
-            ib.innerHTML = informes.map(i => `
-                <tr>
-                    <td>${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td>
-                    <td>${i.tipo}</td>
-                    <td class="${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td>
-                    <td><button class="pdf-btn" onclick="generarPDF(${i.id})">📄 PDF</button></td>
-                </tr>
-            `).join('');
-        }
-        
-        // Select aprobación
-        const sel = document.getElementById("selectAprobacion");
-        sel.innerHTML = '<option value="">Seleccionar</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
-        
-        // Tabla equipos
-        const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="5">Sin equipos</td></tr>';
-        else {
-            eb.innerHTML = equipos.map(e => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td></tr>`).join('');
-        }
-    }
-    
-    // ========== ACTUALIZAR APROBACIÓN ==========
-    document.getElementById("btnActualizarAprobacion").onclick = () => {
-        const id = parseInt(document.getElementById("selectAprobacion").value);
+
+    document.getElementById("btnActualizar").onclick = () => {
+        const id = parseInt(document.getElementById("selectInforme").value);
         if(!id) { alert("Seleccione un informe"); return; }
         const inf = informes.find(i => i.id === id);
-        if(inf) {
-            inf.fechaEnvio = document.getElementById("fechaEnvio").value;
-            inf.estado = document.getElementById("estadoFinal").value;
-            inf.obsCliente = document.getElementById("obsCliente").value;
-            renderAll();
-            alert("Actualizado");
-        }
+        if(inf) { inf.fechaEnvio = document.getElementById("fechaEnvio").value; inf.estado = document.getElementById("estadoFinal").value; inf.obsCliente = document.getElementById("obsCliente").value; renderAll(); alert("Actualizado"); }
     };
-    
-    // ========== GENERAR PDF CON OBSERVACIONES Y FOTOS ==========
+
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
-        
         const fechaActual = new Date().toLocaleDateString('es-CO');
-        let obsHtml = '';
-        if(inf.observaciones && inf.observaciones.length > 0) {
-            obsHtml = '<div style="margin:20px 0;"><strong>📋 Diagnósticos adicionales:</strong><br>';
-            for(let o of inf.observaciones) {
-                obsHtml += `<div style="margin-bottom:15px; border-left:2px solid #2563eb; padding-left:12px;">
-                    <strong>Fecha:</strong> ${o.fecha}<br>
-                    <strong>Texto:</strong> ${o.texto}<br>`;
-                if(o.foto) obsHtml += `<img src="${o.foto}" style="max-width:100%; max-height:200px; margin-top:8px;"><br>`;
-                obsHtml += `</div>`;
-            }
-            obsHtml += '</div>';
-        }
-        
-        const pdfHtml = `
-            <div style="font-family: 'Segoe UI', sans-serif; padding: 30px;">
-                <div style="text-align:center; border-bottom:2px solid #2563eb; padding-bottom:15px;">
-                    <h2>INFORME GENERAL</h2>
-                    <p>CI RENTELCOM SAS - Laboratorio de Calibración</p>
-                </div>
-                <div style="text-align:right; margin:15px 0;">${fechaActual}</div>
-                <div><strong>Señores:</strong> ${inf.cliente}</div>
-                <div><strong>Reporte Técnico N° ${inf.id}</strong></div>
-                <div style="margin:15px 0;">Se recibe ${inf.marca} ${inf.modelo} (Serial: ${inf.serial}) para ${inf.tipo}.</div>
-                <div><strong>Diagnóstico principal:</strong><br>${inf.diagnostico.replace(/\n/g,'<br>')}</div>
-                <div style="margin:15px 0;"><strong>Valores:</strong><br>${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div>
-                ${obsHtml}
-                <div style="margin-top:30px; border-top:1px solid #ccc; padding-top:15px;">
-                    <strong>Verificado por:</strong><br>
-                    Ing. Stephania Garcia<br>
-                    Auditor ISO/IEC 17025:2017
-                </div>
-                <div style="margin-top:20px; font-size:10px; text-align:center;">
-                    CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239
-                </div>
-            </div>
-        `;
-        
-        const tempDiv = document.createElement('div');
-        tempDiv.style.position = 'absolute'; tempDiv.style.left = '-9999px';
-        tempDiv.innerHTML = pdfHtml;
-        document.body.appendChild(tempDiv);
-        const opt = { margin: [0.5,0.5,0.5,0.5], filename: `INFORME_${inf.id}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
-        await html2pdf().set(opt).from(tempDiv).save();
+        const pdfHtml = `<div style="font-family:'Segoe UI',sans-serif;padding:30px;"><div style="text-align:center;border-bottom:2px solid #2563eb;padding-bottom:15px;"><h2>INFORME GENERAL</h2><p>CI RENTELCOM SAS - Laboratorio de Calibración</p></div><div style="text-align:right;margin:15px 0;">${fechaActual}</div><div><strong>Señores:</strong> ${inf.cliente}</div><div><strong>Reporte Técnico N° ${inf.id}</strong></div><div style="margin:15px 0;">Se recibe ${inf.marca} ${inf.modelo} (Serial: ${inf.serial}) para ${inf.tipo}.</div><div><strong>Diagnóstico:</strong><br>${inf.diagnostico.replace(/\n/g,'<br>')}</div><div style="margin:15px 0;"><strong>Valores:</strong><br>${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div><div style="margin-top:30px;border-top:1px solid #ccc;padding-top:15px;"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div style="margin-top:20px;font-size:10px;text-align:center;">CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239</div></div>`;
+        const tempDiv = document.createElement('div'); tempDiv.style.position = 'absolute'; tempDiv.style.left = '-9999px'; tempDiv.innerHTML = pdfHtml; document.body.appendChild(tempDiv);
+        await html2pdf().set({ margin: [0.5,0.5,0.5,0.5], filename: `INFORME_${inf.id}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(tempDiv).save();
         document.body.removeChild(tempDiv);
     };
-    
+
     document.getElementById("btnAgregarEquipo").onclick = () => {
         const serial = prompt("Serial:"); if(!serial) return;
         const equipo = prompt("Tipo:"); const marca = prompt("Marca:"); const modelo = prompt("Modelo:"); const cliente = prompt("Cliente:");
-        equipos.push({ serial, equipo, marca, modelo, cliente });
-        renderAll();
+        equipos.push({ serial, equipo, marca, modelo, cliente }); renderAll();
     };
-    
-    // Tabs
-    document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-            btn.classList.add("active");
-            document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active-pane"));
-            document.getElementById(btn.dataset.tab).classList.add("active-pane");
-            if(btn.dataset.tab === "tabAprobacion") renderAll();
-        });
-    });
-    
+
+    document.querySelectorAll(".tab-btn").forEach(btn => { btn.addEventListener("click", () => { document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active-pane")); document.getElementById(btn.dataset.tab).classList.add("active-pane"); }); });
     renderAll();
 </script>
 </body>
