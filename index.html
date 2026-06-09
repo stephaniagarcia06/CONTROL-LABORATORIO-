@@ -137,7 +137,7 @@
     <!-- INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card"><h3>Listado de informes técnicos <span id="filtroInfo" style="font-size:0.7rem;"></span></h3>
-            <tr><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead><tbody id="informesBody"></tbody></table>
+            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead><tbody id="informesBody"></tbody></table>
         </div>
     </div>
 
@@ -218,7 +218,7 @@
         </div>
     </div>
 
-    <!-- EQUIPOS - MEJORADA CON FOTO, OBSERVACIONES Y REGISTRADO POR -->
+    <!-- EQUIPOS - CON CAMPO REGISTRADO POR -->
     <div id="equipos" class="tab-pane">
         <div class="form-card">
             <h3>Gestión de equipos</h3>
@@ -374,7 +374,7 @@
         return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
     }
 
-    // ==================== RENDERIZAR EQUIPOS COMO TARJETAS ====================
+    // ==================== RENDERIZAR EQUIPOS ====================
     function renderEquipos() {
         const container = document.getElementById("listaEquipos");
         if(equipos.length === 0) {
@@ -406,7 +406,7 @@
         `).join('');
     }
 
-    // Editar equipo (ventana modal simplificada)
+    // Editar equipo
     window.editarEquipo = async (idx) => {
         const eq = equipos[idx];
         const nuevoEquipo = prompt("Tipo de equipo:", eq.equipo);
@@ -425,7 +425,6 @@
         if(nuevasObs !== null) eq.observaciones = nuevasObs;
         if(nuevoRegistradoPor) eq.registradoPor = nuevoRegistradoPor;
         
-        // Preguntar si quiere cambiar la foto
         const cambiarFoto = confirm("¿Desea cambiar la foto del equipo?");
         if(cambiarFoto) {
             const input = document.createElement('input');
@@ -508,7 +507,7 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
-    // Agregar nuevo equipo con foto, observaciones y registrado por
+    // Agregar nuevo equipo
     document.getElementById("btnAgregarEquipo").onclick = async () => {
         const serial = prompt("Serial del equipo:");
         if(!serial) return;
@@ -566,7 +565,6 @@
         renderInformesConFiltro();
         renderEquipos();
         
-        // Cargar selects de seriales
         const seriales = equipos.map(e => e.serial).sort();
         const options = '<option value="">— Seleccione un serial —</option>' + seriales.map(s => `<option value="${s}">${s}</option>`).join('');
         
@@ -586,8 +584,8 @@
         filtrados.sort((a, b) => b.id - a.id);
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}NzAQ73${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}NzAQ73${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}NzAQ73<button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
+        if(filtrados.length === 0) { tbody.innerHTML = '</table><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
     function cargarInformesPorSerial(selectSerialId, selectInformeId) {
@@ -698,7 +696,7 @@
         informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
         
         if(!equipos.find(e => e.serial === serial)) {
-            equipos.push({ id: equipos.length+1, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Stephania Garcia", foto: "" });
+            equipos.push({ id: equipos.length+1, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Importación automática", foto: "" });
         }
         
         document.getElementById("nuevoId").value = ""; document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = ""; document.getElementById("notaFinal").value = ""; document.getElementById("fotoEquipo").value = "";
