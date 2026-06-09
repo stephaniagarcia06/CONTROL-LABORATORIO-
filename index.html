@@ -68,6 +68,8 @@
         .badge-rechazado { background: #ffe6e6; color: #c62828; }
         
         .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
+        .delete-btn { background: #b91c1c; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; cursor: pointer; }
+        .delete-btn:hover { background: #7f1a1a; }
         .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; }
         .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
         .import-area { border: 2px dashed var(--gray-border); padding: 20px; text-align: center; border-radius: 16px; cursor: pointer; margin: 10px 0; }
@@ -120,7 +122,7 @@
         <div class="table-card">
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Nueva entrada</button>
-            <table><thead><tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Cliente</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="equiposBody"></tbody></tr>
+            <table><thead><tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Cliente</th><th>Registrado por</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="equiposBody"></tbody></table>
         </div>
     </div>
 
@@ -135,11 +137,11 @@
                 <div class="input-group"><label>Marca</label><input id="entradaMarca" placeholder="EXFO"></div>
                 <div class="input-group"><label>Modelo</label><input id="entradaModelo" placeholder="MAX715"></div>
                 <div class="input-group"><label>Cliente</label><input id="entradaCliente" placeholder="INMEL INGENIERIA"></div>
-                <div class="input-group"><label>Accesorios</label><textarea id="entradaAccesorios" rows="2"></textarea></div>
+                <div class="input-group"><label>Accesorios</label><textarea id="entradaAccesorios" rows="2" placeholder="Maletín, cargador, conectores..."></textarea></div>
                 <div class="input-group"><label>📷 Foto ingreso</label><input type="file" id="entradaFoto" accept="image/*"></div>
-                <div class="input-group"><label>Registrado por</label><input id="entradaRegistradoPor" value="Stephania Garcia"></div>
+                <div class="input-group"><label>👤 Registrado por (técnico)</label><input id="entradaRegistradoPor" value="Stephania Garcia"></div>
             </div>
-            <button id="btnGuardarEntrada">Guardar entrada y generar PDF</button>
+            <button id="btnGuardarEntrada">💾 Guardar entrada y generar PDF</button>
         </div>
     </div>
 
@@ -229,18 +231,18 @@
         <div class="form-card">
             <h3>Configuración</h3>
             <div class="export-buttons">
-                <button id="btnExportarCompleto" class="btn-success">📊 Exportar TODO (Equipos+Informes)</button>
-                <button id="btnExportarEquipos" class="btn-outline">📋 Exportar solo EQUIPOS</button>
-                <button id="btnExportarInformes" class="btn-outline">📄 Exportar solo INFORMES</button>
+                <button id="btnExportarCompleto" class="btn-success">📊 Exportar TODO</button>
+                <button id="btnExportarEquipos" class="btn-outline">📋 Exportar EQUIPOS</button>
+                <button id="btnExportarInformes" class="btn-outline">📄 Exportar INFORMES</button>
             </div>
             <hr style="margin:20px 0;">
-            <h3>Logo corporativo (aparecerá en todos los PDF)</h3>
+            <h3>Logo corporativo</h3>
             <input type="file" id="logoEmpresa" accept="image/*">
             <div id="logoPreview"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
             <hr style="margin:20px 0;">
             <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
-            <button id="btnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar datos de ejemplo</button>
+            <button id="btnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar ejemplo</button>
         </div>
     </div>
     <div class="app-footer">CI RENTELCOM SAS - Carrera 19A No. 150-50 Bogotá D.C.</div>
@@ -281,70 +283,27 @@
         return logoEmpresaBase64 ? `<div style="text-align:center; margin-bottom:15px;"><img src="${logoEmpresaBase64}" style="max-height:70px;"></div>` : '<div style="text-align:center; margin-bottom:15px;"><h3>CI RENTELCOM SAS</h3></div>';
     }
 
-    // ==================== EXPORTAR FUNCIONES ====================
-    function exportarEquipos() {
-        if(equipos.length===0){mostrarMensaje("No hay equipos para exportar"); return;}
-        const data = equipos.map(e=>({
-            "CONSECUTIVO": e.consecutivo,
-            "SERIAL": e.serial,
-            "EQUIPO": e.equipo,
-            "MARCA": e.marca,
-            "MODELO": e.modelo,
-            "CLIENTE": e.cliente,
-            "ACCESORIOS": e.accesorios,
-            "REGISTRADO_POR": e.registradoPor,
-            "ESTADO": e.estado
-        }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), "EQUIPOS");
-        XLSX.writeFile(wb, `CalibPro_EQUIPOS_${new Date().toISOString().slice(0,19)}.xlsx`);
-        mostrarMensaje("✅ Equipos exportados");
-    }
+    // ELIMINAR EQUIPO
+    window.eliminarEquipo = (idx) => {
+        if(confirm(`¿Eliminar el equipo ${equipos[idx].serial}? También se eliminarán sus informes asociados.`)){
+            const serial = equipos[idx].serial;
+            equipos.splice(idx,1);
+            informes = informes.filter(i => i.serial !== serial);
+            renderAll();
+            mostrarMensaje(`✅ Equipo y sus informes eliminados`);
+        }
+    };
 
-    function exportarInformes() {
-        if(informes.length===0){mostrarMensaje("No hay informes para exportar"); return;}
-        const data = informes.map(i=>({
-            "NUMERO": i.numero,
-            "FECHA": i.fecha,
-            "SERIAL": i.serial,
-            "CLIENTE": i.cliente,
-            "SERVICIO": i.tipo,
-            "DIAGNOSTICO": i.diagnostico,
-            "VALORES": i.valores,
-            "NOTA_FINAL": i.notaFinal,
-            "ESTADO_APROBACION": i.estadoAprobacion,
-            "FECHA_ENVIO_CLIENTE": i.fechaEnvioCliente,
-            "OBSERVACIONES_CLIENTE": i.observacionesCliente
-        }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), "INFORMES");
-        XLSX.writeFile(wb, `CalibPro_INFORMES_${new Date().toISOString().slice(0,19)}.xlsx`);
-        mostrarMensaje("✅ Informes exportados");
-    }
+    // ELIMINAR INFORME
+    window.eliminarInforme = (idx) => {
+        if(confirm(`¿Eliminar el informe ${informes[idx].numero}?`)){
+            informes.splice(idx,1);
+            renderAll();
+            mostrarMensaje(`✅ Informe eliminado`);
+        }
+    };
 
-    function exportarCompleto() {
-        const wb = XLSX.utils.book_new();
-        const equiposData = equipos.map(e=>({
-            "CONSECUTIVO": e.consecutivo, "SERIAL": e.serial, "EQUIPO": e.equipo,
-            "MARCA": e.marca, "MODELO": e.modelo, "CLIENTE": e.cliente,
-            "ACCESORIOS": e.accesorios, "REGISTRADO_POR": e.registradoPor, "ESTADO": e.estado
-        }));
-        const informesData = informes.map(i=>({
-            "NUMERO": i.numero, "FECHA": i.fecha, "SERIAL": i.serial, "CLIENTE": i.cliente,
-            "SERVICIO": i.tipo, "DIAGNOSTICO": i.diagnostico, "VALORES": i.valores,
-            "ESTADO_APROBACION": i.estadoAprobacion, "OBSERVACIONES": i.observacionesCliente
-        }));
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(equiposData), "EQUIPOS");
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(informesData), "INFORMES");
-        XLSX.writeFile(wb, `CalibPro_COMPLETO_${new Date().toISOString().slice(0,19)}.xlsx`);
-        mostrarMensaje("✅ Datos completos exportados");
-    }
-
-    document.getElementById("btnExportarCompleto").onclick = exportarCompleto;
-    document.getElementById("btnExportarEquipos").onclick = exportarEquipos;
-    document.getElementById("btnExportarInformes").onclick = exportarInformes;
-
-    // ==================== PDFs ====================
+    // PDFs
     async function generarPDFEntrada(eq, consecutivo){
         const fecha=new Date().toLocaleDateString('es-CO');
         const doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Entrada_${eq.serial}</title><style>body{font-family:Segoe UI;padding:40px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;}</style></head><body>${getLogoHtml()}<h2 style="text-align:center;">REGISTRO DE ENTRADA DE EQUIPO</h2><div><strong>Fecha:</strong> ${fecha}</div><div><strong>Consecutivo:</strong> ${consecutivo}</div><div class="info"><strong>Serial:</strong> ${eq.serial}<br><strong>Equipo:</strong> ${eq.equipo}<br><strong>Marca/Modelo:</strong> ${eq.marca} ${eq.modelo}<br><strong>Cliente:</strong> ${eq.cliente}<br><strong>Accesorios:</strong> ${eq.accesorios||"Ninguno"}<br><strong>Registrado por:</strong> ${eq.registradoPor}</div>${eq.fotoEntrada?`<div><strong>Foto ingreso:</strong><br><img src="${eq.fotoEntrada}" style="max-width:300px; border-radius:8px;"></div>`:""}<div style="margin-top:30px; border-top:1px solid #ccc; padding-top:15px;"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></body></html>`;
@@ -372,12 +331,12 @@
         document.getElementById("aprobados").innerText=informes.filter(i=>i.estadoAprobacion==="Aprobado").length;
         
         const eb=document.getElementById("equiposBody");
-        if(equipos.length===0) eb.innerHTML='<table><td colspan="6">No hay equipos registrados</tr>';
-        else eb.innerHTML=equipos.map((e,i)=>`<tr><td style="font-weight:bold;">${e.consecutivo||"ENT-"+(i+1)}</td><td class="serial-link" onclick="buscarPorSerial('${e.serial}')">${e.serial}</td><td>${e.equipo}</td><td>${e.cliente}</td><td class="status-badge badge-pendiente">${e.estado||"Activo"}</td><td><button class="pdf-btn" onclick="generarPDFEntrada(equipos[${i}],'${e.consecutivo||"ENT-"+(i+1)}')">PDF Entrada</button></td>`).join('');
+        if(equipos.length===0) eb.innerHTML='<tr><td colspan="7">No hay equipos registrados</td>';
+        else eb.innerHTML=equipos.map((e,i)=>`<tr><td style="font-weight:bold;">${e.consecutivo||"ENT-"+(i+1)}</td><td class="serial-link" onclick="buscarPorSerial('${e.serial}')">${e.serial}</td><td>${e.equipo}</td><td>${e.cliente}</td><td>${e.registradoPor||"No especificado"}</td><td class="status-badge badge-pendiente">${e.estado||"Activo"}</td><td><button class="pdf-btn" onclick="generarPDFEntrada(equipos[${i}],'${e.consecutivo||"ENT-"+(i+1)}')">PDF</button><button class="delete-btn" onclick="eliminarEquipo(${i})">🗑️</button></td>`).join('');
         
         const ib=document.getElementById("informesBody");
         if(informes.length===0) ib.innerHTML='<tr><td colspan="7">No hay informes registrados</td>';
-        else ib.innerHTML=informes.map(i=>`<tr><td style="font-weight:bold;">${i.numero}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estadoAprobacion==='Aprobado'?'badge-aprobado':(i.estadoAprobacion==='Rechazado'?'badge-rechazado':'badge-pendiente')}">${i.estadoAprobacion||'Pendiente'}</td><td><button class="pdf-btn" onclick="generarPDFInforme(informes.find(x=>x.numero==='${i.numero}'))">PDF</button></td>`).join('');
+        else ib.innerHTML=informes.map((i,idx)=>`<tr><td style="font-weight:bold;">${i.numero}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estadoAprobacion==='Aprobado'?'badge-aprobado':(i.estadoAprobacion==='Rechazado'?'badge-rechazado':'badge-pendiente')}">${i.estadoAprobacion||'Pendiente'}</td><td><button class="pdf-btn" onclick="generarPDFInforme(informes[${idx}])">PDF</button><button class="delete-btn" onclick="eliminarInforme(${idx})">🗑️</button></td>`).join('');
         
         cargarSelectAprobacion();
         guardarDatos();
@@ -388,28 +347,42 @@
         if(sel) sel.innerHTML='<option value="">— Seleccione un informe —</option>'+informes.map(i=>`<option value="${i.numero}">${i.numero} - ${i.serial} - ${i.cliente}</option>`).join('');
     }
 
+    // GUARDAR NUEVA ENTRADA
     document.getElementById("btnGuardarEntrada").onclick=async()=>{
-        const consecutivo=document.getElementById("entradaConsecutivo").value.trim()||`ENT-${equipos.length+1}`;
+        const consecutivo=document.getElementById("entradaConsecutivo").value.trim();
+        if(!consecutivo){mostrarMensaje("Ingrese un consecutivo (ej: ENT-001)"); return;}
         const serial=document.getElementById("entradaSerial").value.trim();
         if(!serial){mostrarMensaje("Serial obligatorio"); return;}
+        
         const nuevoEquipo={
             consecutivo, serial,
-            equipo:document.getElementById("entradaEquipo").value.trim(),
-            marca:document.getElementById("entradaMarca").value.trim(),
-            modelo:document.getElementById("entradaModelo").value.trim(),
-            cliente:document.getElementById("entradaCliente").value.trim(),
+            equipo:document.getElementById("entradaEquipo").value.trim()||"No especificado",
+            marca:document.getElementById("entradaMarca").value.trim()||"No especificado",
+            modelo:document.getElementById("entradaModelo").value.trim()||"No especificado",
+            cliente:document.getElementById("entradaCliente").value.trim()||"No especificado",
             accesorios:document.getElementById("entradaAccesorios").value.trim(),
             registradoPor:document.getElementById("entradaRegistradoPor").value.trim()||"Stephania Garcia",
             fotoEntrada:document.getElementById("entradaFoto").files[0]?await fileToBase64(document.getElementById("entradaFoto").files[0]):"",
             estado:"Activo"
         };
         equipos.push(nuevoEquipo);
-        document.getElementById("entradaConsecutivo").value=""; document.getElementById("entradaSerial").value=""; document.getElementById("entradaEquipo").value=""; document.getElementById("entradaMarca").value=""; document.getElementById("entradaModelo").value=""; document.getElementById("entradaCliente").value=""; document.getElementById("entradaAccesorios").value=""; document.getElementById("entradaFoto").value="";
+        // Limpiar formulario
+        document.getElementById("entradaConsecutivo").value="";
+        document.getElementById("entradaSerial").value="";
+        document.getElementById("entradaEquipo").value="";
+        document.getElementById("entradaMarca").value="";
+        document.getElementById("entradaModelo").value="";
+        document.getElementById("entradaCliente").value="";
+        document.getElementById("entradaAccesorios").value="";
+        document.getElementById("entradaFoto").value="";
+        document.getElementById("entradaRegistradoPor").value="Stephania Garcia";
+        
         renderAll();
         await generarPDFEntrada(nuevoEquipo, consecutivo);
         mostrarMensaje(`✅ Equipo ${serial} registrado`);
     };
 
+    // GUARDAR INFORME
     document.getElementById("btnGuardarInforme").onclick=async()=>{
         const numero=document.getElementById("infoNumero").value.trim();
         if(!numero){mostrarMensaje("Número de informe obligatorio"); return;}
@@ -433,6 +406,7 @@
         mostrarMensaje(`✅ Informe ${numero} guardado`);
     };
 
+    // APROBACIÓN
     document.getElementById("btnRegistrarAprobacion").onclick=async()=>{
         const numero=document.getElementById("selectInformeAprobacion").value;
         if(!numero){mostrarMensaje("Seleccione un informe"); return;}
@@ -448,6 +422,7 @@
         }
     };
 
+    // TRAZABILIDAD
     window.buscarPorSerial = (serial) => {
         document.querySelector('.tab-btn[data-tab="trazabilidad"]').click();
         setTimeout(()=>{ document.getElementById("buscarSerialTraza").value=serial; buscarTraza(); },100);
@@ -475,7 +450,38 @@
     window.onclick=e=>{if(e.target===document.getElementById("modalInforme"))cerrarModalInforme();};
     document.getElementById("btnAgregarEquipo").onclick=()=>{ document.querySelector('.tab-btn[data-tab="nuevoEquipo"]').click(); };
 
-    // IMPORTAR EQUIPOS
+    // EXPORTAR
+    function exportarEquipos() {
+        if(equipos.length===0){mostrarMensaje("No hay equipos"); return;}
+        const data = equipos.map(e=>({CONSECUTIVO:e.consecutivo, SERIAL:e.serial, EQUIPO:e.equipo, MARCA:e.marca, MODELO:e.modelo, CLIENTE:e.cliente, ACCESORIOS:e.accesorios, REGISTRADO_POR:e.registradoPor, ESTADO:e.estado}));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), "EQUIPOS");
+        XLSX.writeFile(wb, `CalibPro_EQUIPOS_${new Date().toISOString().slice(0,19)}.xlsx`);
+        mostrarMensaje("Equipos exportados");
+    }
+
+    function exportarInformes() {
+        if(informes.length===0){mostrarMensaje("No hay informes"); return;}
+        const data = informes.map(i=>({NUMERO:i.numero, FECHA:i.fecha, SERIAL:i.serial, CLIENTE:i.cliente, SERVICIO:i.tipo, DIAGNOSTICO:i.diagnostico, VALORES:i.valores, ESTADO_APROBACION:i.estadoAprobacion, OBSERVACIONES:i.observacionesCliente}));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), "INFORMES");
+        XLSX.writeFile(wb, `CalibPro_INFORMES_${new Date().toISOString().slice(0,19)}.xlsx`);
+        mostrarMensaje("Informes exportados");
+    }
+
+    function exportarCompleto() {
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(equipos.map(e=>({CONSECUTIVO:e.consecutivo, SERIAL:e.serial, EQUIPO:e.equipo, CLIENTE:e.cliente, REGISTRADO_POR:e.registradoPor}))), "EQUIPOS");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(informes.map(i=>({NUMERO:i.numero, FECHA:i.fecha, SERIAL:i.serial, CLIENTE:i.cliente, SERVICIO:i.tipo, DIAGNOSTICO:i.diagnostico, ESTADO:i.estadoAprobacion}))), "INFORMES");
+        XLSX.writeFile(wb, `CalibPro_COMPLETO_${new Date().toISOString().slice(0,19)}.xlsx`);
+        mostrarMensaje("Completo exportado");
+    }
+
+    document.getElementById("btnExportarCompleto").onclick = exportarCompleto;
+    document.getElementById("btnExportarEquipos").onclick = exportarEquipos;
+    document.getElementById("btnExportarInformes").onclick = exportarInformes;
+
+    // IMPORTAR
     function setupImportEquipos(){
         const area=document.getElementById("importEquiposArea"), input=document.getElementById("fileEquiposInput");
         area.onclick=()=>input.click();
@@ -505,7 +511,6 @@
         };
     }
 
-    // IMPORTAR INFORMES
     function setupImportInformes(){
         const area=document.getElementById("importInformesArea"), input=document.getElementById("fileInformesInput");
         area.onclick=()=>input.click();
@@ -540,11 +545,11 @@
     }
 
     document.getElementById("btnCargarEjemplo").onclick=()=>{
-        equipos=[{consecutivo:"ENT-001",serial:"AA432002010275",equipo:"Empalmadora",marca:"ILSINTECH",modelo:"KF4",cliente:"CONECTAR TV SAS",accesorios:"Maletín, cargador",registradoPor:"Stephania Garcia",fotoEntrada:"",estado:"Activo"}];
-        informes=[{numero:"INF-447",fecha:"2023-11-23",serial:"AA432002010275",cliente:"CONECTAR TV SAS",marca:"ILSINTECH",modelo:"KF4",tipo:"Reparación",diagnostico:"DAÑO MECANISMO DE AJUSTE DE FOCO",valores:"",notaFinal:"",foto:"",estadoAprobacion:"Pendiente",fechaEnvioCliente:"",observacionesCliente:""}];
+        equipos=[{consecutivo:"ENT-001",serial:"AA432002010275",equipo:"Empalmadora",marca:"ILSINTECH",modelo:"KF4",cliente:"CONECTAR TV SAS",accesorios:"Maletín",registradoPor:"Stephania Garcia",fotoEntrada:"",estado:"Activo"}];
+        informes=[{numero:"INF-447",fecha:"2023-11-23",serial:"AA432002010275",cliente:"CONECTAR TV SAS",marca:"ILSINTECH",modelo:"KF4",tipo:"Reparación",diagnostico:"DAÑO MECANISMO",valores:"",notaFinal:"",foto:"",estadoAprobacion:"Pendiente",fechaEnvioCliente:"",observacionesCliente:""}];
         nextId=453;
         renderAll();
-        mostrarMensaje("Datos de ejemplo cargados");
+        mostrarMensaje("Ejemplo cargado");
     };
 
     document.querySelectorAll(".tab-btn").forEach(btn=>btn.addEventListener("click",()=>{ document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active-pane")); document.getElementById(btn.dataset.tab).classList.add("active-pane"); if(btn.dataset.tab==="importar"){ setupImportEquipos(); setupImportInformes(); } if(btn.dataset.tab==="aprobacion") cargarSelectAprobacion(); }));
