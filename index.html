@@ -92,6 +92,9 @@
         
         .traza-select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--gray-border); margin-bottom: 15px; }
         .export-section { background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
+        
+        .serial-link { color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline; }
+        .serial-link:hover { color: var(--primary-dark); }
     </style>
 </head>
 <body>
@@ -153,17 +156,26 @@
         </div>
     </div>
 
-    <!-- EDITAR INFORME -->
+    <!-- EDITAR INFORME - POR SERIAL -->
     <div id="editar" class="tab-pane">
         <div class="form-card">
             <h3>Editar informe existente</h3>
-            <div class="input-group"><label>Seleccionar informe a editar</label><select id="selectEditar"></select></div>
-            <button id="btnCargarEditar" class="btn-outline">Cargar datos</button>
+            <div class="input-group"><label>🔍 Buscar por serial del equipo</label>
+                <select id="selectEditarSerial" class="traza-select">
+                    <option value="">— Seleccione un serial —</option>
+                </select>
+            </div>
+            <div class="input-group" style="margin-top:10px;"><label>📄 Seleccionar informe específico</label>
+                <select id="selectEditarInforme">
+                    <option value="">— Primero seleccione un serial —</option>
+                </select>
+            </div>
+            <button id="btnCargarEditar" class="btn-outline" style="margin-top:10px;">Cargar datos</button>
             <div id="formEditar" style="display:none; margin-top:20px;">
                 <div class="form-grid">
                     <div class="input-group"><label>Número</label><input type="number" id="editId" readonly></div>
                     <div class="input-group"><label>Fecha</label><input type="date" id="editFecha"></div>
-                    <div class="input-group"><label>Serial</label><input id="editSerial"></div>
+                    <div class="input-group"><label>Serial</label><input id="editSerial" readonly></div>
                     <div class="input-group"><label>Marca</label><input id="editMarca"></div>
                     <div class="input-group"><label>Modelo</label><input id="editModelo"></div>
                     <div class="input-group"><label>Cliente</label><input id="editCliente"></div>
@@ -182,30 +194,39 @@
     <div id="aprobacion" class="tab-pane">
         <div class="form-card">
             <h3>Aprobación comercial</h3>
-            <div class="input-group"><label>Seleccionar informe</label><select id="selectInforme"></select></div>
-            <div class="input-group"><label>Fecha envío al cliente</label><input type="date" id="fechaEnvio"></div>
-            <div class="input-group"><label>Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
-            <div class="input-group"><label>Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
+            <div class="input-group"><label>🔍 Buscar por serial</label>
+                <select id="selectAprobacionSerial" class="traza-select">
+                    <option value="">— Seleccione un serial —</option>
+                </select>
+            </div>
+            <div class="input-group"><label>📄 Seleccionar informe</label>
+                <select id="selectInformeAprobacion">
+                    <option value="">— Primero seleccione un serial —</option>
+                </select>
+            </div>
+            <div class="input-group"><label>📅 Fecha envío al cliente</label><input type="date" id="fechaEnvio"></div>
+            <div class="input-group"><label>📎 Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
+            <div class="input-group"><label>💬 Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
             <button id="btnActualizar">Actualizar</button>
         </div>
     </div>
 
-    <!-- EQUIPOS - CON ESTADO Y BOTÓN CAMBIAR -->
+    <!-- EQUIPOS -->
     <div id="equipos" class="tab-pane">
         <div class="table-card">
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
-            <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></td></thead>
+            <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th></tr></thead>
                 <tbody id="equiposBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- TRAZABILIDAD -->
+    <!-- TRAZABILIDAD - BÚSQUEDA POR SERIAL -->
     <div id="trazabilidad" class="tab-pane">
         <div class="form-card">
             <h3>Trazabilidad de equipos</h3>
-            <p style="margin-bottom: 15px;">Seleccione un equipo por su <strong>serial (código)</strong> para ver todo su historial completo.</p>
+            <p style="margin-bottom: 15px;">Seleccione un equipo por su <strong>serial</strong> para ver todo su historial completo.</p>
             <div class="input-group">
                 <label>🔍 Buscar por serial del equipo</label>
                 <select id="selectEquipoTraza" class="traza-select">
@@ -223,15 +244,15 @@
         <div class="form-card">
             <h3>Importar datos desde archivo</h3>
             <div style="background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-                <h4>📋 Columnas que la app reconoce en tu archivo:</h4>
-                <p>✅ <strong>ID</strong> → Número de informe</p>
+                <h4>📋 Tu archivo debe tener estas columnas:</h4>
+                <p>✅ <strong>ID</strong> o <strong># informe</strong> → Número de informe</p>
                 <p>✅ <strong>fecha</strong> → Fecha del informe</p>
-                <p>✅ <strong>CLIENTE</strong> → Nombre del cliente</p>
-                <p>✅ <strong>equipo</strong> → Tipo de equipo/servicio</p>
-                <p>✅ <strong>marca</strong> → Marca del equipo</p>
-                <p>✅ <strong>modelo</strong> → Modelo del equipo</p>
+                <p>✅ <strong>CLIENTE</strong> o <strong>con</strong> → Cliente</p>
+                <p>✅ <strong>equipo</strong> → Tipo de equipo</p>
+                <p>✅ <strong>marca</strong> → Marca</p>
+                <p>✅ <strong>modelo</strong> → Modelo</p>
                 <p>✅ <strong>serial</strong> → Serial del equipo</p>
-                <p>✅ <strong>diagnostico</strong> → Diagnóstico técnico</p>
+                <p>✅ <strong>diagnostico</strong> → Diagnóstico</p>
             </div>
             <div class="import-area" id="importArea">
                 <div style="font-size: 48px;">📂</div>
@@ -240,6 +261,7 @@
             <input type="file" id="fileInput" accept=".csv,.xlsx" style="display: none;">
             <div id="importPreview" style="margin-top: 20px; display: none;"></div>
             <button id="btnConfirmarImport" style="display: none;">Confirmar importación</button>
+            <button id="btnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar datos de ejemplo</button>
         </div>
     </div>
 
@@ -247,18 +269,15 @@
     <div id="configuracion" class="tab-pane">
         <div class="form-card">
             <h3>Configuración</h3>
-            
             <div class="export-section">
                 <h4 style="margin-bottom: 10px;">📤 Exportar datos</h4>
                 <p style="margin-bottom: 10px;">Exporta todos los informes y equipos a un archivo Excel.</p>
                 <button id="btnExportarDatos" class="btn-success">📊 Exportar a Excel</button>
             </div>
-            
             <h3>Logo corporativo</h3>
             <input type="file" id="logoEmpresa" accept="image/*">
             <div id="logoPreview"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
-            
             <div class="delete-section">
                 <h3 style="color: var(--danger);">⚠️ Peligro - Eliminar datos</h3>
                 <p>Esta acción eliminará TODOS los informes y equipos guardados.</p>
@@ -271,8 +290,14 @@
 </div>
 
 <script>
-    let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "", filtroActual = "todos";
+    // ==================== ESTRUCTURA DE DATOS ====================
+    let equipos = [];      // { serial, equipo, marca, modelo, cliente, estado }
+    let informes = [];     // { id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado, fechaEnvio, obsCliente }
+    let nextId = 100;
+    let logoEmpresaBase64 = "";
+    let filtroActual = "todos";
 
+    // ==================== LOCALSTORAGE ====================
     function guardarDatos() {
         localStorage.setItem("calibpro_equipos", JSON.stringify(equipos));
         localStorage.setItem("calibpro_informes", JSON.stringify(informes));
@@ -293,10 +318,268 @@
         
         actualizarVistaLogo();
         renderAll();
-        cargarSelectEquiposTraza();
     }
 
-    function exportarDatosExcel() {
+    function mostrarMensaje(texto) {
+        const msg = document.getElementById("mensajeExito");
+        msg.innerText = texto; msg.style.display = "block";
+        setTimeout(() => msg.style.display = "none", 4000);
+    }
+
+    // ==================== DATOS DE EJEMPLO ====================
+    function cargarDatosEjemplo() {
+        equipos = [
+            { serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller" },
+            { serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico" },
+            { serial: "45970", equipo: "OTDR", marca: "VIAVI", modelo: "SMART OTDR", cliente: "CONECTAR TV SAS", estado: "Pendiente" },
+            { serial: "35211", equipo: "Empalmadora", marca: "fitel", modelo: "s178a", cliente: "TELCOS INGENIERIA SA", estado: "Entregado" }
+        ];
+        
+        informes = [
+            { id: 447, fecha: "2023-11-23", serial: "AA432002010275", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", tipo: "Reparación", diagnostico: "DAÑO MECANISMO DE AJUSTE DE FOCO", valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" },
+            { id: 448, fecha: "2023-11-23", serial: "TF3C02PA010869", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", tipo: "Calibración", diagnostico: "REPOTENCIACION DE BATERIA", valores: "", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-11-25", obsCliente: "Cliente autorizó la reparación" },
+            { id: 452, fecha: "2023-12-01", serial: "45970", marca: "VIAVI", modelo: "SMART OTDR", cliente: "CONECTAR TV SAS", tipo: "Calibración", diagnostico: "CAMBIO DE PIGTAIL 1310-1550", valores: "$220.000 + IVA", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" },
+            { id: 453, fecha: "2023-12-01", serial: "35211", marca: "fitel", modelo: "s178a", cliente: "TELCOS INGENIERIA SA", tipo: "Reparación", diagnostico: "VENTA DE BATERIAS", valores: "$180.000 + IVA", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-12-05", obsCliente: "Aprobado para entrega inmediata" }
+        ];
+        
+        nextId = 454;
+        guardarDatos();
+        renderAll();
+        mostrarMensaje("✅ Datos de ejemplo cargados correctamente");
+    }
+
+    // ==================== LOGO ====================
+    function actualizarVistaLogo() {
+        const previewDiv = document.getElementById("logoPreview");
+        if(logoEmpresaBase64) previewDiv.innerHTML = `<img src="${logoEmpresaBase64}" class="logo-preview"><br><small>Logo actual</small>`;
+        else previewDiv.innerHTML = "<small>No hay logo configurado</small>";
+    }
+    
+    document.getElementById("btnGuardarLogo").onclick = () => {
+        const file = document.getElementById("logoEmpresa").files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function() { logoEmpresaBase64 = reader.result; guardarDatos(); actualizarVistaLogo(); mostrarMensaje("Logo guardado"); };
+        }
+    };
+
+    function fileToBase64(file) {
+        return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
+    }
+
+    // ==================== RENDERIZAR TODO ====================
+    function renderAll() {
+        document.getElementById("totalEquipos").innerText = equipos.length;
+        document.getElementById("totalInformes").innerText = informes.length;
+        document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
+        document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
+        document.getElementById("nextIdDisplay").innerText = nextId;
+        
+        // Renderizar informes (ordenados por ID descendente)
+        renderInformesConFiltro();
+        
+        // Renderizar equipos
+        const eb = document.getElementById("equiposBody");
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td>' + '</tr>';
+        else eb.innerHTML = equipos.map((e, idx) => `<tr><td style="font-weight:bold;">${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>`).join('');
+        
+        // Cargar selects de seriales para todas las pestañas
+        cargarSelectsSeriales();
+        guardarDatos();
+    }
+
+    function renderInformesConFiltro() {
+        const tbody = document.getElementById("informesBody");
+        let filtrados = [...informes];
+        filtrados.sort((a, b) => b.id - a.id);
+        
+        if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
+        if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
+        
+        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
+    }
+
+    function cargarSelectsSeriales() {
+        const seriales = equipos.map(e => e.serial).sort();
+        const options = '<option value="">— Seleccione un serial —</option>' + seriales.map(s => `<option value="${s}">${s}</option>`).join('');
+        
+        const selectTraza = document.getElementById("selectEquipoTraza");
+        if(selectTraza) selectTraza.innerHTML = options;
+        
+        const selectEditarSerial = document.getElementById("selectEditarSerial");
+        if(selectEditarSerial) selectEditarSerial.innerHTML = options;
+        
+        const selectAprobacionSerial = document.getElementById("selectAprobacionSerial");
+        if(selectAprobacionSerial) selectAprobacionSerial.innerHTML = options;
+    }
+
+    function cargarInformesPorSerial(selectSerialId, selectInformeId) {
+        const serial = document.getElementById(selectSerialId).value;
+        const selectInforme = document.getElementById(selectInformeId);
+        if(!serial || !selectInforme) return;
+        
+        const informesEquipo = informes.filter(i => i.serial === serial).sort((a,b) => b.id - a.id);
+        if(informesEquipo.length === 0) {
+            selectInforme.innerHTML = '<option value="">— No hay informes para este serial —</option>';
+            return;
+        }
+        selectInforme.innerHTML = '<option value="">— Seleccione un informe —</option>' + informesEquipo.map(i => `<option value="${i.id}">#${i.id} - ${i.fecha} - ${i.tipo}</option>`).join('');
+    }
+
+    // Función global para buscar por serial desde la tabla
+    window.buscarPorSerial = (serial) => {
+        document.querySelector('.tab-btn[data-tab="trazabilidad"]').click();
+        setTimeout(() => {
+            const select = document.getElementById("selectEquipoTraza");
+            if(select) {
+                select.value = serial;
+                verHistorialEquipo();
+            }
+        }, 100);
+    };
+
+    window.cambiarEstadoEquipo = (idx) => {
+        const nuevo = prompt("Nuevo estado (Ej: Pendiente diagnóstico, En taller, Entregado):", equipos[idx].estado);
+        if(nuevo) { equipos[idx].estado = nuevo; renderAll(); mostrarMensaje("Estado actualizado"); }
+    };
+
+    // ==================== GUARDAR NUEVO INFORME ====================
+    document.getElementById("btnGuardar").onclick = async () => {
+        let id = parseInt(document.getElementById("nuevoId").value);
+        if(isNaN(id)) id = nextId++;
+        else if(informes.find(i => i.id === id)) { alert("Ese número ya existe"); return; }
+        else if(id >= nextId) nextId = id + 1;
+        
+        const fecha = document.getElementById("fecha").value || new Date().toISOString().slice(0,10);
+        const serial = document.getElementById("serial").value.trim();
+        const marca = document.getElementById("marca").value.trim();
+        const modelo = document.getElementById("modelo").value.trim();
+        const cliente = document.getElementById("cliente").value.trim();
+        const tipo = document.getElementById("tipo").value;
+        const diagnostico = document.getElementById("diagnostico").value.trim();
+        const valores = document.getElementById("valores").value.trim();
+        const notaFinal = document.getElementById("notaFinal").value.trim();
+        const file = document.getElementById("fotoEquipo").files[0];
+        let foto = file ? await fileToBase64(file) : "";
+        
+        if(!serial || !cliente || !diagnostico) { alert("Complete campos obligatorios"); return; }
+        
+        informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
+        
+        if(!equipos.find(e => e.serial === serial)) {
+            equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
+        }
+        
+        document.getElementById("nuevoId").value = ""; document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = ""; document.getElementById("notaFinal").value = ""; document.getElementById("fotoEquipo").value = "";
+        
+        renderAll();
+        mostrarMensaje(`✅ Informe #${id} guardado`);
+    };
+
+    // ==================== EDITAR INFORME ====================
+    document.getElementById("selectEditarSerial").onchange = () => {
+        cargarInformesPorSerial("selectEditarSerial", "selectEditarInforme");
+    };
+    
+    document.getElementById("btnCargarEditar").onclick = () => {
+        const id = parseInt(document.getElementById("selectEditarInforme").value);
+        const inf = informes.find(i => i.id === id);
+        if(inf) {
+            document.getElementById("editId").value = inf.id;
+            document.getElementById("editFecha").value = inf.fecha;
+            document.getElementById("editSerial").value = inf.serial;
+            document.getElementById("editMarca").value = inf.marca;
+            document.getElementById("editModelo").value = inf.modelo;
+            document.getElementById("editCliente").value = inf.cliente;
+            document.getElementById("editTipo").value = inf.tipo;
+            document.getElementById("editDiagnostico").value = inf.diagnostico;
+            document.getElementById("editValores").value = inf.valores || "";
+            document.getElementById("editNotaFinal").value = inf.notaFinal || "";
+            document.getElementById("formEditar").style.display = "block";
+        } else alert("Seleccione un informe");
+    };
+    
+    document.getElementById("btnGuardarEdicion").onclick = async () => {
+        const id = parseInt(document.getElementById("editId").value);
+        const inf = informes.find(i => i.id === id);
+        if(inf) {
+            inf.fecha = document.getElementById("editFecha").value;
+            inf.marca = document.getElementById("editMarca").value;
+            inf.modelo = document.getElementById("editModelo").value;
+            inf.cliente = document.getElementById("editCliente").value;
+            inf.tipo = document.getElementById("editTipo").value;
+            inf.diagnostico = document.getElementById("editDiagnostico").value;
+            inf.valores = document.getElementById("editValores").value;
+            inf.notaFinal = document.getElementById("editNotaFinal").value;
+            const newFoto = document.getElementById("editFoto").files[0];
+            if(newFoto) inf.foto = await fileToBase64(newFoto);
+            
+            // Actualizar también el equipo asociado
+            const equipo = equipos.find(e => e.serial === inf.serial);
+            if(equipo) {
+                equipo.marca = inf.marca;
+                equipo.modelo = inf.modelo;
+                equipo.cliente = inf.cliente;
+            }
+            
+            renderAll();
+            mostrarMensaje(`✅ Informe #${id} actualizado`);
+            document.getElementById("formEditar").style.display = "none";
+            document.getElementById("editFoto").value = "";
+        }
+    };
+
+    // ==================== APROBACIÓN COMERCIAL ====================
+    document.getElementById("selectAprobacionSerial").onchange = () => {
+        cargarInformesPorSerial("selectAprobacionSerial", "selectInformeAprobacion");
+    };
+    
+    document.getElementById("selectInformeAprobacion").onchange = () => {
+        const id = parseInt(document.getElementById("selectInformeAprobacion").value);
+        const inf = informes.find(i => i.id === id);
+        if(inf) {
+            document.getElementById("fechaEnvio").value = inf.fechaEnvio || '';
+            document.getElementById("estadoFinal").value = inf.estado;
+            document.getElementById("obsCliente").value = inf.obsCliente || '';
+        }
+    };
+    
+    document.getElementById("btnActualizar").onclick = () => {
+        const id = parseInt(document.getElementById("selectInformeAprobacion").value);
+        const inf = informes.find(i => i.id === id);
+        if(inf) { 
+            inf.fechaEnvio = document.getElementById("fechaEnvio").value; 
+            inf.estado = document.getElementById("estadoFinal").value; 
+            inf.obsCliente = document.getElementById("obsCliente").value; 
+            renderAll(); 
+            mostrarMensaje(`✅ Informe #${id} actualizado`);
+        } else alert("Seleccione un informe");
+    };
+
+    // ==================== AGREGAR EQUIPO MANUAL ====================
+    document.getElementById("btnAgregarEquipo").onclick = () => {
+        const serial = prompt("Serial:"); if(!serial) return;
+        const equipo = prompt("Tipo de equipo:"); 
+        const marca = prompt("Marca:"); 
+        const modelo = prompt("Modelo:"); 
+        const cliente = prompt("Cliente:");
+        equipos.push({ serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
+        renderAll();
+        mostrarMensaje(`✅ Equipo ${serial} agregado`);
+    };
+
+    // ==================== ELIMINAR TODOS LOS DATOS ====================
+    document.getElementById("btnEliminarTodos").onclick = () => {
+        if(confirm("⚠️ ¿ESTÁS SEGURA? Esta acción eliminará TODOS los datos.")) {
+            equipos = []; informes = []; nextId = 100; guardarDatos(); renderAll();
+            mostrarMensaje("✅ Todos los datos han sido eliminados");
+        }
+    };
+
+    // ==================== EXPORTAR DATOS ====================
+    document.getElementById("btnExportarDatos").onclick = () => {
         if(informes.length === 0 && equipos.length === 0) {
             mostrarMensaje("No hay datos para exportar");
             return;
@@ -331,194 +614,17 @@
         const wsInformes = XLSX.utils.json_to_sheet(informesExport);
         const wsEquipos = XLSX.utils.json_to_sheet(equiposExport);
         
-        wsInformes['!cols'] = [{wch:10},{wch:12},{wch:18},{wch:15},{wch:25},{wch:12},{wch:12},{wch:40},{wch:20},{wch:20},{wch:15},{wch:15},{wch:25}];
-        wsEquipos['!cols'] = [{wch:18},{wch:15},{wch:12},{wch:12},{wch:25},{wch:15}];
+        wsInformes['!cols'] = [{wch:10},{wch:12},{wch:20},{wch:15},{wch:25},{wch:12},{wch:12},{wch:40},{wch:20},{wch:20},{wch:15},{wch:15},{wch:25}];
+        wsEquipos['!cols'] = [{wch:20},{wch:15},{wch:12},{wch:12},{wch:25},{wch:15}];
         
         XLSX.utils.book_append_sheet(wb, wsInformes, "INFORMES");
         XLSX.utils.book_append_sheet(wb, wsEquipos, "EQUIPOS");
         
         XLSX.writeFile(wb, `CalibPro_Datos_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
         mostrarMensaje("✅ Datos exportados correctamente");
-    }
-    
-    document.getElementById("btnExportarDatos").onclick = exportarDatosExcel;
-
-    function eliminarTodosLosDatos() {
-        if(confirm("⚠️ ¿ESTÁS SEGURA?\n\nEsta acción eliminará TODOS los informes y equipos guardados.\n\nNo se puede deshacer.")) {
-            equipos = []; informes = []; nextId = 100; guardarDatos(); renderAll(); cargarSelectEquiposTraza();
-            mostrarMensaje("✅ Todos los datos han sido eliminados");
-        }
-    }
-
-    function mostrarMensaje(texto) {
-        const msg = document.getElementById("mensajeExito");
-        msg.innerText = texto; msg.style.display = "block";
-        setTimeout(() => msg.style.display = "none", 4000);
-    }
-
-    function actualizarVistaLogo() {
-        const previewDiv = document.getElementById("logoPreview");
-        if(logoEmpresaBase64) previewDiv.innerHTML = `<img src="${logoEmpresaBase64}" class="logo-preview"><br><small>Logo actual</small>`;
-        else previewDiv.innerHTML = "<small>No hay logo configurado</small>";
-    }
-    
-    document.getElementById("btnGuardarLogo").onclick = () => {
-        const file = document.getElementById("logoEmpresa").files[0];
-        if(file) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function() { logoEmpresaBase64 = reader.result; guardarDatos(); actualizarVistaLogo(); mostrarMensaje("Logo guardado"); };
-        }
     };
 
-    document.getElementById("btnEliminarTodos").onclick = eliminarTodosLosDatos;
-
-    function fileToBase64(file) {
-        return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
-    }
-
-    function cargarSelectEquiposTraza() {
-        const select = document.getElementById("selectEquipoTraza");
-        select.innerHTML = '<option value="">— Seleccione un serial —</option>' + equipos.map(e => `<option value="${e.serial}">${e.serial} - ${e.equipo} (${e.marca} ${e.modelo})</option>`).join('');
-    }
-
-    function renderInformesConFiltro() {
-        const tbody = document.getElementById("informesBody");
-        let filtrados = [...informes];
-        filtrados.sort((a, b) => b.id - a.id);
-        
-        if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
-        if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
-        
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
-    }
-
-    function renderAll() {
-        document.getElementById("totalEquipos").innerText = equipos.length;
-        document.getElementById("totalInformes").innerText = informes.length;
-        document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
-        document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
-        document.getElementById("nextIdDisplay").innerText = nextId;
-        renderInformesConFiltro();
-        
-        const options = '<option value="">— Seleccionar —</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
-        document.getElementById("selectInforme").innerHTML = options;
-        document.getElementById("selectEditar").innerHTML = options;
-        
-        const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td>' + '</tr>';
-        else eb.innerHTML = equipos.map((e, idx) => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>`).join('');
-        
-        cargarSelectEquiposTraza();
-        guardarDatos();
-    }
-
-    window.cambiarEstadoEquipo = (idx) => {
-        const nuevo = prompt("Nuevo estado:", equipos[idx].estado);
-        if(nuevo) { equipos[idx].estado = nuevo; renderAll(); mostrarMensaje("Estado actualizado"); }
-    };
-
-    // EDITAR INFORME
-    document.getElementById("btnCargarEditar").onclick = () => {
-        const id = parseInt(document.getElementById("selectEditar").value);
-        const inf = informes.find(i => i.id === id);
-        if(inf) {
-            document.getElementById("editId").value = inf.id;
-            document.getElementById("editFecha").value = inf.fecha;
-            document.getElementById("editSerial").value = inf.serial;
-            document.getElementById("editMarca").value = inf.marca;
-            document.getElementById("editModelo").value = inf.modelo;
-            document.getElementById("editCliente").value = inf.cliente;
-            document.getElementById("editTipo").value = inf.tipo;
-            document.getElementById("editDiagnostico").value = inf.diagnostico;
-            document.getElementById("editValores").value = inf.valores || "";
-            document.getElementById("editNotaFinal").value = inf.notaFinal || "";
-            document.getElementById("formEditar").style.display = "block";
-        } else alert("Seleccione un informe");
-    };
-    
-    document.getElementById("btnGuardarEdicion").onclick = async () => {
-        const id = parseInt(document.getElementById("editId").value);
-        const inf = informes.find(i => i.id === id);
-        if(inf) {
-            inf.fecha = document.getElementById("editFecha").value;
-            inf.serial = document.getElementById("editSerial").value;
-            inf.marca = document.getElementById("editMarca").value;
-            inf.modelo = document.getElementById("editModelo").value;
-            inf.cliente = document.getElementById("editCliente").value;
-            inf.tipo = document.getElementById("editTipo").value;
-            inf.diagnostico = document.getElementById("editDiagnostico").value;
-            inf.valores = document.getElementById("editValores").value;
-            inf.notaFinal = document.getElementById("editNotaFinal").value;
-            const newFoto = document.getElementById("editFoto").files[0];
-            if(newFoto) inf.foto = await fileToBase64(newFoto);
-            renderAll();
-            mostrarMensaje(`✅ Informe #${id} actualizado`);
-            document.getElementById("formEditar").style.display = "none";
-            document.getElementById("editFoto").value = "";
-        }
-    };
-
-    // GUARDAR NUEVO INFORME
-    document.getElementById("btnGuardar").onclick = async () => {
-        let id = parseInt(document.getElementById("nuevoId").value);
-        if(isNaN(id)) id = nextId++;
-        else if(informes.find(i => i.id === id)) { alert("Ese número ya existe"); return; }
-        else if(id >= nextId) nextId = id + 1;
-        
-        const fecha = document.getElementById("fecha").value || new Date().toISOString().slice(0,10);
-        const serial = document.getElementById("serial").value.trim();
-        const marca = document.getElementById("marca").value.trim();
-        const modelo = document.getElementById("modelo").value.trim();
-        const cliente = document.getElementById("cliente").value.trim();
-        const tipo = document.getElementById("tipo").value;
-        const diagnostico = document.getElementById("diagnostico").value.trim();
-        const valores = document.getElementById("valores").value.trim();
-        const notaFinal = document.getElementById("notaFinal").value.trim();
-        const file = document.getElementById("fotoEquipo").files[0];
-        let foto = file ? await fileToBase64(file) : "";
-        
-        if(!serial || !cliente || !diagnostico) { alert("Complete campos obligatorios"); return; }
-        
-        informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
-        
-        if(!equipos.find(e => e.serial === serial)) {
-            equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
-        }
-        
-        document.getElementById("nuevoId").value = ""; document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = ""; document.getElementById("notaFinal").value = ""; document.getElementById("fotoEquipo").value = "";
-        
-        renderAll();
-        mostrarMensaje(`✅ Informe #${id} guardado`);
-    };
-
-    // APROBACIÓN
-    document.getElementById("btnActualizar").onclick = () => {
-        const id = parseInt(document.getElementById("selectInforme").value);
-        const inf = informes.find(i => i.id === id);
-        if(inf) { 
-            inf.fechaEnvio = document.getElementById("fechaEnvio").value; 
-            inf.estado = document.getElementById("estadoFinal").value; 
-            inf.obsCliente = document.getElementById("obsCliente").value; 
-            renderAll(); 
-            mostrarMensaje(`✅ Informe #${id} actualizado`);
-        } else alert("Seleccione un informe");
-    };
-
-    // AGREGAR EQUIPO MANUAL
-    document.getElementById("btnAgregarEquipo").onclick = () => {
-        const serial = prompt("Serial:"); if(!serial) return;
-        const equipo = prompt("Tipo de equipo:"); 
-        const marca = prompt("Marca:"); 
-        const modelo = prompt("Modelo:"); 
-        const cliente = prompt("Cliente:");
-        equipos.push({ serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
-        renderAll();
-        mostrarMensaje(`✅ Equipo ${serial} agregado`);
-    };
-
-    // IMPORTAR DATOS
+    // ==================== IMPORTAR DATOS ====================
     function setupImport() {
         const importArea = document.getElementById("importArea");
         const fileInput = document.getElementById("fileInput");
@@ -552,24 +658,40 @@
             datos = XLSX.utils.sheet_to_json(sheet);
         }
         if(datos.length === 0) { preview.innerHTML = '<p>❌ No se encontraron datos.</p>'; btnConfirmar.style.display = "none"; return; }
+        
         const primerRegistro = datos[0];
-        preview.innerHTML = `<h4>✅ Vista previa (${datos.length} registros)</h4><div style="background:#e8f0fe; padding:12px; border-radius:12px;"><p><strong>📌 Mapeo detectado:</strong></p><p>🔢 ID: ${primerRegistro.ID || 'No'}</p><p>📅 fecha: ${primerRegistro.fecha || 'No'}</p><p>🏢 CLIENTE: ${primerRegistro.CLIENTE || 'No'}</p></div><p>Se importarán ${datos.length} informes.</p>`;
+        preview.innerHTML = `<h4>✅ Vista previa (${datos.length} registros)</h4>
+            <div style="background:#e8f0fe; padding:12px; border-radius:12px; margin:10px 0;">
+                <p><strong>📌 Mapeo detectado:</strong></p>
+                <p>🔢 ID: ${primerRegistro.ID || primerRegistro["# informe"] || 'No'}</p>
+                <p>📅 fecha: ${primerRegistro.fecha || 'No'}</p>
+                <p>🏢 CLIENTE: ${primerRegistro.CLIENTE || primerRegistro.con || 'No'}</p>
+                <p>🔧 equipo: ${primerRegistro.equipo || 'No'}</p>
+                <p>🔢 serial: ${primerRegistro.serial || 'No'}</p>
+            </div>
+            <p>Se importarán ${datos.length} informes.</p>`;
         btnConfirmar.style.display = "block";
+        
         btnConfirmar.onclick = () => {
             let nuevos = 0, maxId = 0;
             for(const row of datos) {
-                let id = row.ID || row.id;
+                let id = row.ID || row["# informe"] || row.id;
                 if(id && !isNaN(parseInt(id))) { id = parseInt(id); if(id > maxId) maxId = id; } else id = nextId++;
+                
                 let fecha = row.fecha ? (row.fecha.includes('/') ? row.fecha.split('/').reverse().join('-') : row.fecha).substring(0,10) : new Date().toISOString().slice(0,10);
                 const serial = row.serial || `EQ-${id}`;
-                const cliente = row.CLIENTE || row.cliente || "CLIENTE";
-                const diagnostico = row.diagnostico || "Diagnóstico";
+                const cliente = row.CLIENTE || row.con || row.cliente || "CLIENTE GENERAL";
+                const diagnostico = row.diagnostico || "Diagnóstico registrado";
                 const tipo = row.equipo || "Calibración";
                 const marca = row.marca || "GENERICO";
                 const modelo = row.modelo || "MODELO";
+                
                 informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
                 nuevos++;
-                if(!equipos.find(e => e.serial === serial)) equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
+                
+                if(!equipos.find(e => e.serial === serial)) {
+                    equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
+                }
             }
             if(maxId > 0 && maxId >= nextId) nextId = maxId + 1;
             renderAll(); mostrarMensaje(`✅ Se importaron ${nuevos} informes`);
@@ -577,7 +699,66 @@
         };
     }
 
-    // GENERAR PDF
+    // ==================== TRAZABILIDAD POR SERIAL ====================
+    function verHistorialEquipo() {
+        const serial = document.getElementById("selectEquipoTraza").value;
+        const div = document.getElementById("historialEquipo");
+        const btnExportar = document.getElementById("btnExportarTraza");
+        if(!serial) { div.innerHTML = '<p>🔍 Seleccione un serial para ver su historial.</p>'; btnExportar.style.display = "none"; return; }
+        
+        const infoEquipo = equipos.find(e => e.serial === serial);
+        const informesEquipo = informes.filter(i => i.serial === serial).sort((a,b) => b.id - a.id);
+        if(informesEquipo.length === 0) { div.innerHTML = `<p>📭 No hay informes para el serial <strong>${serial}</strong>.</p>`; btnExportar.style.display = "none"; return; }
+        
+        let html = `<div style="margin-bottom:20px; padding:15px; background:var(--secondary); border-radius:12px;">
+                        <strong>🔧 DATOS DEL EQUIPO</strong><br>
+                        📟 Serial: ${serial}<br>
+                        🏷️ Equipo: ${infoEquipo?.equipo || 'N/A'} ${infoEquipo?.marca || ''} ${infoEquipo?.modelo || ''}<br>
+                        🏢 Cliente: ${infoEquipo?.cliente || 'N/A'}<br>
+                        📍 Estado actual: ${infoEquipo?.estado || 'Pendiente'}<br>
+                        📄 Total de intervenciones: ${informesEquipo.length}
+                    </div>
+                    <h4 style="margin-bottom: 15px;">📋 HISTORIAL DE INFORMES (${informesEquipo.length})</h4>`;
+        
+        for(const inf of informesEquipo) {
+            html += `<div class="historial-item">
+                        <div class="historial-fecha">📄 INFORME #${inf.id} - ${inf.fecha}</div>
+                        <div><strong>Servicio:</strong> ${inf.tipo}</div>
+                        <div><strong>Diagnóstico:</strong> ${inf.diagnostico.substring(0, 200)}${inf.diagnostico.length > 200 ? '...' : ''}</div>
+                        <div><strong>Valores:</strong> ${inf.valores || 'No especificado'}</div>
+                        <div><strong>Estado comercial:</strong> <span class="status-badge ${inf.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${inf.estado}</span></div>
+                        ${inf.obsCliente ? `<div><strong>💬 Observaciones cliente:</strong> ${inf.obsCliente}</div>` : ''}
+                        <div style="margin-top: 8px;"><button class="pdf-btn" onclick="generarPDF(${inf.id})">📄 Ver informe completo</button></div>
+                    </div>`;
+        }
+        div.innerHTML = html;
+        btnExportar.style.display = "block";
+        btnExportar.onclick = () => exportarTrazabilidad(serial, infoEquipo, informesEquipo);
+    }
+
+    function exportarTrazabilidad(serial, infoEquipo, informesEquipo) {
+        const fechaActual = new Date().toLocaleDateString('es-CO');
+        let informesHtml = '';
+        for(const inf of informesEquipo) {
+            informesHtml += `<div style="margin-bottom:25px; border-bottom:1px solid #ddd; padding-bottom:15px;">
+                                <div style="font-weight:bold; background:#f0f0f0; padding:8px;">INFORME #${inf.id} - ${inf.fecha}</div>
+                                <div><strong>Servicio:</strong> ${inf.tipo}</div>
+                                <div><strong>Diagnóstico:</strong> ${inf.diagnostico}</div>
+                                <div><strong>Valores:</strong> ${inf.valores || 'No especificado'}</div>
+                                <div><strong>Estado comercial:</strong> ${inf.estado}</div>
+                                ${inf.obsCliente ? `<div><strong>Observaciones:</strong> ${inf.obsCliente}</div>` : ''}
+                            </div>`;
+        }
+        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Trazabilidad_${serial}</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;padding:40px;background:white;color:#111;}.container{max-width:900px;margin:0 auto;}.header{text-align:center;margin-bottom:30px;border-bottom:2px solid #333;padding-bottom:15px;}.info-equipo{background:#f5f5f5;padding:15px;margin-bottom:25px;border-radius:8px;}.fecha{text-align:right;margin-bottom:20px;}.footer{margin-top:40px;text-align:center;font-size:9px;color:#666;border-top:1px solid #eee;padding-top:15px;}</style></head><body><div class="container"><div class="header">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;"><br><br>` : '<div style="font-weight:bold;font-size:18px;">CI RENTELCOM SAS</div>'}<h2>REPORTE DE TRAZABILIDAD</h2></div><div class="fecha">Fecha: ${fechaActual}</div><div class="info-equipo"><strong>SERIAL:</strong> ${serial}<br><strong>EQUIPO:</strong> ${infoEquipo?.equipo || 'N/A'} ${infoEquipo?.marca || ''} ${infoEquipo?.modelo || ''}<br><strong>CLIENTE:</strong> ${infoEquipo?.cliente || 'N/A'}<br><strong>ESTADO ACTUAL:</strong> ${infoEquipo?.estado || 'Pendiente'}<br><strong>TOTAL INTERVENCIONES:</strong> ${informesEquipo.length}</div><div style="font-weight:bold; font-size:16px; margin:20px 0 10px;">HISTORIAL COMPLETO</div>${informesHtml}<div class="footer">CI RENTELCOM SAS - Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167 - 3185586239</div></div></body></html>`;
+        const blob = new Blob([docHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const ventana = window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    document.getElementById("btnCargarTraza").onclick = verHistorialEquipo;
+
+    // ==================== GENERAR PDF ====================
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
@@ -591,36 +772,7 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
-    // TRAZABILIDAD
-    function verHistorialEquipo() {
-        const serial = document.getElementById("selectEquipoTraza").value;
-        const div = document.getElementById("historialEquipo");
-        const btnExportar = document.getElementById("btnExportarTraza");
-        if(!serial) { div.innerHTML = '<p>🔍 Seleccione un serial para ver su historial.</p>'; btnExportar.style.display = "none"; return; }
-        const infoEquipo = equipos.find(e => e.serial === serial);
-        const informesEquipo = informes.filter(i => i.serial === serial).sort((a,b) => b.id - a.id);
-        if(informesEquipo.length === 0) { div.innerHTML = `<p>📭 No hay informes para el serial ${serial}.</p>`; btnExportar.style.display = "none"; return; }
-        let html = `<div style="margin-bottom:20px; padding:15px; background:var(--secondary); border-radius:12px;"><strong>🔧 DATOS DEL EQUIPO</strong><br>📟 Serial: ${serial}<br>🏷️ Equipo: ${infoEquipo?.equipo || 'N/A'} ${infoEquipo?.marca || ''} ${infoEquipo?.modelo || ''}<br>🏢 Cliente: ${infoEquipo?.cliente || 'N/A'}<br>📍 Estado actual: ${infoEquipo?.estado || 'Pendiente'}<br>📄 Total intervenciones: ${informesEquipo.length}</div><h4>📋 HISTORIAL DE INFORMES (${informesEquipo.length})</h4>`;
-        for(const inf of informesEquipo) html += `<div class="historial-item"><div class="historial-fecha">📄 INFORME #${inf.id} - ${inf.fecha}</div><div><strong>Servicio:</strong> ${inf.tipo}</div><div><strong>Diagnóstico:</strong> ${inf.diagnostico.substring(0,150)}${inf.diagnostico.length>150?'...':''}</div><div><strong>Valores:</strong> ${inf.valores || 'No especificado'}</div><div><strong>Estado comercial:</strong> <span class="status-badge ${inf.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${inf.estado}</span></div><div style="margin-top:8px;"><button class="pdf-btn" onclick="generarPDF(${inf.id})">📄 Ver informe</button></div></div>`;
-        div.innerHTML = html;
-        btnExportar.style.display = "block";
-        btnExportar.onclick = () => exportarTrazabilidad(serial, infoEquipo, informesEquipo);
-    }
-    
-    function exportarTrazabilidad(serial, infoEquipo, informesEquipo) {
-        const fechaActual = new Date().toLocaleDateString('es-CO');
-        let informesHtml = '';
-        for(const inf of informesEquipo) informesHtml += `<div style="margin-bottom:25px;border-bottom:1px solid #ddd;padding-bottom:15px;"><div style="font-weight:bold;background:#f0f0f0;padding:8px;">INFORME #${inf.id} - ${inf.fecha}</div><div><strong>Servicio:</strong> ${inf.tipo}</div><div><strong>Diagnóstico:</strong> ${inf.diagnostico}</div><div><strong>Valores:</strong> ${inf.valores || 'No especificado'}</div><div><strong>Estado comercial:</strong> ${inf.estado}</div>${inf.obsCliente ? `<div><strong>Observaciones:</strong> ${inf.obsCliente}</div>` : ''}</div>`;
-        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Trazabilidad_${serial}</title><style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',sans-serif;padding:40px;background:white;color:#111;}.container{max-width:900px;margin:0 auto;}.header{text-align:center;margin-bottom:30px;border-bottom:2px solid #333;padding-bottom:15px;}.info-equipo{background:#f5f5f5;padding:15px;margin-bottom:25px;border-radius:8px;}.fecha{text-align:right;margin-bottom:20px;}.footer{margin-top:40px;text-align:center;font-size:9px;color:#666;border-top:1px solid #eee;padding-top:15px;}</style></head><body><div class="container"><div class="header">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;"><br><br>` : '<div style="font-weight:bold;font-size:18px;">CI RENTELCOM SAS</div>'}<h2>REPORTE DE TRAZABILIDAD</h2></div><div class="fecha">Fecha: ${fechaActual}</div><div class="info-equipo"><strong>SERIAL:</strong> ${serial}<br><strong>EQUIPO:</strong> ${infoEquipo?.equipo || 'N/A'} ${infoEquipo?.marca || ''} ${infoEquipo?.modelo || ''}<br><strong>CLIENTE:</strong> ${infoEquipo?.cliente || 'N/A'}<br><strong>ESTADO ACTUAL:</strong> ${infoEquipo?.estado || 'Pendiente'}<br><strong>TOTAL INTERVENCIONES:</strong> ${informesEquipo.length}</div><div style="font-weight:bold; font-size:16px; margin:20px 0 10px;">HISTORIAL COMPLETO</div>${informesHtml}<div class="footer">CI RENTELCOM SAS - Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167 - 3185586239</div></div></body></html>`;
-        const blob = new Blob([docHtml], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const ventana = window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-    
-    document.getElementById("btnCargarTraza").onclick = verHistorialEquipo;
-
-    // DASHBOARD CLICKEABLE
+    // ==================== DASHBOARD CLICKEABLE ====================
     function activarDashboardClick() {
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', () => {
@@ -633,7 +785,7 @@
         });
     }
 
-    // TABS
+    // ==================== TABS ====================
     document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => {
         document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
@@ -641,6 +793,8 @@
         document.getElementById(btn.dataset.tab).classList.add("active-pane");
         if(btn.dataset.tab === "informes") renderInformesConFiltro();
     }));
+
+    document.getElementById("btnCargarEjemplo").onclick = cargarDatosEjemplo;
     
     setupImport();
     cargarDatos();
