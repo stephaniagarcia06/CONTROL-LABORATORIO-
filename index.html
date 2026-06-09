@@ -100,8 +100,12 @@
         .busqueda-serial .input-group { flex: 1; margin-bottom: 0; }
         .busqueda-serial button { margin-bottom: 0; height: 48px; }
         
-        .equipo-card { border: 1px solid var(--gray-border); border-radius: 16px; padding: 15px; margin-bottom: 15px; background: var(--white); }
-        .equipo-foto { max-width: 150px; max-height: 150px; border-radius: 8px; object-fit: cover; margin-top: 10px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; border-radius: 20px; padding: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { color: var(--primary); }
+        .close-modal { font-size: 24px; cursor: pointer; color: var(--text-gray); }
+        .close-modal:hover { color: var(--danger); }
     </style>
 </head>
 <body>
@@ -218,15 +222,51 @@
         </div>
     </div>
 
-    <!-- EQUIPOS - CON CAMPO REGISTRADO POR -->
+    <!-- EQUIPOS - TABLA COMO INFORMES -->
     <div id="equipos" class="tab-pane">
-        <div class="form-card">
+        <div class="table-card">
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
-            
-            <div id="listaEquipos">
-                <!-- Los equipos se renderizarán aquí como tarjetas -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>Consecutivo</th>
+                        <th>Serial</th>
+                        <th>Equipo</th>
+                        <th>Marca</th>
+                        <th>Modelo</th>
+                        <th>Cliente</th>
+                        <th>Estado</th>
+                        <th>Registrado por</th>
+                        <th>Foto</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="equiposBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Editar Equipo -->
+    <div id="modalEditarEquipo" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Editar equipo</h3>
+                <span class="close-modal" onclick="cerrarModalEquipo()">&times;</span>
             </div>
+            <div class="form-grid">
+                <div class="input-group"><label>Consecutivo</label><input type="text" id="editEqConsecutivo" readonly></div>
+                <div class="input-group"><label>Serial</label><input id="editEqSerial" readonly></div>
+                <div class="input-group"><label>Tipo de equipo</label><input id="editEqEquipo"></div>
+                <div class="input-group"><label>Marca</label><input id="editEqMarca"></div>
+                <div class="input-group"><label>Modelo</label><input id="editEqModelo"></div>
+                <div class="input-group"><label>Cliente</label><input id="editEqCliente"></div>
+                <div class="input-group"><label>Estado</label><select id="editEqEstado"><option>Pendiente diagnóstico</option><option>En taller</option><option>Diagnóstico</option><option>Entregado</option></select></div>
+                <div class="input-group"><label>Registrado por</label><input id="editEqRegistradoPor"></div>
+                <div class="input-group"><label>Observaciones / Accesorios</label><textarea id="editEqObservaciones" rows="2"></textarea></div>
+                <div class="input-group"><label>Foto del equipo</label><input type="file" id="editEqFoto" accept="image/*"></div>
+            </div>
+            <button id="btnGuardarEdicionEquipo" style="margin-top:15px; width:100%;">💾 Guardar cambios</button>
         </div>
     </div>
 
@@ -308,6 +348,7 @@
 
 <script>
     let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "", filtroActual = "todos";
+    let equipoEditandoIdx = null;
 
     function guardarDatos() {
         localStorage.setItem("calibpro_equipos", JSON.stringify(equipos));
@@ -333,15 +374,13 @@
 
     function cargarDatosEjemplo() {
         equipos = [
-            { id: 1, serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller", foto: "", observaciones: "Equipo con golpes en la carcasa, viene con maletín de transporte, cargador y kit de limpieza.", registradoPor: "Stephania Garcia" },
-            { id: 2, serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "Equipo completo: cargador, batería adicional, 2 conectores.", registradoPor: "Stephania Garcia" }
+            { id: 1, serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller", foto: "", observaciones: "Equipo con golpes en la carcasa, viene con maletín de transporte.", registradoPor: "Stephania Garcia" },
+            { id: 2, serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "Equipo completo: cargador, batería adicional.", registradoPor: "Stephania Garcia" }
         ];
-        
         informes = [
             { id: 447, fecha: "2023-11-23", serial: "AA432002010275", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", tipo: "Reparación", diagnostico: "DAÑO MECANISMO DE AJUSTE DE FOCO", valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" },
             { id: 448, fecha: "2023-11-23", serial: "TF3C02PA010869", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", tipo: "Calibración", diagnostico: "REPOTENCIACION DE BATERIA", valores: "", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-11-25", obsCliente: "Cliente autorizó" }
         ];
-        
         nextId = 449;
         guardarDatos();
         renderAll();
@@ -374,79 +413,78 @@
         return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
     }
 
-    // ==================== RENDERIZAR EQUIPOS ====================
+    // ==================== RENDERIZAR EQUIPOS EN TABLA ====================
     function renderEquipos() {
-        const container = document.getElementById("listaEquipos");
+        const tbody = document.getElementById("equiposBody");
         if(equipos.length === 0) {
-            container.innerHTML = '<p style="text-align:center; color:var(--text-gray);">No hay equipos registrados</p>';
+            tbody.innerHTML = '<tr><td colspan="10">No hay equipos registrados</td>' + '</tr>';
             return;
         }
         
-        container.innerHTML = equipos.map((eq, idx) => `
-            <div class="equipo-card">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
-                    <div style="flex: 2;">
-                        <div><strong style="font-size:1.1rem;">📟 ${eq.equipo} ${eq.marca} ${eq.modelo}</strong></div>
-                        <div><strong>🔢 Consecutivo:</strong> EQ-${eq.id || idx+1}</div>
-                        <div><strong>🔧 Serial:</strong> ${eq.serial}</div>
-                        <div><strong>🏢 Cliente:</strong> ${eq.cliente}</div>
-                        <div><strong>📍 Estado:</strong> <span class="status-badge">${eq.estado || "Pendiente"}</span></div>
-                        <div><strong>📝 Accesorios / Observaciones:</strong><br>${eq.observaciones || "Ninguna"}</div>
-                        <div><strong>👤 Registrado por:</strong> ${eq.registradoPor || "No especificado"}</div>
-                    </div>
-                    <div style="flex: 1; text-align: center;">
-                        ${eq.foto ? `<img src="${eq.foto}" class="equipo-foto"><br>` : '<div style="width:150px; height:100px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border-radius:8px;">Sin foto</div>'}
-                        <div style="margin-top: 10px;">
-                            <button class="edit-btn" onclick="editarEquipo(${idx})">✏️ Editar</button>
-                            <button class="pdf-btn" onclick="generarPDFEquipo(${idx})" style="background:#10b981;">📄 PDF Equipo</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        tbody.innerHTML = equipos.map((eq, idx) => `
+            <tr>
+                <td>EQ-${eq.id || idx+1}</td>
+                <td class="serial-link" onclick="buscarPorSerial('${eq.serial}')">${eq.serial}</td>
+                <td>${eq.equipo}</td>
+                <td>${eq.marca}</td>
+                <td>${eq.modelo}</td>
+                <td>${eq.cliente}</td>
+                <td><span class="status-badge">${eq.estado || "Pendiente"}</span></td>
+                <td>${eq.registradoPor || "No especificado"}</td>
+                <td>${eq.foto ? '<img src="'+eq.foto+'" class="foto-miniatura">' : '—'}</td>
+                <td>
+                    <button class="edit-btn" onclick="abrirModalEditarEquipo(${idx})">✏️ Editar</button>
+                    <button class="pdf-btn" onclick="generarPDFEquipo(${idx})" style="background:#10b981;">📄 PDF</button>
+                </td>
+            </tr>
         `).join('');
     }
 
-    // Editar equipo
-    window.editarEquipo = async (idx) => {
+    // Abrir modal editar equipo
+    window.abrirModalEditarEquipo = (idx) => {
+        equipoEditandoIdx = idx;
         const eq = equipos[idx];
-        const nuevoEquipo = prompt("Tipo de equipo:", eq.equipo);
-        const nuevaMarca = prompt("Marca:", eq.marca);
-        const nuevoModelo = prompt("Modelo:", eq.modelo);
-        const nuevoCliente = prompt("Cliente:", eq.cliente);
-        const nuevoEstado = prompt("Estado (Pendiente diagnóstico, En taller, Entregado):", eq.estado);
-        const nuevasObs = prompt("Observaciones / Accesorios:", eq.observaciones || "");
-        const nuevoRegistradoPor = prompt("Registrado por (técnico que ingresa los datos):", eq.registradoPor || "Stephania Garcia");
+        document.getElementById("editEqConsecutivo").value = `EQ-${eq.id || idx+1}`;
+        document.getElementById("editEqSerial").value = eq.serial;
+        document.getElementById("editEqEquipo").value = eq.equipo;
+        document.getElementById("editEqMarca").value = eq.marca;
+        document.getElementById("editEqModelo").value = eq.modelo;
+        document.getElementById("editEqCliente").value = eq.cliente;
+        document.getElementById("editEqEstado").value = eq.estado || "Pendiente diagnóstico";
+        document.getElementById("editEqRegistradoPor").value = eq.registradoPor || "Stephania Garcia";
+        document.getElementById("editEqObservaciones").value = eq.observaciones || "";
+        document.getElementById("modalEditarEquipo").style.display = "flex";
+    };
+
+    function cerrarModalEquipo() {
+        document.getElementById("modalEditarEquipo").style.display = "none";
+        equipoEditandoIdx = null;
+    }
+
+    document.getElementById("btnGuardarEdicionEquipo").onclick = async () => {
+        if(equipoEditandoIdx === null) return;
+        const eq = equipos[equipoEditandoIdx];
         
-        if(nuevoEquipo) eq.equipo = nuevoEquipo;
-        if(nuevaMarca) eq.marca = nuevaMarca;
-        if(nuevoModelo) eq.modelo = nuevoModelo;
-        if(nuevoCliente) eq.cliente = nuevoCliente;
-        if(nuevoEstado) eq.estado = nuevoEstado;
-        if(nuevasObs !== null) eq.observaciones = nuevasObs;
-        if(nuevoRegistradoPor) eq.registradoPor = nuevoRegistradoPor;
+        eq.equipo = document.getElementById("editEqEquipo").value;
+        eq.marca = document.getElementById("editEqMarca").value;
+        eq.modelo = document.getElementById("editEqModelo").value;
+        eq.cliente = document.getElementById("editEqCliente").value;
+        eq.estado = document.getElementById("editEqEstado").value;
+        eq.registradoPor = document.getElementById("editEqRegistradoPor").value;
+        eq.observaciones = document.getElementById("editEqObservaciones").value;
         
-        const cambiarFoto = confirm("¿Desea cambiar la foto del equipo?");
-        if(cambiarFoto) {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = async (e) => {
-                const file = e.target.files[0];
-                if(file) eq.foto = await fileToBase64(file);
-                guardarDatos();
-                renderAll();
-                mostrarMensaje("Equipo actualizado");
-            };
-            input.click();
-            return;
+        const fotoFile = document.getElementById("editEqFoto").files[0];
+        if(fotoFile) {
+            eq.foto = await fileToBase64(fotoFile);
         }
         
         guardarDatos();
         renderAll();
-        mostrarMensaje("Equipo actualizado");
+        cerrarModalEquipo();
+        mostrarMensaje("✅ Equipo actualizado");
     };
 
-    // Generar PDF individual del equipo (SIN FIRMA)
+    // Generar PDF del equipo
     window.generarPDFEquipo = (idx) => {
         const eq = equipos[idx];
         if(!eq) return;
@@ -515,8 +553,8 @@
         const marca = prompt("Marca:");
         const modelo = prompt("Modelo:");
         const cliente = prompt("Cliente:");
-        const observaciones = prompt("Observaciones / Accesorios (ej: maletín, cargador, conectores, estado físico):");
-        const registradoPor = prompt("Registrado por (técnico que ingresa los datos):", "Stephania Garcia");
+        const observaciones = prompt("Observaciones / Accesorios:");
+        const registradoPor = prompt("Registrado por (técnico):", "Stephania Garcia");
         
         let foto = "";
         const agregarFoto = confirm("¿Desea agregar una foto del equipo?");
@@ -528,13 +566,7 @@
                 const file = e.target.files[0];
                 if(file) foto = await fileToBase64(file);
                 const nuevoId = equipos.length + 1;
-                equipos.push({ 
-                    id: nuevoId, serial, equipo, marca, modelo, cliente, 
-                    estado: "Pendiente diagnóstico", 
-                    observaciones: observaciones || "",
-                    registradoPor: registradoPor || "Stephania Garcia",
-                    foto: foto 
-                });
+                equipos.push({ id: nuevoId, serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: observaciones || "", registradoPor: registradoPor || "Stephania Garcia", foto: foto });
                 guardarDatos();
                 renderAll();
                 mostrarMensaje(`✅ Equipo ${serial} agregado`);
@@ -542,13 +574,7 @@
             input.click();
         } else {
             const nuevoId = equipos.length + 1;
-            equipos.push({ 
-                id: nuevoId, serial, equipo, marca, modelo, cliente, 
-                estado: "Pendiente diagnóstico", 
-                observaciones: observaciones || "",
-                registradoPor: registradoPor || "Stephania Garcia",
-                foto: "" 
-            });
+            equipos.push({ id: nuevoId, serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: observaciones || "", registradoPor: registradoPor || "Stephania Garcia", foto: "" });
             guardarDatos();
             renderAll();
             mostrarMensaje(`✅ Equipo ${serial} agregado`);
@@ -584,8 +610,8 @@
         filtrados.sort((a, b) => b.id - a.id);
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
-        if(filtrados.length === 0) { tbody.innerHTML = '</table><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
+        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}NzAQ73${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}NzAQ73${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}NzAQ73<button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
     function cargarInformesPorSerial(selectSerialId, selectInformeId) {
@@ -914,6 +940,12 @@
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
         setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+
+    // Cerrar modal al hacer clic fuera
+    window.onclick = function(event) {
+        const modal = document.getElementById("modalEditarEquipo");
+        if (event.target === modal) cerrarModalEquipo();
     };
 
     // DASHBOARD CLICKEABLE
