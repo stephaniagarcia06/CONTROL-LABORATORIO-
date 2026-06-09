@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CalibPro — Gestión de Calibraciones</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f9fa;--bg2:#fff;--bg3:#f1f3f5;
+  --text:#1a1a2e;--text2:#6c757d;--text3:#adb5bd;
+  --border:#dee2e6;--border2:#ced4da;
+  --blue:#185FA5;--blue-light:#E6F1FB;
+  --green:#3B6D11;--green-light:#EAF3DE;
+  --amber:#854F0B;--amber-light:#FAEEDA;
+  --red:#A32D2D;--red-light:#FCEBEB;
+  --radius:8px;--radius-lg:12px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text);background:var(--bg);font-size:14px}
+.app{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;height:100vh;z-index:50}
+.logo{padding:16px;border-bottom:1px solid var(--border);margin-bottom:8px}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-icon{width:36px;height:36px;background:var(--blue);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+.logo-title{font-size:15px;font-weight:600;color:var(--text)}
+.logo-sub{font-size:11px;color:var(--text2);margin-top:1px}
+.nav-section{padding:8px 12px 4px;font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;font-size:13px;color:var(--text2);border:none;background:none;width:100%;text-align:left;border-radius:0;transition:all .15s}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--blue-light);color:var(--blue);font-weight:500}
+.nav-item i{font-size:17px;width:20px;text-align:center}
+.sidebar-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--border);font-size:11px;color:var(--text3)}
+
+/* MAIN */
+.main{flex:1;margin-left:220px;padding:28px 32px;max-width:1100px}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+.page-title{font-size:20px;font-weight:600}
+.page-sub{font-size:13px;color:var(--text2);margin-top:3px}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:24px}
+.metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px}
+.metric-label{font-size:12px;color:var(--text2);margin-bottom:6px}
+.metric-val{font-size:26px;font-weight:600}
+.metric-val.blue{color:var(--blue)}
+.metric-val.green{color:var(--green)}
+.metric-val.amber{color:var(--amber)}
+.metric-val.red{color:var(--red)}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;margin-bottom:18px}
+.card-title{font-size:14px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.card-title i{color:var(--blue);font-size:18px}
+
+/* FORMS */
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px}
+.field label{font-size:12px;font-weight:500;color:var(--text2)}
+.field input,.field select,.field textarea{font-size:13px;border:1px solid var(--border2);border-radius:var(--radius);padding:8px 11px;background:var(--bg2);color:var(--text);width:100%;font-family:inherit;transition:border .15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,.1)}
+.field textarea{resize:vertical;min-height:80px;line-height:1.6}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg2);color:var(--text);font-family:inherit;transition:all .15s}
+.btn:hover{background:var(--bg3)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.primary:hover{background:#0C447C}
+.btn.success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.success:hover{background:#27500A}
+.btn.danger{background:transparent;color:var(--red);border-color:var(--red)}
+.btn.danger:hover{background:var(--red-light)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+
+/* TABLE */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);font-size:12px;background:var(--bg3)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg3)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
+.badge.ok{background:var(--green-light);color:var(--green)}
+.badge.warn{background:var(--amber-light);color:var(--amber)}
+.badge.pending{background:var(--blue-light);color:var(--blue)}
+.badge.fail{background:var(--red-light);color:var(--red)}
+
+/* PHOTOS */
+.photo-grid{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.photo-thumb{width:80px;height:80px;border-radius:var(--radius);border:1px solid var(--border);object-fit:cover;cursor:pointer;transition:transform .15s}
+.photo-thumb:hover{transform:scale(1.05)}
+.photo-add{width:80px;height:80px;border-radius:var(--radius);border:2px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);flex-direction:column;gap:4px;font-size:11px;background:var(--bg3);transition:all .15s}
+.photo-add:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
+.photo-add i{font-size:22px}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;gap:0}
+.tl-item{display:flex;gap:14px;padding-bottom:20px;position:relative}
+.tl-dot{width:12px;height:12px;border-radius:50%;background:var(--blue);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--blue-light)}
+.tl-line{position:absolute;left:5px;top:16px;bottom:0;width:2px;background:var(--border)}
+.tl-item:last-child .tl-line{display:none}
+.tl-content{flex:1}
+.tl-title{font-size:14px;font-weight:600}
+.tl-date{font-size:12px;color:var(--text2);margin-top:2px}
+.tl-desc{font-size:13px;color:var(--text2);margin-top:5px;line-height:1.5}
+
+/* SEARCH */
+.search-bar{display:flex;gap:10px;margin-bottom:16px}
+.search-bar input{flex:1;padding:9px 14px;border:1px solid var(--border2);border-radius:var(--radius);font-size:13px;background:var(--bg2);color:var(--text);font-family:inherit}
+.search-bar input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(24,95,165,.1)}
+
+/* EMPTY */
+.empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+.empty i{font-size:36px;display:block;margin-bottom:10px;opacity:.5}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border-radius:var(--radius-lg);padding:24px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal.wide{max-width:680px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:16px;font-weight:600}
+.close-btn{background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;padding:2px;border-radius:var(--radius);display:flex;align-items:center;transition:all .15s}
+.close-btn:hover{background:var(--bg3);color:var(--text)}
+
+/* REPORT PREVIEW */
+.report-doc{font-size:13px;line-height:1.8;color:var(--text)}
+.report-doc .rep-header{background:var(--blue);color:#fff;border-radius:var(--radius);padding:16px 20px;margin-bottom:20px}
+.report-doc .rep-header h1{font-size:18px;font-weight:700;margin-bottom:4px}
+.report-doc .rep-header p{font-size:12px;opacity:.85}
+.report-doc h3{font-size:13px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.report-doc table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0}
+.report-doc table th{background:var(--bg3);text-align:left;padding:7px 10px;font-size:12px;color:var(--text2);border-bottom:1px solid var(--border)}
+.report-doc table td{padding:7px 10px;border-bottom:1px solid var(--border)}
+.report-doc .result-box{border-radius:var(--radius);padding:12px 16px;margin:12px 0;font-weight:600}
+.report-doc .result-box.ok{background:var(--green-light);color:var(--green)}
+.report-doc .result-box.warn{background:var(--amber-light);color:var(--amber)}
+.report-doc .result-box.fail{background:var(--red-light);color:var(--red)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 18px;font-size:13px;display:none;z-index:999;align-items:center;gap:10px;max-width:300px;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.toast.show{display:flex}
+.toast.ok{border-color:#9FE1CB;color:#085041;background:#E1F5EE}
+.toast.err{border-color:#F7C1C1;color:#791F1F;background:#FCEBEB}
+
+/* DIVIDER */
+hr.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.section-label{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;display:block}
+
+/* PRINT */
+@media print{
+  .sidebar,.btn-row,.modal-header button,.search-bar,.page-header .btn,.nav-item{display:none!important}
+  .main{margin-left:0;padding:0}
+  .modal-bg{position:static!important;background:none!important}
+  .modal{max-height:none!important;box-shadow:none!important}
+  body{background:#fff}
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{width:60px;min-width:60px}
+  .sidebar .logo-title,.sidebar .logo-sub,.sidebar .nav-section,.nav-item span{display:none}
+  .nav-item{justify-content:center;padding:12px}
+  .main{margin-left:60px;padding:16px}
+  .logo-wrap{justify-content:center}
+  .logo-icon{margin:0 auto}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-wrap">
+        <div class="logo-icon"><i class="ti ti-settings-2"></i></div>
+        <div>
+          <div class="logo-title">CalibPro</div>
+          <div class="logo-sub">Calibraciones</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-section">Menú</div>
+    <button class="nav-item active" onclick="showPage('dashboard')"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></button>
+    <button class="nav-item" onclick="showPage('equipos')"><i class="ti ti-tool"></i><span>Equipos</span></button>
+    <button class="nav-item" onclick="showPage('nuevo-informe')"><i class="ti ti-file-plus"></i><span>Nuevo informe</span></button>
+    <button class="nav-item" onclick="showPage('informes')"><i class="ti ti-files"></i><span>Informes</span></button>
+    <button class="nav-item" onclick="showPage('trazabilidad')"><i class="ti ti-timeline"></i><span>Trazabilidad</span></button>
+    <div class="sidebar-footer">CalibPro v1.0</div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-sub">Resumen general del sistema</div>
+        </div>
+        <button class="btn primary" onclick="showPage('nuevo-informe')"><i class="ti ti-plus"></i> Nuevo informe</button>
+      </div>
+      <div class="cards-grid">
+        <div class="metric-card"><div class="metric-label"><i class="ti ti-tool" style="margin-right:4px"></i>Equipos</div><div class="metric-val blue" id="stat-equipos">0</div></div>
+        <div class="metric-card"><div class="metric-label"><i class="ti ti-files" style="margin-right:4px"></i>Informes</div><div class="metric-val green" id="stat-informes">0</div></div>
+        <div class="metric-card"><div class="metric-label"><i class="ti ti-alert-triangle" style="margin-right:4px"></i>Calibraciones próximas</div><div class="metric-val amber" id="stat-pendientes">0</div></div>
+        <div class="metric-card"><div class="metric-label"><i class="ti ti-x" style="margin-right:4px"></i>No conformes</div><div class="metric-val red" id="stat-reprobados">0</div></div>
+      </div>
+      <div class="row" style="align-items:flex-start">
+        <div style="flex:1;min-width:260px">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-clock-hour-4"></i> Actividad reciente</div>
+            <div id="recent-activity"><div class="empty"><i class="ti ti-mood-empty"></i>Sin actividad aún</div></div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:260px">
+          <div class="card">
+            <div class="card-title"><i class="ti ti-alert-triangle"></i> Calibraciones próximas (30 días)</div>
+            <div id="proximas-calib"><div class="empty"><i class="ti ti-circle-check"></i>Todo al día</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EQUIPOS -->
+    <div class="page" id="page-equipos">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Equipos</div>
+          <div class="page-sub">Registro de equipos con trazabilidad</div>
+        </div>
+        <button class="btn primary" onclick="openModal('modal-equipo')"><i class="ti ti-plus"></i> Nuevo equipo</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" placeholder="Buscar por código, nombre o cliente..." id="search-equipos" oninput="renderEquipos()">
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Equipo</th><th>Cliente</th><th>Ubicación</th><th>Próx. calibración</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="tabla-equipos"><tr><td colspan="7"><div class="empty"><i class="ti ti-tool"></i>Sin equipos. Agrega el primero.</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- NUEVO INFORME -->
+    <div class="page" id="page-nuevo-informe">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Nuevo informe de calibración</div>
+          <div class="page-sub">Completa los datos para generar el informe</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-info-circle"></i> Datos generales</div>
+        <div class="row">
+          <div class="field"><label>N° de informe *</label><input type="text" id="inf-numero" placeholder="CAL-2024-001"></div>
+          <div class="field"><label>Fecha *</label><input type="date" id="inf-fecha"></div>
+          <div class="field"><label>Técnico responsable</label><input type="text" id="inf-tecnico" placeholder="Nombre del técnico"></div>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div class="field"><label>Equipo</label>
+            <select id="inf-equipo" onchange="autoFillEquipo()">
+              <option value="">— Seleccionar equipo —</option>
+            </select>
+          </div>
+          <div class="field"><label>Cliente / Empresa</label><input type="text" id="inf-cliente" placeholder="Nombre del cliente"></div>
+          <div class="field"><label>Tipo de servicio</label>
+            <select id="inf-tipo">
+              <option>Calibración</option>
+              <option>Ajuste mecánico</option>
+              <option>Verificación</option>
+              <option>Mantenimiento preventivo</option>
+              <option>Inspección</option>
+              <option>Reparación</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-alert-circle"></i> Diagnóstico y observaciones</div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Condición inicial del equipo</label>
+          <textarea id="inf-condicion" placeholder="Describe la condición en que se recibió el equipo..."></textarea>
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Fallas observadas</label>
+          <textarea id="inf-fallas" placeholder="Lista las fallas encontradas durante la inspección..."></textarea>
+        </div>
+        <div class="field">
+          <label>Trabajos realizados / Ajustes efectuados</label>
+          <textarea id="inf-trabajos" placeholder="Describe los trabajos y ajustes realizados..."></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-ruler-measure"></i> Mediciones</div>
+        <div id="mediciones-list"></div>
+        <button class="btn" style="margin-top:10px" onclick="addMedicion()"><i class="ti ti-plus"></i> Agregar medición</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-camera"></i> Evidencias fotográficas</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:8px">Agrega fotos de las fallas y del estado final del equipo</p>
+        <div class="photo-grid" id="photo-grid">
+          <label class="photo-add" for="photo-input" title="Agregar fotos">
+            <i class="ti ti-camera-plus"></i>
+            <span>Agregar</span>
+          </label>
+          <input type="file" id="photo-input" accept="image/*" multiple style="display:none" onchange="addPhotos(event)">
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i class="ti ti-clipboard-check"></i> Resultado final</div>
+        <div class="row">
+          <div class="field"><label>Resultado *</label>
+            <select id="inf-resultado">
+              <option value="aprobado">✅ Aprobado / Conforme</option>
+              <option value="ajustado">✅ Ajustado y aprobado</option>
+              <option value="observacion">⚠️ Aprobado con observaciones</option>
+              <option value="reprobado">❌ Reprobado / No conforme</option>
+            </select>
+          </div>
+          <div class="field"><label>Próxima calibración</label><input type="date" id="inf-proxima"></div>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>Recomendaciones para el cliente</label>
+          <textarea id="inf-recomendaciones" placeholder="Recomendaciones, instrucciones de uso, cuidados especiales..."></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn success" onclick="guardarInforme()"><i class="ti ti-device-floppy"></i> Guardar informe</button>
+        <button class="btn primary" onclick="previewInforme()"><i class="ti ti-eye"></i> Vista previa</button>
+        <button class="btn" onclick="limpiarFormulario()"><i class="ti ti-trash"></i> Limpiar formulario</button>
+      </div>
+    </div>
+
+    <!-- INFORMES -->
+    <div class="page" id="page-informes">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Informes</div>
+          <div class="page-sub">Historial de todos los informes generados</div>
+        </div>
+        <button class="btn primary" onclick="showPage('nuevo-informe')"><i class="ti ti-plus"></i> Nuevo informe</button>
+      </div>
+      <div class="search-bar">
+        <input type="text" placeholder="Buscar por número, equipo o cliente..." id="search-informes" oninput="renderInformes()">
+      </div>
+      <div class="card" style="padding:0">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>N° Informe</th><th>Fecha</th><th>Equipo</th><th>Cliente</th><th>Tipo</th><th>Resultado</th><th>Acciones</th></tr></thead>
+            <tbody id="tabla-informes"><tr><td colspan="7"><div class="empty">Sin informes aún.</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRAZABILIDAD -->
+    <div class="page" id="page-trazabilidad">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Trazabilidad</div>
+          <div class="page-sub">Historial completo de intervenciones por equipo</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="field" style="max-width:360px">
+          <label>Seleccionar equipo</label>
+          <select id="traz-equipo" onchange="renderTrazabilidad()">
+            <option value="">— Seleccionar equipo —</option>
+          </select>
+        </div>
+      </div>
+      <div id="traz-content"><div class="empty"><i class="ti ti-timeline"></i>Selecciona un equipo para ver su historial completo</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: NUEVO EQUIPO -->
+<div class="modal-bg" id="modal-equipo">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-tool" style="margin-right:6px;color:var(--blue)"></i>Registrar equipo</div>
+      <button class="close-btn" onclick="closeModal('modal-equipo')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="row">
+      <div class="field"><label>Código / N° Serie *</label><input type="text" id="eq-codigo" placeholder="EQ-001"></div>
+      <div class="field"><label>Nombre del equipo *</label><input type="text" id="eq-nombre" placeholder="Ej: Torno CNC, Balanza..."></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field"><label>Marca</label><input type="text" id="eq-marca" placeholder="Marca"></div>
+      <div class="field"><label>Modelo</label><input type="text" id="eq-modelo" placeholder="Modelo"></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field"><label>Cliente / Propietario *</label><input type="text" id="eq-cliente" placeholder="Empresa o persona"></div>
+      <div class="field"><label>Ubicación / Área</label><input type="text" id="eq-ubicacion" placeholder="Planta, laboratorio..."></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="field"><label>Fecha de ingreso</label><input type="date" id="eq-ingreso"></div>
+      <div class="field"><label>Próxima calibración</label><input type="date" id="eq-proxima"></div>
+    </div>
+    <div class="field" style="margin-top:12px">
+      <label>Observaciones iniciales</label>
+      <textarea id="eq-obs" placeholder="Estado inicial, características importantes, accesorios..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="guardarEquipo()"><i class="ti ti-device-floppy"></i> Guardar equipo</button>
+      <button class="btn" onclick="closeModal('modal-equipo')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: VISTA PREVIA / VER INFORME -->
+<div class="modal-bg" id="modal-preview">
+  <div class="modal wide">
+    <div class="modal-header">
+      <div class="modal-title"><i class="ti ti-file-text" style="margin-right:6px;color:var(--blue)"></i>Informe de calibración</div>
+      <button class="close-btn" onclick="closeModal('modal-preview')"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="preview-content" class="report-doc"></div>
+    <div class="btn-row">
+      <button class="btn success" onclick="window.print()"><i class="ti ti-printer"></i> Imprimir / Guardar PDF</button>
+      <button class="btn" onclick="closeModal('modal-preview')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let equipos = JSON.parse(localStorage.getItem('cp_equipos')||'[]');
+let informes = JSON.parse(localStorage.getItem('cp_informes')||'[]');
+let medicionCount = 0;
+let photos = [];
+
+function save(){
+  localStorage.setItem('cp_equipos', JSON.stringify(equipos));
+  localStorage.setItem('cp_informes', JSON.stringify(informes));
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick') && n.getAttribute('onclick').includes("'"+id+"'")) n.classList.add('active');
+  });
+  if(id==='dashboard') renderDashboard();
+  if(id==='equipos') renderEquipos();
+  if(id==='informes') renderInformes();
+  if(id==='trazabilidad') renderTrazSelectores();
+  if(id==='nuevo-informe') populateEquipoSelect();
+}
+
+function toast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.innerHTML = (type==='ok' ? '<i class="ti ti-check"></i>' : '<i class="ti ti-x"></i>') + msg;
+  t.className = 'toast show ' + type;
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function formatDate(d){
+  if(!d) return '—';
+  const dt = new Date(d + 'T12:00:00');
+  return dt.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+// ---- DASHBOARD ----
+function renderDashboard(){
+  document.getElementById('stat-equipos').textContent = equipos.length;
+  document.getElementById('stat-informes').textContent = informes.length;
+  const now = Date.now();
+  const pend = equipos.filter(e=>{
+    if(!e.proxima) return false;
+    const d = new Date(e.proxima).getTime();
+    return d >= now && d <= now + 30*86400000;
+  }).length;
+  document.getElementById('stat-pendientes').textContent = pend;
+  document.getElementById('stat-reprobados').textContent = informes.filter(i=>i.resultado==='reprobado').length;
+
+  // Actividad reciente
+  const items = [
+    ...informes.map(i=>({date:i.fecha, text:'Informe '+i.numero+' — '+i.equipo, type:'inf'})),
+    ...equipos.map(e=>({date:e.ingreso, text:'Equipo: '+e.nombre+' ('+e.codigo+')', type:'eq'}))
+  ].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+
+  const ra = document.getElementById('recent-activity');
+  if(!items.length){ ra.innerHTML='<div class="empty"><i class="ti ti-mood-empty"></i>Sin actividad aún</div>'; }
+  else {
+    ra.innerHTML='<div class="timeline">'+items.map(it=>`
+      <div class="tl-item">
+        <div class="tl-dot" style="background:${it.type==='eq'?'var(--green)':'var(--blue)'}"></div>
+        <div class="tl-line"></div>
+        <div class="tl-content">
+          <div class="tl-title">${it.text}</div>
+          <div class="tl-date">${formatDate(it.date)}</div>
+        </div>
+      </div>`).join('')+'</div>';
+  }
+
+  // Próximas calibraciones
+  const prox = equipos.filter(e=>{
+    if(!e.proxima) return false;
+    const d = new Date(e.proxima).getTime();
+    return d >= now && d <= now + 30*86400000;
+  });
+  const pc = document.getElementById('proximas-calib');
+  if(!prox.length){ pc.innerHTML='<div class="empty"><i class="ti ti-circle-check"></i>Todo al día</div>'; }
+  else {
+    pc.innerHTML='<div class="table-wrap"><table><thead><tr><th>Código</th><th>Equipo</th><th>Cliente</th><th>Fecha límite</th></tr></thead><tbody>'+
+      prox.map(e=>`<tr><td><strong>${e.codigo}</strong></td><td>${e.nombre}</td><td>${e.cliente}</td><td style="color:var(--amber);font-weight:600">${formatDate(e.proxima)}</td></tr>`).join('')+
+    '</tbody></table></div>';
+  }
+}
+
+// ---- EQUIPOS ----
+function guardarEquipo(){
+  const cod = document.getElementById('eq-codigo').value.trim();
+  const nom = document.getElementById('eq-nombre').value.trim();
+  if(!cod||!nom){ toast('Código y nombre son obligatorios','err'); return; }
+  equipos.push({
+    id: Date.now(), codigo: cod, nombre: nom,
+    marca: document.getElementById('eq-marca').value,
+    modelo: document.getElementById('eq-modelo').value,
+    cliente: document.getElementById('eq-cliente').value,
+    ubicacion: document.getElementById('eq-ubicacion').value,
+    ingreso: document.getElementById('eq-ingreso').value || new Date().toISOString().slice(0,10),
+    proxima: document.getElementById('eq-proxima').value,
+    obs: document.getElementById('eq-obs').value
+  });
+  save();
+  closeModal('modal-equipo');
+  ['eq-codigo','eq-nombre','eq-marca','eq-modelo','eq-cliente','eq-ubicacion','eq-ingreso','eq-proxima','eq-obs'].forEach(id=>{ document.getElementById(id).value=''; });
+  renderEquipos();
+  toast('Equipo registrado correctamente');
+}
+
+function renderEquipos(){
+  const q = (document.getElementById('search-equipos').value||'').toLowerCase();
+  const fil = equipos.filter(e=>!q||(e.codigo+e.nombre+e.cliente).toLowerCase().includes(q));
+  const tb = document.getElementById('tabla-equipos');
+  if(!fil.length){ tb.innerHTML='<tr><td colspan="7"><div class="empty">Sin equipos encontrados.</div></td></tr>'; return; }
+  const now = Date.now();
+  tb.innerHTML = fil.map(e=>{
+    const eqIdx = equipos.indexOf(e);
+    const dp = e.proxima ? new Date(e.proxima).getTime() : null;
+    let badge;
+    if(!dp) badge='<span class="badge pending">Sin fecha</span>';
+    else if(dp < now) badge='<span class="badge fail">Vencida</span>';
+    else if(dp <= now + 30*86400000) badge='<span class="badge warn">Próxima</span>';
+    else badge='<span class="badge ok">Al día</span>';
+    return `<tr>
+      <td><strong>${e.codigo}</strong></td>
+      <td>${e.nombre}${e.marca?` <span style="font-size:11px;color:var(--text2)">${e.marca} ${e.modelo}</span>`:''}</td>
+      <td>${e.cliente||'—'}</td>
+      <td>${e.ubicacion||'—'}</td>
+      <td>${formatDate(e.proxima)}</td>
+      <td>${badge}</td>
+      <td style="white-space:nowrap">
+        <button class="btn sm" onclick="verTrazEquipo(${eqIdx})" title="Ver trazabilidad"><i class="ti ti-timeline"></i></button>
+        <button class="btn sm danger" onclick="eliminarEquipo(${eqIdx})" title="Eliminar"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function eliminarEquipo(i){
+  if(confirm('¿Eliminar el equipo "'+equipos[i].nombre+'"?')){
+    equipos.splice(i,1); save(); renderEquipos(); toast('Equipo eliminado');
+  }
+}
+
+function verTrazEquipo(i){
+  showPage('trazabilidad');
+  setTimeout(()=>{ document.getElementById('traz-equipo').value = equipos[i].id; renderTrazabilidad(); }, 80);
+}
+
+// ---- INFORME ----
+function populateEquipoSelect(){
+  const sel = document.getElementById('inf-equipo');
+  sel.innerHTML = '<option value="">— Seleccionar equipo —</option>' +
+    equipos.map(e=>`<option value="${e.id}">${e.codigo} — ${e.nombre} (${e.cliente||'s/c'})</option>`).join('');
+}
+
+function autoFillEquipo(){
+  const id = parseInt(document.getElementById('inf-equipo').value);
+  const eq = equipos.find(e=>e.id===id);
+  if(eq) document.getElementById('inf-cliente').value = eq.cliente||'';
+}
+
+function addMedicion(){
+  medicionCount++;
+  const div = document.createElement('div');
+  div.className = 'row'; div.style.marginBottom='10px'; div.id='med-'+medicionCount;
+  div.innerHTML=`
+    <div class="field"><label>Parámetro</label><input type="text" placeholder="Ej: Presión, Temperatura..."></div>
+    <div class="field"><label>Valor antes</label><input type="text" placeholder="Valor inicial"></div>
+    <div class="field"><label>Valor después</label><input type="text" placeholder="Valor final"></div>
+    <div class="field" style="max-width:90px"><label>Unidad</label><input type="text" placeholder="kPa, °C..."></div>
+    <div class="field" style="max-width:50px;justify-content:flex-end"><label style="opacity:0">-</label>
+      <button class="btn sm danger" onclick="document.getElementById('med-${medicionCount}').remove()" title="Eliminar"><i class="ti ti-trash"></i></button>
+    </div>`;
+  document.getElementById('mediciones-list').appendChild(div);
+}
+
+function addPhotos(e){
+  Array.from(e.target.files).forEach(file=>{
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      photos.push({name:file.name, data:ev.target.result});
+      const img = document.createElement('img');
+      img.className='photo-thumb'; img.src=ev.target.result; img.title=file.name;
+      img.onclick=()=>{ const w=window.open(); w.document.write('<img src="'+ev.target.result+'" style="max-width:100%">'); };
+      document.getElementById('photo-grid').insertBefore(img, document.getElementById('photo-grid').firstChild);
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+function getFormData(){
+  const meds=[];
+  document.querySelectorAll('#mediciones-list .row').forEach(row=>{
+    const inp = row.querySelectorAll('input');
+    if(inp[0]&&inp[0].value) meds.push({param:inp[0].value, antes:inp[1].value, despues:inp[2].value, unidad:inp[3].value});
+  });
+  return {
+    numero: document.getElementById('inf-numero').value,
+    fecha: document.getElementById('inf-fecha').value || new Date().toISOString().slice(0,10),
+    tecnico: document.getElementById('inf-tecnico').value,
+    equipoId: document.getElementById('inf-equipo').value,
+    equipo: document.getElementById('inf-equipo').options[document.getElementById('inf-equipo').selectedIndex]?.text || '',
+    cliente: document.getElementById('inf-cliente').value,
+    tipo: document.getElementById('inf-tipo').value,
+    condicion: document.getElementById('inf-condicion').value,
+    fallas: document.getElementById('inf-fallas').value,
+    trabajos: document.getElementById('inf-trabajos').value,
+    resultado: document.getElementById('inf-resultado').value,
+    proxima: document.getElementById('inf-proxima').value,
+    recomendaciones: document.getElementById('inf-recomendaciones').value,
+    mediciones: meds,
+    photos: photos.map(p=>({name:p.name, data:p.data}))
+  };
+}
+
+function buildReportHTML(d){
+  const resMap = {aprobado:'Aprobado / Conforme', ajustado:'Ajustado y aprobado', observacion:'Aprobado con observaciones', reprobado:'Reprobado / No conforme'};
+  const resClass = {aprobado:'ok', ajustado:'ok', observacion:'warn', reprobado:'fail'};
+  const resIcon = {aprobado:'✅', ajustado:'✅', observacion:'⚠️', reprobado:'❌'};
+
+  let html = `<div class="rep-header">
+    <h1>Informe de ${d.tipo}</h1>
+    <p>N° ${d.numero||'—'} &nbsp;·&nbsp; ${formatDate(d.fecha)}</p>
+  </div>
+  <h3>Información general</h3>
+  <table><tbody>
+    <tr><td style="color:var(--text2);width:40%;padding:5px 0">Técnico responsable</td><td style="padding:5px 0"><strong>${d.tecnico||'—'}</strong></td></tr>
+    <tr><td style="color:var(--text2);padding:5px 0">Equipo</td><td style="padding:5px 0"><strong>${d.equipo||'—'}</strong></td></tr>
+    <tr><td style="color:var(--text2);padding:5px 0">Cliente</td><td style="padding:5px 0"><strong>${d.cliente||'—'}</strong></td></tr>
+    <tr><td style="color:var(--text2);padding:5px 0">Tipo de servicio</td><td style="padding:5px 0">${d.tipo}</td></tr>
+    <tr><td style="color:var(--text2);padding:5px 0">Fecha</td><td style="padding:5px 0">${formatDate(d.fecha)}</td></tr>
+  </tbody></table>`;
+
+  if(d.condicion) html += `<h3>Condición inicial</h3><p style="font-size:13px;line-height:1.6">${d.condicion}</p>`;
+  if(d.fallas) html += `<h3>Fallas observadas</h3><p style="font-size:13px;line-height:1.6;color:var(--red)">${d.fallas}</p>`;
+  if(d.trabajos) html += `<h3>Trabajos realizados</h3><p style="font-size:13px;line-height:1.6">${d.trabajos}</p>`;
+
+  if(d.mediciones && d.mediciones.length){
+    html += `<h3>Mediciones</h3>
+    <table>
+      <thead><tr><th>Parámetro</th><th>Antes</th><th>Después</th><th>Unidad</th></tr></thead>
+      <tbody>${d.mediciones.map(m=>`<tr><td>${m.param}</td><td style="text-align:center">${m.antes}</td><td style="text-align:center;font-weight:600">${m.despues}</td><td style="text-align:center">${m.unidad}</td></tr>`).join('')}</tbody>
+    </table>`;
+  }
+
+  html += `<h3>Resultado</h3>
+  <div class="result-box ${resClass[d.resultado]||'ok'}">${resIcon[d.resultado]||''} ${resMap[d.resultado]||d.resultado}</div>`;
+
+  if(d.recomendaciones) html += `<h3>Recomendaciones</h3><p style="font-size:13px;line-height:1.6">${d.recomendaciones}</p>`;
+  if(d.proxima) html += `<p style="font-size:12px;color:var(--text2);margin-top:12px;padding:10px;background:var(--bg3);border-radius:var(--radius)"><i class="ti ti-calendar"></i> Próxima calibración programada: <strong>${formatDate(d.proxima)}</strong></p>`;
+
+  if(d.photos && d.photos.length){
+    html += `<h3>Evidencias fotográficas (${d.photos.length})</h3>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+      ${d.photos.map(p=>`<img src="${p.data}" style="width:120px;height:100px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border)">`).join('')}
+    </div>`;
+  }
+
+  return html;
+}
+
+function previewInforme(){
+  const d = getFormData();
+  if(!d.numero){ toast('Ingresa un número de informe','err'); return; }
+  document.getElementById('preview-content').innerHTML = buildReportHTML(d);
+  openModal('modal-preview');
+}
+
+function guardarInforme(){
+  const d = getFormData();
+  if(!d.numero){ toast('Ingresa un número de informe','err'); return; }
+  informes.unshift({...d, id:Date.now()});
+  if(d.equipoId && d.proxima){
+    const eq = equipos.find(e=>e.id===parseInt(d.equipoId));
+    if(eq) eq.proxima = d.proxima;
+  }
+  save();
+  limpiarFormulario();
+  toast('Informe guardado correctamente');
+  showPage('informes');
+}
+
+function limpiarFormulario(){
+  ['inf-numero','inf-fecha','inf-tecnico','inf-cliente','inf-condicion','inf-fallas','inf-trabajos','inf-proxima','inf-recomendaciones'].forEach(id=>{ document.getElementById(id).value=''; });
+  document.getElementById('inf-equipo').value='';
+  document.getElementById('mediciones-list').innerHTML='';
+  medicionCount=0; photos=[];
+  const pg = document.getElementById('photo-grid');
+  while(pg.children.length>1) pg.removeChild(pg.firstChild);
+  document.getElementById('inf-fecha').value = new Date().toISOString().slice(0,10);
+}
+
+// ---- LISTADO INFORMES ----
+function renderInformes(){
+  const q = (document.getElementById('search-informes').value||'').toLowerCase();
+  const fil = informes.filter(i=>!q||(i.numero+i.equipo+i.cliente).toLowerCase().includes(q));
+  const tb = document.getElementById('tabla-informes');
+  if(!fil.length){ tb.innerHTML='<tr><td colspan="7"><div class="empty">Sin informes encontrados.</div></td></tr>'; return; }
+  const rc={aprobado:'ok',ajustado:'ok',observacion:'warn',reprobado:'fail'};
+  const rl={aprobado:'Aprobado',ajustado:'Ajustado',observacion:'Con obs.',reprobado:'No conforme'};
+  tb.innerHTML = fil.map(i=>`<tr>
+    <td><strong>${i.numero||'—'}</strong></td>
+    <td>${formatDate(i.fecha)}</td>
+    <td>${i.equipo||'—'}</td>
+    <td>${i.cliente||'—'}</td>
+    <td>${i.tipo}</td>
+    <td><span class="badge ${rc[i.resultado]||'pending'}">${rl[i.resultado]||i.resultado}</span></td>
+    <td style="white-space:nowrap">
+      <button class="btn sm" onclick="verInforme(${i.id})" title="Ver informe"><i class="ti ti-eye"></i></button>
+      <button class="btn sm danger" onclick="eliminarInforme(${i.id})" title="Eliminar"><i class="ti ti-trash"></i></button>
+    </td>
+  </tr>`).join('');
+}
+
+function verInforme(id){
+  const inf = informes.find(i=>i.id===id);
+  if(!inf) return;
+  document.getElementById('preview-content').innerHTML = buildReportHTML(inf);
+  openModal('modal-preview');
+}
+
+function eliminarInforme(id){
+  if(confirm('¿Eliminar este informe?')){
+    informes = informes.filter(i=>i.id!==id);
+    save(); renderInformes(); toast('Informe eliminado');
+  }
+}
+
+// ---- TRAZABILIDAD ----
+function renderTrazSelectores(){
+  const sel = document.getElementById('traz-equipo');
+  const val = sel.value;
+  sel.innerHTML = '<option value="">— Seleccionar equipo —</option>' +
+    equipos.map(e=>`<option value="${e.id}">${e.codigo} — ${e.nombre} (${e.cliente||'s/c'})</option>`).join('');
+  if(val) sel.value=val;
+}
+
+function renderTrazabilidad(){
+  const id = parseInt(document.getElementById('traz-equipo').value);
+  const cont = document.getElementById('traz-content');
+  if(!id){ cont.innerHTML='<div class="empty"><i class="ti ti-timeline"></i>Selecciona un equipo para ver su historial</div>'; return; }
+  const eq = equipos.find(e=>e.id===id);
+  const eqInf = informes.filter(i=>parseInt(i.equipoId)===id);
+  const now = Date.now();
+  const dp = eq.proxima ? new Date(eq.proxima).getTime() : null;
+  let badge;
+  if(!dp) badge='<span class="badge pending">Sin fecha</span>';
+  else if(dp<now) badge='<span class="badge fail">Vencida</span>';
+  else if(dp<=now+30*86400000) badge='<span class="badge warn">Próxima</span>';
+  else badge='<span class="badge ok">Al día</span>';
+
+  let html=`<div class="card">
+    <div class="card-title"><i class="ti ti-tool"></i>${eq.nombre} <span style="font-size:12px;color:var(--text2);font-weight:400;margin-left:4px">${eq.codigo}</span></div>
+    <div class="row">
+      <div class="field"><span class="section-label">Marca / Modelo</span><span>${eq.marca||'—'} ${eq.modelo||''}</span></div>
+      <div class="field"><span class="section-label">Cliente</span><span>${eq.cliente||'—'}</span></div>
+      <div class="field"><span class="section-label">Ubicación</span><span>${eq.ubicacion||'—'}</span></div>
+      <div class="field"><span class="section-label">Fecha ingreso</span><span>${formatDate(eq.ingreso)}</span></div>
+      <div class="field"><span class="section-label">Próx. calibración</span><span>${formatDate(eq.proxima)} ${badge}</span></div>
+    </div>
+    ${eq.obs?`<p style="font-size:12px;color:var(--text2);margin-top:12px;padding:10px;background:var(--bg3);border-radius:var(--radius)"><strong>Observaciones iniciales:</strong> ${eq.obs}</p>`:''}
+  </div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-history"></i> Historial de intervenciones <span style="font-size:13px;color:var(--text2);font-weight:400">(${eqInf.length})</span></div>`;
+
+  if(!eqInf.length){
+    html+='<div class="empty"><i class="ti ti-file-off"></i>Sin intervenciones registradas para este equipo</div>';
+  } else {
+    const rc={aprobado:'ok',ajustado:'ok',observacion:'warn',reprobado:'fail'};
+    const rl={aprobado:'Aprobado / Conforme',ajustado:'Ajustado y aprobado',observacion:'Con observaciones',reprobado:'No conforme'};
+    html+='<div class="timeline">'+eqInf.map(inf=>`
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-line"></div>
+        <div class="tl-content">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+            <div class="tl-title">${inf.tipo} — N° ${inf.numero||'—'}</div>
+            <span class="badge ${rc[inf.resultado]||'pending'}">${rl[inf.resultado]||inf.resultado}</span>
+          </div>
+          <div class="tl-date"><i class="ti ti-calendar" style="margin-right:4px"></i>${formatDate(inf.fecha)} &nbsp;·&nbsp; Técnico: ${inf.tecnico||'—'}</div>
+          ${inf.fallas?`<div class="tl-desc"><strong>Fallas:</strong> ${inf.fallas}</div>`:''}
+          ${inf.trabajos?`<div class="tl-desc"><strong>Trabajos:</strong> ${inf.trabajos}</div>`:''}
+          ${inf.proxima?`<div class="tl-desc" style="color:var(--amber)"><i class="ti ti-calendar"></i> Próx. calibración: ${formatDate(inf.proxima)}</div>`:''}
+          <button class="btn sm" style="margin-top:8px" onclick="verInforme(${inf.id})"><i class="ti ti-eye"></i> Ver informe completo</button>
+        </div>
+      </div>`).join('')+'</div>';
+  }
+  html+='</div>';
+  cont.innerHTML=html;
+}
+
+// Cerrar modal clickeando fondo
+document.querySelectorAll('.modal-bg').forEach(bg=>{
+  bg.addEventListener('click', e=>{ if(e.target===bg) bg.classList.remove('open'); });
+});
+
+// Init
+document.getElementById('inf-fecha').value = new Date().toISOString().slice(0,10);
+document.getElementById('eq-ingreso').value = new Date().toISOString().slice(0,10);
+renderDashboard();
+</script>
+</body>
+</html>
