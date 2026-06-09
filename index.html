@@ -19,12 +19,11 @@
             --danger: #dc2626;
             --warning: #f59e0b;
             --success: #10b981;
+            --gold: #c9a03d;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--gray-light); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: var(--text-dark); }
+        body { background: var(--gray-light); font-family: 'Segoe UI', sans-serif; padding: 24px 20px; color: var(--text-dark); }
         .container { max-width: 1400px; margin: 0 auto; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid var(--primary); }
         .logo-area { display: flex; align-items: center; gap: 15px; }
         .logo-placeholder { width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
@@ -32,31 +31,30 @@
         .badge { background: var(--primary-light); color: white; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; font-weight: 500; }
         
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
-        .card { background: var(--white); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-border); transition: all 0.2s; cursor: pointer; }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); background: var(--secondary); }
-        .card h3 { font-size: 0.85rem; font-weight: 500; color: var(--text-gray); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .card { background: var(--white); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-border); cursor: pointer; transition: all 0.2s; }
+        .card:hover { transform: translateY(-3px); background: var(--secondary); }
+        .card h3 { font-size: 0.85rem; font-weight: 500; color: var(--text-gray); margin-bottom: 12px; text-transform: uppercase; }
         .card .number { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
         
         .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid var(--gray-border); margin-bottom: 28px; }
-        .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: var(--text-gray); border-radius: 30px; transition: all 0.2s; }
+        .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-radius: 30px; color: var(--text-gray); }
         .tab-btn:hover { background: var(--secondary); color: var(--primary); }
-        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(10,43,78,0.3); }
+        .tab-btn.active { background: var(--primary); color: white; }
         
         .tab-pane { display: none; }
         .tab-pane.active-pane { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .form-card, .table-card { background: var(--white); border-radius: 20px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid var(--gray-border); margin-bottom: 32px; }
-        .form-card h3, .table-card h3 { margin-bottom: 20px; color: var(--primary); font-size: 1.2rem; border-left: 4px solid var(--primary); padding-left: 12px; }
+        .form-card, .table-card { background: var(--white); border-radius: 20px; padding: 24px; margin-bottom: 32px; border: 1px solid var(--gray-border); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .form-card h3, .table-card h3 { margin-bottom: 20px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 12px; }
         
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
         label { font-weight: 600; font-size: 0.8rem; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select, textarea { padding: 12px 14px; border: 1px solid var(--gray-border); border-radius: 12px; font-size: 0.9rem; font-family: inherit; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(10,43,78,0.1); }
+        input, select, textarea { padding: 12px; border: 1px solid var(--gray-border); border-radius: 12px; font-family: inherit; }
         textarea { resize: vertical; min-height: 60px; }
         
-        button { background: var(--primary); border: none; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        button { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
         button:hover { background: var(--primary-dark); }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: var(--primary); color: white; }
@@ -75,208 +73,131 @@
         
         .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
         .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
+        .delete-btn { background: #b91c1c; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
         .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--gray-border); }
         .logo-preview { max-width: 150px; max-height: 60px; margin-top: 5px; }
-        .next-id-info { background: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; color: var(--primary); }
+        .next-id-info { background: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; }
         .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
-        
         .app-footer { text-align: center; padding: 20px; color: var(--text-gray); font-size: 0.7rem; border-top: 1px solid var(--gray-border); margin-top: 20px; }
-        
-        .historial-item { background: var(--gray-light); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 4px solid var(--primary); }
-        .historial-fecha { font-weight: bold; color: var(--primary); margin-bottom: 8px; }
-        .btn-exportar { background: #10b981; margin-top: 15px; }
-        .filtro-activo { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; margin-left: 10px; }
-        .import-area { border: 2px dashed var(--gray-border); padding: 30px; text-align: center; border-radius: 16px; margin: 20px 0; cursor: pointer; transition: all 0.2s; }
+        .import-area { border: 2px dashed var(--gray-border); padding: 30px; text-align: center; border-radius: 16px; margin: 20px 0; cursor: pointer; }
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
-        .delete-section { border-top: 1px solid var(--gray-border); margin-top: 20px; padding-top: 20px; }
-        
         .traza-select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--gray-border); margin-bottom: 15px; }
-        .export-section { background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 20px; }
-        
         .serial-link { color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline; }
-        .serial-link:hover { color: var(--primary-dark); }
+        .etapa-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.65rem; font-weight: bold; display: inline-block; margin-left: 10px; }
+        .etapa-entrada { background: #e0f2fe; color: #0369a1; }
+        .etapa-laboratorio { background: #fef3c7; color: #92400e; }
+        .etapa-comercial { background: #dbeafe; color: #1e40af; }
+        .etapa-salida { background: #d1fae5; color: #065f46; }
         
-        .busqueda-serial { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 20px; }
-        .busqueda-serial .input-group { flex: 1; margin-bottom: 0; }
-        .busqueda-serial button { margin-bottom: 0; height: 48px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; border-radius: 20px; padding: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-modal { font-size: 24px; cursor: pointer; }
+        .timeline-item { background: var(--white); border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .indicadores { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .indicador { background: linear-gradient(135deg, var(--white), var(--secondary)); padding: 15px; border-radius: 16px; text-align: center; }
+        .indicador .numero { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+        .indicador .label { font-size: 0.7rem; color: var(--text-gray); }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
-        <div class="logo-area">
-            <div class="logo-placeholder">CR</div>
-            <h1>CalibPro | CI RENTELCOM</h1>
-        </div>
-        <div class="badge">Sistema de Gestión Técnica</div>
+        <div class="logo-area"><div class="logo-placeholder">CR</div><h1>CalibPro | CI RENTELCOM</h1></div>
+        <div class="badge">Gestión del Ciclo de Vida</div>
     </div>
-
     <div id="mensajeExito" class="alert-success"></div>
 
     <div class="dashboard">
         <div class="card" data-accion="equipos"><h3>Equipos</h3><div class="number" id="totalEquipos">0</div></div>
         <div class="card" data-accion="informes-todos"><h3>Informes</h3><div class="number" id="totalInformes">0</div></div>
-        <div class="card" data-accion="informes-pendientes"><h3>Pendientes</h3><div class="number" id="pendientes">0</div></div>
-        <div class="card" data-accion="informes-aprobados"><h3>Aprobados</h3><div class="number" id="aprobados">0</div></div>
+        <div class="card" data-accion="pendientes"><h3>Pendientes</h3><div class="number" id="pendientes">0</div></div>
+        <div class="card" data-accion="finalizados"><h3>Finalizados</h3><div class="number" id="finalizados">0</div></div>
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" data-tab="informes">Informes</button>
-        <button class="tab-btn" data-tab="nuevo">Nuevo informe</button>
-        <button class="tab-btn" data-tab="editar">Editar informe</button>
-        <button class="tab-btn" data-tab="aprobacion">Aprobación comercial</button>
-        <button class="tab-btn" data-tab="equipos">Equipos</button>
-        <button class="tab-btn" data-tab="trazabilidad">Trazabilidad</button>
-        <button class="tab-btn" data-tab="importar">Importar datos</button>
-        <button class="tab-btn" data-tab="configuracion">Configuración</button>
-    </div>
-
-    <!-- INFORMES -->
-    <div id="informes" class="tab-pane active-pane">
-        <div class="table-card"><h3>Listado de informes técnicos <span id="filtroInfo" style="font-size:0.7rem;"></span></h3>
-            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead><tbody id="informesBody"></tbody></table>
-        </div>
-    </div>
-
-    <!-- NUEVO INFORME -->
-    <div id="nuevo" class="tab-pane">
-        <div class="form-card">
-            <h3>Registrar nuevo informe</h3>
-            <div class="next-id-info">Próximo número disponible: <span id="nextIdDisplay">100</span></div>
-            <div class="form-grid">
-                <div class="input-group"><label>Número de informe</label><input type="number" id="nuevoId" placeholder="Automático"></div>
-                <div class="input-group"><label>Fecha</label><input type="date" id="fecha"></div>
-                <div class="input-group"><label>Serial</label><input id="serial" placeholder="Ej: AA432002010275"></div>
-                <div class="input-group"><label>Marca</label><input id="marca" placeholder="ILSINTECH"></div>
-                <div class="input-group"><label>Modelo</label><input id="modelo" placeholder="KF4"></div>
-                <div class="input-group"><label>Cliente</label><input id="cliente" placeholder="CONECTAR TV SAS"></div>
-                <div class="input-group"><label>Servicio</label><select id="tipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
-            </div>
-            <div class="input-group"><label>Diagnóstico</label><textarea id="diagnostico" rows="3"></textarea></div>
-            <div class="input-group"><label>Valores</label><textarea id="valores" rows="2"></textarea></div>
-            <div class="input-group"><label>Nota final</label><textarea id="notaFinal" rows="2"></textarea></div>
-            <div class="input-group"><label>Evidencia fotográfica (opcional)</label><input type="file" id="fotoEquipo" accept="image/*"></div>
-            <button id="btnGuardar">Guardar informe</button>
-        </div>
-    </div>
-
-    <!-- EDITAR INFORME -->
-    <div id="editar" class="tab-pane">
-        <div class="form-card">
-            <h3>Editar informe existente</h3>
-            <div class="input-group"><label>🔍 Buscar por serial</label>
-                <select id="selectEditarSerial" class="traza-select">
-                    <option value="">— Seleccione un serial —</option>
-                </select>
-            </div>
-            <div class="input-group"><label>📄 Seleccionar informe</label>
-                <select id="selectEditarInforme">
-                    <option value="">— Primero seleccione un serial —</option>
-                </select>
-            </div>
-            <button id="btnCargarEditar" class="btn-outline">Cargar datos</button>
-            <div id="formEditar" style="display:none; margin-top:20px;">
-                <div class="form-grid">
-                    <div class="input-group"><label>Número</label><input type="number" id="editId" readonly></div>
-                    <div class="input-group"><label>Fecha</label><input type="date" id="editFecha"></div>
-                    <div class="input-group"><label>Serial</label><input id="editSerial" readonly></div>
-                    <div class="input-group"><label>Marca</label><input id="editMarca"></div>
-                    <div class="input-group"><label>Modelo</label><input id="editModelo"></div>
-                    <div class="input-group"><label>Cliente</label><input id="editCliente"></div>
-                    <div class="input-group"><label>Servicio</label><select id="editTipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
-                </div>
-                <div class="input-group"><label>Diagnóstico</label><textarea id="editDiagnostico" rows="3"></textarea></div>
-                <div class="input-group"><label>Valores</label><textarea id="editValores" rows="2"></textarea></div>
-                <div class="input-group"><label>Nota final</label><textarea id="editNotaFinal" rows="2"></textarea></div>
-                <div class="input-group"><label>Cambiar foto</label><input type="file" id="editFoto" accept="image/*"></div>
-                <button id="btnGuardarEdicion">Guardar cambios</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- APROBACIÓN COMERCIAL -->
-    <div id="aprobacion" class="tab-pane">
-        <div class="form-card">
-            <h3>Aprobación comercial</h3>
-            <div class="input-group"><label>🔍 Buscar por serial</label>
-                <select id="selectAprobacionSerial" class="traza-select">
-                    <option value="">— Seleccione un serial —</option>
-                </select>
-            </div>
-            <div class="input-group"><label>📄 Seleccionar informe</label>
-                <select id="selectInformeAprobacion">
-                    <option value="">— Primero seleccione un serial —</option>
-                </select>
-            </div>
-            <div class="input-group"><label>📅 Fecha envío al cliente</label><input type="date" id="fechaEnvio"></div>
-            <div class="input-group"><label>📎 Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
-            <div class="input-group"><label>💬 Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
-            <button id="btnActualizar">Actualizar</button>
-        </div>
+        <button class="tab-btn active" data-tab="equipos">📋 Equipos</button>
+        <button class="tab-btn" data-tab="nuevoEquipo">➕ Nueva Entrada</button>
+        <button class="tab-btn" data-tab="informes">📄 Informes Técnicos</button>
+        <button class="tab-btn" data-tab="trazabilidad">🔍 Trazabilidad</button>
+        <button class="tab-btn" data-tab="importar">📂 Importar</button>
+        <button class="tab-btn" data-tab="configuracion">⚙️ Configuración</button>
     </div>
 
     <!-- EQUIPOS -->
-    <div id="equipos" class="tab-pane">
+    <div id="equipos" class="tab-pane active-pane">
         <div class="table-card">
             <h3>Gestión de equipos</h3>
-            <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
-            <table><thead><tr><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Estado</th><th>Acción</th><tr></thead>
-                <tbody id="equiposBody"></tbody>
-            </table>
+            <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Nueva entrada de equipo</button>
+            <table><thead><tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Cliente</th><th>Etapa</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="equiposBody"></tbody></table>
         </div>
     </div>
 
-    <!-- TRAZABILIDAD -->
+    <!-- NUEVA ENTRADA DE EQUIPO (ETAPA 1) -->
+    <div id="nuevoEquipo" class="tab-pane">
+        <div class="form-card">
+            <h3>📥 REGISTRO DE ENTRADA DE EQUIPO</h3>
+            <div class="form-grid">
+                <div class="input-group"><label>Consecutivo de entrada</label><input type="text" id="entradaConsecutivo" placeholder="ENT-001"></div>
+                <div class="input-group"><label>Serial del equipo</label><input id="entradaSerial" placeholder="Ej: AA432002010275"></div>
+                <div class="input-group"><label>Tipo de equipo</label><input id="entradaEquipo" placeholder="OTDR/Empalmadora"></div>
+                <div class="input-group"><label>Marca</label><input id="entradaMarca" placeholder="EXFO"></div>
+                <div class="input-group"><label>Modelo</label><input id="entradaModelo" placeholder="MAX715"></div>
+                <div class="input-group"><label>Cliente</label><input id="entradaCliente" placeholder="INMEL INGENIERIA"></div>
+                <div class="input-group"><label>Accesorios / Observaciones</label><textarea id="entradaAccesorios" rows="2" placeholder="Maletín, cargador, conectores..."></textarea></div>
+                <div class="input-group"><label>📷 Foto del equipo al ingreso</label><input type="file" id="entradaFoto" accept="image/*"></div>
+                <div class="input-group"><label>👤 Registrado por</label><input id="entradaRegistradoPor" placeholder="Stephania Garcia"></div>
+            </div>
+            <button id="btnGuardarEntrada">💾 Guardar entrada y generar PDF</button>
+        </div>
+    </div>
+
+    <!-- INFORMES TÉCNICOS (ETAPA 2 - LABORATORIO) -->
+    <div id="informes" class="tab-pane">
+        <div class="table-card">
+            <h3>Informes técnicos de laboratorio</h3>
+            <button id="btnNuevoInforme" class="btn-outline" style="margin-bottom:15px;">+ Nuevo informe técnico</button>
+            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="informesBody"></tbody></table>
+        </div>
+        <!-- Modal para crear/editar informe técnico -->
+        <div id="modalInforme" class="modal">
+            <div class="modal-content">
+                <div class="modal-header"><h3>📝 Informe de laboratorio</h3><span class="close-modal" onclick="cerrarModalInforme()">&times;</span></div>
+                <div class="form-grid">
+                    <div class="input-group"><label>Número de informe</label><input type="text" id="infoNumero" placeholder="INF-001"></div>
+                    <div class="input-group"><label>Serial del equipo</label><input id="infoSerial"></div>
+                    <div class="input-group"><label>Fecha</label><input type="date" id="infoFecha"></div>
+                    <div class="input-group"><label>Servicio</label><select id="infoTipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
+                </div>
+                <div class="input-group"><label>Diagnóstico / Hallazgos</label><textarea id="infoDiagnostico" rows="3"></textarea></div>
+                <div class="input-group"><label>Valores / Presupuesto</label><textarea id="infoValores" rows="2"></textarea></div>
+                <div class="input-group"><label>Nota final / Recomendaciones</label><textarea id="infoNotaFinal" rows="2"></textarea></div>
+                <div class="input-group"><label>📷 Evidencias fotográficas</label><input type="file" id="infoFoto" accept="image/*"></div>
+                <button id="btnGuardarInforme">💾 Guardar informe y generar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TRAZABILIDAD COMPLETA -->
     <div id="trazabilidad" class="tab-pane">
         <div class="form-card">
-            <h3>Trazabilidad de equipos</h3>
-            
-            <div class="busqueda-serial">
-                <div class="input-group">
-                    <label>🔍 Buscar por serial</label>
-                    <input type="text" id="buscarSerialInput" placeholder="Ej: AA432002010275">
-                </div>
-                <button id="btnBuscarSerial">Buscar</button>
+            <h3>📊 Trazabilidad completa del equipo</h3>
+            <div class="busqueda-serial" style="display:flex; gap:10px; margin-bottom:20px;">
+                <input type="text" id="buscarSerialTraza" placeholder="Ingrese serial del equipo" style="flex:1;">
+                <button id="btnBuscarTraza">Buscar</button>
             </div>
-            
-            <div style="text-align: center; margin: 10px 0;">- o -</div>
-            
-            <div class="input-group">
-                <label>📋 Seleccionar de la lista</label>
-                <select id="selectEquipoTraza" class="traza-select">
-                    <option value="">— Seleccione un serial —</option>
-                </select>
-            </div>
-            <button id="btnCargarTraza" class="btn-outline">Ver historial</button>
-            
-            <div id="historialEquipo" style="margin-top: 25px;"></div>
-            <button id="btnExportarTraza" class="btn-exportar" style="display: none;">Exportar trazabilidad a PDF</button>
+            <div id="trazabilidadResultados"></div>
         </div>
     </div>
 
-    <!-- IMPORTAR DATOS -->
+    <!-- IMPORTAR -->
     <div id="importar" class="tab-pane">
         <div class="form-card">
-            <h3>Importar datos desde archivo</h3>
-            <div style="background: var(--secondary); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-                <h4>📋 Tu archivo debe tener estas columnas:</h4>
-                <p>✅ <strong>fecha</strong> - Fecha del informe</p>
-                <p>✅ <strong>CLIENTE</strong> - Nombre del cliente</p>
-                <p>✅ <strong>equipo</strong> - Tipo de equipo</p>
-                <p>✅ <strong>marca</strong> - Marca</p>
-                <p>✅ <strong>modelo</strong> - Modelo</p>
-                <p>✅ <strong>serial</strong> - Serial del equipo</p>
-                <p>✅ <strong>ID</strong> - Número de informe</p>
-                <p>✅ <strong>diagnostico</strong> - Diagnóstico</p>
-            </div>
-            <div class="import-area" id="importArea">
-                <div style="font-size: 48px;">📂</div>
-                <p>Arrastra tu archivo Excel (.xlsx) aquí o haz clic para seleccionar</p>
-            </div>
-            <input type="file" id="fileInput" accept=".xlsx" style="display: none;">
-            <div id="importPreview" style="margin-top: 20px; display: none;"></div>
-            <button id="btnConfirmarImport" style="display: none;">Confirmar importación</button>
-            <button id="btnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar datos de ejemplo</button>
+            <h3>Importar datos desde Excel</h3>
+            <div class="import-area" id="importArea"><div style="font-size:48px;">📂</div><p>Arrastra tu archivo Excel (.xlsx) aquí o haz clic</p></div>
+            <input type="file" id="fileInput" accept=".xlsx" style="display:none;">
+            <div id="importPreview"></div>
+            <button id="btnConfirmarImport" style="display:none;">Confirmar importación</button>
         </div>
     </div>
 
@@ -284,530 +205,195 @@
     <div id="configuracion" class="tab-pane">
         <div class="form-card">
             <h3>Configuración</h3>
-            <div class="export-section">
-                <h4>📤 Exportar datos</h4>
-                <button id="btnExportarDatos" class="btn-success">📊 Exportar a Excel</button>
-            </div>
+            <button id="btnExportarDatos" class="btn-success">📊 Exportar a Excel</button>
+            <hr style="margin:20px 0;">
             <h3>Logo corporativo</h3>
             <input type="file" id="logoEmpresa" accept="image/*">
             <div id="logoPreview"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
-            <div class="delete-section">
-                <h3 style="color: var(--danger);">⚠️ Peligro - Eliminar datos</h3>
-                <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
-            </div>
+            <hr style="margin:20px 0;">
+            <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
+            <button id="btnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar datos de ejemplo</button>
         </div>
     </div>
-    
-    <div class="app-footer">CI RENTELCOM SAS - Laboratorio de Calibración y Telecomunicaciones | Carrera 19A No. 150-50 Bogotá D.C.</div>
+    <div class="app-footer">CI RENTELCOM SAS - Carrera 19A No. 150-50 Bogotá D.C.</div>
 </div>
 
 <script>
-    let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "", filtroActual = "todos";
+    let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "";
+    let equipoEditando = null;
 
     function guardarDatos() {
-        localStorage.setItem("calibpro_equipos", JSON.stringify(equipos));
-        localStorage.setItem("calibpro_informes", JSON.stringify(informes));
-        localStorage.setItem("calibpro_nextId", nextId);
-        localStorage.setItem("calibpro_logo", logoEmpresaBase64);
+        localStorage.setItem("equipos", JSON.stringify(equipos));
+        localStorage.setItem("informes", JSON.stringify(informes));
+        localStorage.setItem("nextId", nextId);
+        localStorage.setItem("logo", logoEmpresaBase64);
     }
 
     function cargarDatos() {
-        if(localStorage.getItem("calibpro_equipos")) equipos = JSON.parse(localStorage.getItem("calibpro_equipos"));
-        if(localStorage.getItem("calibpro_informes")) informes = JSON.parse(localStorage.getItem("calibpro_informes"));
-        if(localStorage.getItem("calibpro_nextId")) nextId = parseInt(localStorage.getItem("calibpro_nextId"));
-        if(localStorage.getItem("calibpro_logo")) logoEmpresaBase64 = localStorage.getItem("calibpro_logo");
+        equipos = JSON.parse(localStorage.getItem("equipos") || "[]");
+        informes = JSON.parse(localStorage.getItem("informes") || "[]");
+        nextId = parseInt(localStorage.getItem("nextId") || "100");
+        logoEmpresaBase64 = localStorage.getItem("logo") || "";
         actualizarVistaLogo();
         renderAll();
     }
 
-    function mostrarMensaje(texto) {
-        const msg = document.getElementById("mensajeExito");
-        msg.innerText = texto; msg.style.display = "block";
-        setTimeout(() => msg.style.display = "none", 4000);
+    function mostrarMensaje(msg) { const d=document.getElementById("mensajeExito"); d.innerText=msg; d.style.display="block"; setTimeout(()=>d.style.display="none",3000); }
+    function fileToBase64(file){ return new Promise(r=>{const a=new FileReader(); a.readAsDataURL(file); a.onload=()=>r(a.result);}); }
+    function actualizarVistaLogo(){ const d=document.getElementById("logoPreview"); d.innerHTML=logoEmpresaBase64?`<img src="${logoEmpresaBase64}" style="max-height:60px;">`:"<small>No hay logo</small>"; }
+    document.getElementById("btnGuardarLogo").onclick=()=>{const f=document.getElementById("logoEmpresa").files[0]; if(f){const a=new FileReader(); a.readAsDataURL(f); a.onload=()=>{logoEmpresaBase64=a.result; guardarDatos(); actualizarVistaLogo(); mostrarMensaje("Logo guardado");};}};
+    document.getElementById("btnEliminarTodos").onclick=()=>{if(confirm("¿Eliminar TODOS los datos?")){equipos=[]; informes=[]; nextId=100; guardarDatos(); renderAll(); mostrarMensaje("Datos eliminados");}};
+
+    // Generar PDF de ENTRADA
+    async function generarPDFEntrada(eq, consecutivo){
+        const fecha=new Date().toLocaleDateString('es-CO');
+        const doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Entrada_${eq.serial}</title><style>body{font-family:Segoe UI;padding:40px;} .header{text-align:center;border-bottom:2px solid #0a2b4e;} .info{background:#f5f5f5;padding:20px;margin:20px 0;}</style></head><body><div class="header"><h2>REGISTRO DE ENTRADA DE EQUIPO</h2><p>CI RENTELCOM SAS</p></div><div><strong>Fecha:</strong> ${fecha}</div><div><strong>Consecutivo:</strong> ${consecutivo}</div><div class="info"><strong>Serial:</strong> ${eq.serial}<br><strong>Equipo:</strong> ${eq.equipo}<br><strong>Marca/Modelo:</strong> ${eq.marca} ${eq.modelo}<br><strong>Cliente:</strong> ${eq.cliente}<br><strong>Accesorios:</strong> ${eq.accesorios||"Ninguno"}<br><strong>Registrado por:</strong> ${eq.registradoPor||"No especificado"}</div>${eq.fotoEntrada?`<div><strong>Foto de ingreso:</strong><br><img src="${eq.fotoEntrada}" style="max-width:300px;"></div>`:""}<div class="footer">Carrera 19A No. 150-50 Bogotá D.C.</div></body></html>`;
+        const blob=new Blob([doc],{type:'text/html'}); window.open(URL.createObjectURL(blob),'_blank');
     }
 
-    function cargarDatosEjemplo() {
-        equipos = [
-            { serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller" },
-            { serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico" },
-            { serial: "45970", equipo: "OTDR", marca: "VIAVI", modelo: "SMART OTDR", cliente: "CONECTAR TV SAS", estado: "Pendiente" }
-        ];
-        
-        informes = [
-            { id: 447, fecha: "2023-11-23", serial: "AA432002010275", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", tipo: "Reparación", diagnostico: "DAÑO MECANISMO DE AJUSTE DE FOCO", valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" },
-            { id: 448, fecha: "2023-11-23", serial: "TF3C02PA010869", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", tipo: "Calibración", diagnostico: "REPOTENCIACION DE BATERIA", valores: "", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-11-25", obsCliente: "Cliente autorizó" },
-            { id: 452, fecha: "2023-12-01", serial: "45970", marca: "VIAVI", modelo: "SMART OTDR", cliente: "CONECTAR TV SAS", tipo: "Calibración", diagnostico: "CAMBIO DE PIGTAIL 1310-1550", valores: "$220.000 + IVA", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" }
-        ];
-        
-        nextId = 453;
-        guardarDatos();
-        renderAll();
-        mostrarMensaje("✅ Datos de ejemplo cargados correctamente");
+    // Generar PDF de INFORME TÉCNICO
+    async function generarPDFInforme(inf){
+        const fecha=new Date().toLocaleDateString('es-CO');
+        const doc=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe_${inf.numero}</title><style>body{font-family:Segoe UI;padding:40px;} .header{text-align:center;border-bottom:2px solid #0a2b4e;} .info{background:#f5f5f5;padding:20px;margin:20px 0;} .firma{margin-top:30px;border-top:1px solid #ccc;}</style></head><body><div class="header"><h2>INFORME TÉCNICO DE LABORATORIO</h2><p>CI RENTELCOM SAS</p></div><div><strong>Fecha:</strong> ${fecha}</div><div><strong>N° Informe:</strong> ${inf.numero}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="info"><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}<br><strong>Servicio solicitado:</strong> ${inf.tipo}<br><strong>Diagnóstico:</strong> ${inf.diagnostico}<br><strong>Valores:</strong> ${inf.valores||"No especificado"}<br><strong>Nota final:</strong> ${inf.notaFinal||"Ninguna"}</div>${inf.foto?`<div><strong>Evidencias:</strong><br><img src="${inf.foto}" style="max-width:300px;"></div>`:""}<div class="firma"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div class="footer">Carrera 19A No. 150-50 Bogotá D.C.</div></body></html>`;
+        const blob=new Blob([doc],{type:'text/html'}); window.open(URL.createObjectURL(blob),'_blank');
     }
 
-    function actualizarVistaLogo() {
-        const previewDiv = document.getElementById("logoPreview");
-        if(logoEmpresaBase64) previewDiv.innerHTML = `<img src="${logoEmpresaBase64}" class="logo-preview"><br><small>Logo actual</small>`;
-        else previewDiv.innerHTML = "<small>No hay logo</small>";
-    }
-    
-    document.getElementById("btnGuardarLogo").onclick = () => {
-        const file = document.getElementById("logoEmpresa").files[0];
-        if(file) {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function() { logoEmpresaBase64 = reader.result; guardarDatos(); actualizarVistaLogo(); mostrarMensaje("Logo guardado"); };
-        }
-    };
-
-    document.getElementById("btnEliminarTodos").onclick = () => {
-        if(confirm("⚠️ ¿Eliminar TODOS los datos?")) {
-            equipos = []; informes = []; nextId = 100; guardarDatos(); renderAll();
-            mostrarMensaje("✅ Datos eliminados");
-        }
-    };
-
-    function fileToBase64(file) {
-        return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
-    }
-
-    function renderAll() {
-        document.getElementById("totalEquipos").innerText = equipos.length;
-        document.getElementById("totalInformes").innerText = informes.length;
-        document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
-        document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
-        document.getElementById("nextIdDisplay").innerText = nextId;
+    // Renderizar todo
+    function renderAll(){
+        document.getElementById("totalEquipos").innerText=equipos.length;
+        document.getElementById("totalInformes").innerText=informes.length;
+        document.getElementById("pendientes").innerText=informes.filter(i=>i.estado==="Pendiente").length;
+        document.getElementById("finalizados").innerText=informes.filter(i=>i.estado==="Aprobado"||i.estado==="Entregado").length;
         
-        renderInformesConFiltro();
+        const eb=document.getElementById("equiposBody");
+        if(equipos.length===0) eb.innerHTML='<tr><td colspan="7">No hay equipos registrados</td></tr>';
+        else eb.innerHTML=equipos.map((e,i)=>`<tr><td>${e.consecutivo||"ENT-"+(i+1)}</td><td>${e.serial}</td><td>${e.equipo}</td><td>${e.cliente}</td><td><span class="etapa-badge etapa-entrada">Entrada</span> ${e.etapaLab?'→ <span class="etapa-badge etapa-laboratorio">Laboratorio</span>':''} ${e.etapaComercial?'→ <span class="etapa-badge etapa-comercial">Comercial</span>':''} ${e.etapaSalida?'→ <span class="etapa-badge etapa-salida">Salida</span>':''}</td><td>${e.estado||"Activo"}</td><td><button class="pdf-btn" onclick="generarPDFEntrada(equipos[${i}],'${e.consecutivo||"ENT-"+(i+1)}')">PDF Entrada</button></td></tr>`).join('');
         
-        const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registradosNeo' + '<tr>';
-        else eb.innerHTML = equipos.map((e, idx) => `<tr><td style="font-weight:bold;">${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>`).join('');
-        
-        cargarSelectsSeriales();
+        const ib=document.getElementById("informesBody");
+        if(informes.length===0) ib.innerHTML='<tr><td colspan="7">No hay informes</td></tr>';
+        else ib.innerHTML=informes.map(i=>`<tr><td>${i.numero}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado==='Aprobado'?'badge-aprobado':'badge-pendiente'}">${i.estado}</td><td><button class="pdf-btn" onclick="generarPDFInforme(informes.find(x=>x.numero==='${i.numero}'))">PDF</button></td></tr>`).join('');
         guardarDatos();
     }
 
-    function renderInformesConFiltro() {
-        const tbody = document.getElementById("informesBody");
-        let filtrados = [...informes];
-        filtrados.sort((a, b) => b.id - a.id);
-        if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
-        if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registradosNeo' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
-    }
-
-    function cargarSelectsSeriales() {
-        const seriales = equipos.map(e => e.serial).sort();
-        const options = '<option value="">— Seleccione un serial —</option>' + seriales.map(s => `<option value="${s}">${s}</option>`).join('');
-        
-        const selectTraza = document.getElementById("selectEquipoTraza");
-        if(selectTraza) selectTraza.innerHTML = options;
-        const selectEditarSerial = document.getElementById("selectEditarSerial");
-        if(selectEditarSerial) selectEditarSerial.innerHTML = options;
-        const selectAprobacionSerial = document.getElementById("selectAprobacionSerial");
-        if(selectAprobacionSerial) selectAprobacionSerial.innerHTML = options;
-    }
-
-    function cargarInformesPorSerial(selectSerialId, selectInformeId) {
-        const serial = document.getElementById(selectSerialId).value;
-        const selectInforme = document.getElementById(selectInformeId);
-        if(!serial || !selectInforme) return;
-        const informesEquipo = informes.filter(i => i.serial === serial).sort((a,b) => b.id - a.id);
-        if(informesEquipo.length === 0) {
-            selectInforme.innerHTML = '<option value="">— No hay informes —</option>';
-            return;
-        }
-        selectInforme.innerHTML = '<option value="">— Seleccione un informe —</option>' + informesEquipo.map(i => `<option value="${i.id}">#${i.id} - ${i.fecha} - ${i.tipo}</option>`).join('');
-    }
-
-    window.buscarPorSerial = (serial) => {
-        document.querySelector('.tab-btn[data-tab="trazabilidad"]').click();
-        setTimeout(() => {
-            const input = document.getElementById("buscarSerialInput");
-            if(input) input.value = serial;
-            buscarSerialDirecto(serial);
-        }, 100);
-    };
-
-    function buscarSerialDirecto(serial) {
-        const div = document.getElementById("historialEquipo");
-        const btnExportar = document.getElementById("btnExportarTraza");
-        
-        if(!serial) {
-            div.innerHTML = '<p>Ingrese un serial para buscar</p>';
-            btnExportar.style.display = "none";
-            return;
-        }
-        
-        const infoEquipo = equipos.find(e => e.serial === serial);
-        const informesEquipo = informes.filter(i => i.serial === serial).sort((a,b) => b.id - a.id);
-        
-        if(informesEquipo.length === 0) {
-            div.innerHTML = `<p>No hay informes para el serial <strong>${serial}</strong></p>`;
-            btnExportar.style.display = "none";
-            return;
-        }
-        
-        let html = `<div style="margin-bottom:20px; padding:15px; background:#e8f0fe; border-radius:12px;">
-                        <strong>🔧 DATOS DEL EQUIPO</strong><br>
-                        Serial: ${serial}<br>
-                        Equipo: ${infoEquipo?.equipo || 'N/A'} ${infoEquipo?.marca || ''} ${infoEquipo?.modelo || ''}<br>
-                        Cliente: ${infoEquipo?.cliente || 'N/A'}<br>
-                        Estado: ${infoEquipo?.estado || 'Pendiente'}<br>
-                        Total intervenciones: ${informesEquipo.length}
-                    </div>
-                    <h4 style="margin-bottom: 15px;">📋 HISTORIAL (${informesEquipo.length})</h4>`;
-        
-        for(const inf of informesEquipo) {
-            html += `<div class="historial-item">
-                        <div class="historial-fecha">📄 INFORME #${inf.id} - ${inf.fecha}</div>
-                        <div><strong>Servicio:</strong> ${inf.tipo}</div>
-                        <div><strong>Diagnóstico:</strong> ${inf.diagnostico.substring(0, 200)}${inf.diagnostico.length > 200 ? '...' : ''}</div>
-                        <div><strong>Valores:</strong> ${inf.valores || 'No especificado'}</div>
-                        <div><strong>Estado comercial:</strong> <span class="status-badge ${inf.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${inf.estado}</span></div>
-                        ${inf.obsCliente ? `<div><strong>💬 Observaciones cliente:</strong> ${inf.obsCliente}</div>` : ''}
-                        <div style="margin-top: 8px;"><button class="pdf-btn" onclick="generarPDF(${inf.id})">📄 Ver informe completo</button></div>
-                    </div>`;
-        }
-        div.innerHTML = html;
-        btnExportar.style.display = "block";
-        btnExportar.onclick = () => exportarTrazabilidad(serial, infoEquipo, informesEquipo);
-    }
-
-    function exportarTrazabilidad(serial, infoEquipo, informesEquipo) {
-        const fechaActual = new Date().toLocaleDateString('es-CO');
-        let informesHtml = '';
-        for(const inf of informesEquipo) {
-            informesHtml += `<div style="margin-bottom:20px; border-bottom:1px solid #ddd; padding-bottom:10px;">
-                                <strong>INFORME #${inf.id}</strong> - ${inf.fecha}<br>
-                                Servicio: ${inf.tipo}<br>
-                                Diagnóstico: ${inf.diagnostico}<br>
-                                Estado: ${inf.estado}
-                            </div>`;
-        }
-        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Trazabilidad_${serial}</title><style>body{font-family:Segoe UI;padding:40px;}.header{text-align:center;border-bottom:2px solid #0a2b4e;}.info-equipo{background:#f5f5f5;padding:15px;margin:20px 0;}</style></head><body><div class="header">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;"><br>` : '<h2>CI RENTELCOM SAS</h2>'}<h2>REPORTE DE TRAZABILIDAD</h2></div><div class="info-equipo"><strong>SERIAL:</strong> ${serial}<br><strong>EQUIPO:</strong> ${infoEquipo?.equipo || 'N/A'}<br><strong>CLIENTE:</strong> ${infoEquipo?.cliente || 'N/A'}<br><strong>INTERVENCIONES:</strong> ${informesEquipo.length}</div>${informesHtml}<div class="footer">Carrera 19A No. 150-50 Bogotá D.C.</div></body></html>`;
-        const blob = new Blob([docHtml], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }
-
-    window.cambiarEstadoEquipo = (idx) => {
-        const nuevo = prompt("Nuevo estado:", equipos[idx].estado);
-        if(nuevo) { equipos[idx].estado = nuevo; renderAll(); mostrarMensaje("Estado actualizado"); }
-    };
-
-    // GUARDAR NUEVO INFORME
-    document.getElementById("btnGuardar").onclick = async () => {
-        let id = parseInt(document.getElementById("nuevoId").value);
-        if(isNaN(id)) id = nextId++;
-        else if(informes.find(i => i.id === id)) { alert("Ese número ya existe"); return; }
-        else if(id >= nextId) nextId = id + 1;
-        
-        const fecha = document.getElementById("fecha").value || new Date().toISOString().slice(0,10);
-        const serial = document.getElementById("serial").value.trim();
-        const marca = document.getElementById("marca").value.trim();
-        const modelo = document.getElementById("modelo").value.trim();
-        const cliente = document.getElementById("cliente").value.trim();
-        const tipo = document.getElementById("tipo").value;
-        const diagnostico = document.getElementById("diagnostico").value.trim();
-        const valores = document.getElementById("valores").value.trim();
-        const notaFinal = document.getElementById("notaFinal").value.trim();
-        const file = document.getElementById("fotoEquipo").files[0];
-        let foto = file ? await fileToBase64(file) : "";
-        
-        if(!serial || !cliente || !diagnostico) { alert("Complete campos"); return; }
-        
-        informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
-        
-        if(!equipos.find(e => e.serial === serial)) {
-            equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
-        }
-        
-        document.getElementById("nuevoId").value = ""; document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = ""; document.getElementById("notaFinal").value = ""; document.getElementById("fotoEquipo").value = "";
-        
+    // Guardar entrada
+    document.getElementById("btnGuardarEntrada").onclick=async()=>{
+        const consecutivo=document.getElementById("entradaConsecutivo").value.trim()||`ENT-${equipos.length+1}`;
+        const serial=document.getElementById("entradaSerial").value.trim();
+        if(!serial){mostrarMensaje("Serial obligatorio"); return;}
+        const equipo=document.getElementById("entradaEquipo").value.trim();
+        const marca=document.getElementById("entradaMarca").value.trim();
+        const modelo=document.getElementById("entradaModelo").value.trim();
+        const cliente=document.getElementById("entradaCliente").value.trim();
+        const accesorios=document.getElementById("entradaAccesorios").value.trim();
+        const registradoPor=document.getElementById("entradaRegistradoPor").value.trim()||"Stephania Garcia";
+        const fotoInput=document.getElementById("entradaFoto").files[0];
+        let fotoEntrada=fotoInput?await fileToBase64(fotoInput):"";
+        const nuevoEquipo={consecutivo, serial, equipo, marca, modelo, cliente, accesorios, registradoPor, fotoEntrada, etapaLab:false, etapaComercial:false, etapaSalida:false, estado:"Pendiente diagnóstico"};
+        equipos.push(nuevoEquipo);
+        document.getElementById("entradaConsecutivo").value=""; document.getElementById("entradaSerial").value=""; document.getElementById("entradaEquipo").value=""; document.getElementById("entradaMarca").value=""; document.getElementById("entradaModelo").value=""; document.getElementById("entradaCliente").value=""; document.getElementById("entradaAccesorios").value=""; document.getElementById("entradaRegistradoPor").value=""; document.getElementById("entradaFoto").value="";
         renderAll();
-        mostrarMensaje(`✅ Informe #${id} guardado`);
+        await generarPDFEntrada(nuevoEquipo, consecutivo);
+        mostrarMensaje(`✅ Equipo ${serial} registrado y PDF generado`);
     };
 
-    // EDITAR INFORME
-    document.getElementById("selectEditarSerial").onchange = () => {
-        cargarInformesPorSerial("selectEditarSerial", "selectEditarInforme");
-    };
-    
-    document.getElementById("btnCargarEditar").onclick = () => {
-        const id = parseInt(document.getElementById("selectEditarInforme").value);
-        const inf = informes.find(i => i.id === id);
-        if(inf) {
-            document.getElementById("editId").value = inf.id;
-            document.getElementById("editFecha").value = inf.fecha;
-            document.getElementById("editSerial").value = inf.serial;
-            document.getElementById("editMarca").value = inf.marca;
-            document.getElementById("editModelo").value = inf.modelo;
-            document.getElementById("editCliente").value = inf.cliente;
-            document.getElementById("editTipo").value = inf.tipo;
-            document.getElementById("editDiagnostico").value = inf.diagnostico;
-            document.getElementById("editValores").value = inf.valores || "";
-            document.getElementById("editNotaFinal").value = inf.notaFinal || "";
-            document.getElementById("formEditar").style.display = "block";
-        } else alert("Seleccione un informe");
-    };
-    
-    document.getElementById("btnGuardarEdicion").onclick = async () => {
-        const id = parseInt(document.getElementById("editId").value);
-        const inf = informes.find(i => i.id === id);
-        if(inf) {
-            inf.fecha = document.getElementById("editFecha").value;
-            inf.marca = document.getElementById("editMarca").value;
-            inf.modelo = document.getElementById("editModelo").value;
-            inf.cliente = document.getElementById("editCliente").value;
-            inf.tipo = document.getElementById("editTipo").value;
-            inf.diagnostico = document.getElementById("editDiagnostico").value;
-            inf.valores = document.getElementById("editValores").value;
-            inf.notaFinal = document.getElementById("editNotaFinal").value;
-            const newFoto = document.getElementById("editFoto").files[0];
-            if(newFoto) inf.foto = await fileToBase64(newFoto);
-            const equipo = equipos.find(e => e.serial === inf.serial);
-            if(equipo) { equipo.marca = inf.marca; equipo.modelo = inf.modelo; equipo.cliente = inf.cliente; }
-            renderAll();
-            mostrarMensaje(`✅ Informe #${id} actualizado`);
-            document.getElementById("formEditar").style.display = "none";
-        }
-    };
-
-    // APROBACIÓN
-    document.getElementById("selectAprobacionSerial").onchange = () => {
-        cargarInformesPorSerial("selectAprobacionSerial", "selectInformeAprobacion");
-    };
-    
-    document.getElementById("selectInformeAprobacion").onchange = () => {
-        const id = parseInt(document.getElementById("selectInformeAprobacion").value);
-        const inf = informes.find(i => i.id === id);
-        if(inf) {
-            document.getElementById("fechaEnvio").value = inf.fechaEnvio || '';
-            document.getElementById("estadoFinal").value = inf.estado;
-            document.getElementById("obsCliente").value = inf.obsCliente || '';
-        }
-    };
-    
-    document.getElementById("btnActualizar").onclick = () => {
-        const id = parseInt(document.getElementById("selectInformeAprobacion").value);
-        const inf = informes.find(i => i.id === id);
-        if(inf) { 
-            inf.fechaEnvio = document.getElementById("fechaEnvio").value; 
-            inf.estado = document.getElementById("estadoFinal").value; 
-            inf.obsCliente = document.getElementById("obsCliente").value; 
-            renderAll(); 
-            mostrarMensaje(`✅ Informe #${id} actualizado`);
-        } else alert("Seleccione un informe");
-    };
-
-    // AGREGAR EQUIPO
-    document.getElementById("btnAgregarEquipo").onclick = () => {
-        const serial = prompt("Serial:"); if(!serial) return;
-        const equipo = prompt("Tipo:"); const marca = prompt("Marca:"); const modelo = prompt("Modelo:"); const cliente = prompt("Cliente:");
-        equipos.push({ serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
+    // Guardar informe técnico
+    document.getElementById("btnGuardarInforme").onclick=async()=>{
+        const numero=document.getElementById("infoNumero").value.trim();
+        if(!numero){mostrarMensaje("Número de informe obligatorio"); return;}
+        const serial=document.getElementById("infoSerial").value.trim();
+        const fecha=document.getElementById("infoFecha").value||new Date().toISOString().slice(0,10);
+        const tipo=document.getElementById("infoTipo").value;
+        const diagnostico=document.getElementById("infoDiagnostico").value.trim();
+        const valores=document.getElementById("infoValores").value.trim();
+        const notaFinal=document.getElementById("infoNotaFinal").value.trim();
+        const fotoInput=document.getElementById("infoFoto").files[0];
+        let foto=fotoInput?await fileToBase64(fotoInput):"";
+        const equipo=equipos.find(e=>e.serial===serial);
+        if(!equipo){mostrarMensaje("Serial no encontrado"); return;}
+        const nuevoInforme={numero, fecha, serial, cliente:equipo.cliente, marca:equipo.marca, modelo:equipo.modelo, tipo, diagnostico, valores, notaFinal, foto, estado:"Pendiente"};
+        informes.push(nuevoInforme);
+        equipo.etapaLab=true;
         renderAll();
-        mostrarMensaje(`✅ Equipo ${serial} agregado`);
+        await generarPDFInforme(nuevoInforme);
+        cerrarModalInforme();
+        mostrarMensaje(`✅ Informe ${numero} guardado y PDF generado`);
     };
 
-    // EXPORTAR
-    document.getElementById("btnExportarDatos").onclick = () => {
-        if(informes.length === 0 && equipos.length === 0) { mostrarMensaje("No hay datos"); return; }
-        const informesExport = informes.map(inf => ({
-            "ID": inf.id, "FECHA": inf.fecha, "SERIAL": inf.serial, "EQUIPO": inf.tipo,
-            "CLIENTE": inf.cliente, "MARCA": inf.marca, "MODELO": inf.modelo,
-            "DIAGNOSTICO": inf.diagnostico, "VALORES": inf.valores || "", "NOTA_FINAL": inf.notaFinal || "",
-            "ESTADO_COMERCIAL": inf.estado, "FECHA_ENVIO_CLIENTE": inf.fechaEnvio || "", "OBSERVACIONES_CLIENTE": inf.obsCliente || ""
-        }));
-        const equiposExport = equipos.map(eq => ({
-            "SERIAL": eq.serial, "EQUIPO": eq.equipo, "MARCA": eq.marca, "MODELO": eq.modelo, "CLIENTE": eq.cliente, "ESTADO": eq.estado || "Pendiente"
-        }));
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(informesExport), "INFORMES");
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(equiposExport), "EQUIPOS");
-        XLSX.writeFile(wb, `CalibPro_Datos_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.xlsx`);
-        mostrarMensaje("✅ Datos exportados");
-    };
+    function cerrarModalInforme(){ document.getElementById("modalInforme").style.display="none"; }
+    document.getElementById("btnNuevoInforme").onclick=()=>{ document.getElementById("modalInforme").style.display="flex"; document.getElementById("infoNumero").value=`INF-${informes.length+1}`; document.getElementById("infoSerial").value=""; document.getElementById("infoFecha").value=new Date().toISOString().slice(0,10); document.getElementById("infoDiagnostico").value=""; document.getElementById("infoValores").value=""; document.getElementById("infoNotaFinal").value=""; document.getElementById("infoFoto").value=""; };
+    window.onclick=e=>{if(e.target===document.getElementById("modalInforme"))cerrarModalInforme();};
 
-    // IMPORTAR DATOS - CORREGIDO PARA LEER CORRECTAMENTE TU EXCEL
-    function setupImport() {
-        const importArea = document.getElementById("importArea");
-        const fileInput = document.getElementById("fileInput");
-        importArea.onclick = () => fileInput.click();
-        importArea.ondragover = (e) => { e.preventDefault(); importArea.style.borderColor = "var(--primary)"; };
-        importArea.ondragleave = () => importArea.style.borderColor = "var(--gray-border)";
-        importArea.ondrop = (e) => { e.preventDefault(); importArea.style.borderColor = "var(--gray-border)"; handleFile(e.dataTransfer.files[0]); };
-        fileInput.onchange = (e) => { if(e.target.files[0]) handleFile(e.target.files[0]); };
-    }
-
-    async function handleFile(file) {
-        const preview = document.getElementById("importPreview");
-        const btnConfirmar = document.getElementById("btnConfirmarImport");
-        
-        // Leer el archivo con opciones para preservar los datos
-        const data = await file.arrayBuffer();
-        const workbook = XLSX.read(data, { type: 'array', cellDates: false, defval: "" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-        
-        // Convertir a JSON respetando los encabezados originales
-        let datos = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-        
-        // Filtrar filas vacías (sin ID o sin serial)
-        datos = datos.filter(row => row.ID || row.serial);
-        
-        if(datos.length === 0) { 
-            preview.innerHTML = '<p>❌ No se encontraron datos válidos. Asegúrate de que tu archivo tenga las columnas: fecha, CLIENTE, equipo, marca, modelo, serial, ID, diagnostico</p>'; 
-            btnConfirmar.style.display = "none"; 
-            return; 
+    // Trazabilidad completa
+    document.getElementById("btnBuscarTraza").onclick=()=>{
+        const serial=document.getElementById("buscarSerialTraza").value.trim();
+        const div=document.getElementById("trazabilidadResultados");
+        if(!serial){div.innerHTML="<p>Ingrese un serial</p>"; return;}
+        const equipo=equipos.find(e=>e.serial===serial);
+        const informesEquipo=informes.filter(i=>i.serial===serial);
+        if(!equipo && informesEquipo.length===0){div.innerHTML="<p>No se encontró información para este serial</p>"; return;}
+        let html=`<div class="indicadores"><div class="indicador"><div class="numero">${informesEquipo.length}</div><div class="label">Total servicios</div></div><div class="indicador"><div class="numero">${informesEquipo.filter(i=>i.tipo==="Calibración").length}</div><div class="label">Calibraciones</div></div><div class="indicador"><div class="numero">${informesEquipo.filter(i=>i.tipo==="Ajuste mecánico").length}</div><div class="label">Ajustes</div></div><div class="indicador"><div class="numero">${informesEquipo.filter(i=>i.estado==="Aprobado").length}</div><div class="label">Aprobados</div></div></div>`;
+        if(equipo) html+=`<div style="background:var(--secondary); padding:15px; border-radius:16px; margin-bottom:20px;"><strong>DATOS DEL EQUIPO</strong><br>Serial: ${equipo.serial}<br>Equipo: ${equipo.equipo} ${equipo.marca} ${equipo.modelo}<br>Cliente: ${equipo.cliente}<br>Estado actual: ${equipo.estado||"En proceso"}<br>Accesorios: ${equipo.accesorios||"Ninguno"}<br>Registrado por: ${equipo.registradoPor||"N/A"}<br>Etapas completadas: ${equipo.etapaLab?"✅ Laboratorio ":""}${equipo.etapaComercial?"✅ Comercial ":""}${equipo.etapaSalida?"✅ Salida":""}</div>`;
+        html+=`<h4 style="margin-bottom:15px;">📋 HISTORIAL COMPLETO (${informesEquipo.length} eventos)</h4>`;
+        for(const inf of informesEquipo){
+            html+=`<div class="timeline-item"><div><strong>📄 INFORME #${inf.numero}</strong><br><span class="etapa-badge etapa-laboratorio">Laboratorio</span><br><strong>Fecha:</strong> ${inf.fecha}<br><strong>Servicio:</strong> ${inf.tipo}<br><strong>Diagnóstico:</strong> ${inf.diagnostico.substring(0,150)}${inf.diagnostico.length>150?"...":""}<br><strong>Valores:</strong> ${inf.valores||"No especificado"}<br><strong>Estado comercial:</strong> ${inf.estado}<br>${inf.obsCliente?`<strong>Obs cliente:</strong> ${inf.obsCliente}<br>`:""}<button class="pdf-btn" onclick="generarPDFInforme(informes.find(x=>x.numero==='${inf.numero}'))">Ver informe</button></div></div>`;
         }
-        
-        const primerRegistro = datos[0];
-        preview.innerHTML = `<h4>✅ Vista previa (${datos.length} registros)</h4>
-            <div style="background:#e8f0fe; padding:12px; border-radius:12px;">
-                <p><strong>📌 Columnas detectadas:</strong></p>
-                <p>📅 fecha: ${primerRegistro.fecha || 'No'}</p>
-                <p>🏢 CLIENTE: ${primerRegistro.CLIENTE || 'No'}</p>
-                <p>🔧 equipo: ${primerRegistro.equipo || 'No'}</p>
-                <p>🏷️ marca: ${primerRegistro.marca || 'No'}</p>
-                <p>📟 modelo: ${primerRegistro.modelo || 'No'}</p>
-                <p>🔢 serial: ${primerRegistro.serial || 'No'}</p>
-                <p>🔢 ID: ${primerRegistro.ID || 'No'}</p>
-                <p>📋 diagnostico: ${primerRegistro.diagnostico ? 'Sí' : 'No'}</p>
-            </div>
-            <p>Se importarán <strong>${datos.length}</strong> informes.</p>`;
-        btnConfirmar.style.display = "block";
-        
-        btnConfirmar.onclick = () => {
-            let nuevos = 0, maxId = 0;
-            for(const row of datos) {
-                // Obtener serial (obligatorio)
-                const serial = row.serial || "";
+        div.innerHTML=html;
+    };
+
+    // Importar
+    function setupImport(){
+        const area=document.getElementById("importArea"), input=document.getElementById("fileInput");
+        area.onclick=()=>input.click();
+        area.ondrop=e=>{e.preventDefault(); procesarArchivo(e.dataTransfer.files[0]);};
+        input.onchange=e=>{if(e.target.files[0])procesarArchivo(e.target.files[0]);};
+    }
+    async function procesarArchivo(file){
+        const data=await file.arrayBuffer(), workbook=XLSX.read(data), sheet=workbook.Sheets[workbook.SheetNames[0]];
+        let datos=XLSX.utils.sheet_to_json(sheet);
+        datos=datos.filter(r=>r.ID||r.serial);
+        document.getElementById("importPreview").innerHTML=`<p>✅ ${datos.length} registros encontrados</p><button id="btnConfirmarImportStub">Confirmar importación</button>`;
+        document.getElementById("btnConfirmarImportStub").onclick=()=>{
+            for(const row of datos){
+                const serial=row.serial||"";
                 if(!serial) continue;
-                
-                // Obtener ID
-                let id = row.ID || row.id;
-                if(id && !isNaN(parseInt(id))) { 
-                    id = parseInt(id); 
-                    if(id > maxId) maxId = id; 
-                } else { 
-                    id = nextId++;
-                }
-                
-                // Formatear fecha
-                let fecha = row.fecha;
-                if(fecha) {
-                    if(typeof fecha === 'number') {
-                        // Si es número de Excel, convertirlo
-                        const date = XLSX.SSF.parse_date_code(fecha);
-                        fecha = `${date.y}-${String(date.m).padStart(2,'0')}-${String(date.d).padStart(2,'0')}`;
-                    } else if(fecha.includes('/')) {
-                        let partes = fecha.split('/');
-                        fecha = `${partes[2]}-${partes[1]}-${partes[0]}`;
-                    }
-                    fecha = fecha.substring(0,10);
-                } else {
-                    fecha = new Date().toISOString().slice(0,10);
-                }
-                
-                const cliente = row.CLIENTE || "";
-                const diagnostico = row.diagnostico || "";
-                const tipo = row.equipo || "";
-                const marca = row.marca || "";
-                const modelo = row.modelo || "";
-                
-                if(!cliente || !diagnostico) continue;
-                
-                // Agregar informe
-                informes.push({ 
-                    id, fecha, serial, marca, modelo, cliente, tipo, 
-                    diagnostico, valores: "", notaFinal: "", foto: "", 
-                    estado: "Pendiente", fechaEnvio: "", obsCliente: "" 
-                });
-                nuevos++;
-                
-                // Agregar o actualizar equipo
-                const equipoExistente = equipos.find(e => e.serial === serial);
-                if(equipoExistente) {
-                    if(!equipoExistente.marca && marca) equipoExistente.marca = marca;
-                    if(!equipoExistente.modelo && modelo) equipoExistente.modelo = modelo;
-                    if(!equipoExistente.cliente && cliente) equipoExistente.cliente = cliente;
-                } else {
-                    equipos.push({ 
-                        serial, equipo: tipo, marca, modelo, cliente, 
-                        estado: "Pendiente diagnóstico" 
-                    });
-                }
+                let id=row.ID||row.id||nextId++;
+                const fecha=row.fecha?new Date(row.fecha).toISOString().slice(0,10):new Date().toISOString().slice(0,10);
+                const cliente=row.CLIENTE||"";
+                const diagnostico=row.diagnostico||"";
+                const tipo=row.equipo||"Calibración";
+                const marca=row.marca||"";
+                const modelo=row.modelo||"";
+                if(!cliente||!diagnostico) continue;
+                informes.push({numero:`INF-${id}`, fecha, serial, cliente, marca, modelo, tipo, diagnostico, valores:"", notaFinal:"", foto:"", estado:"Pendiente"});
+                if(!equipos.find(e=>e.serial===serial)) equipos.push({consecutivo:`ENT-${equipos.length+1}`, serial, equipo:tipo, marca, modelo, cliente, accesorios:"", registradoPor:"Importación", etapaLab:true, etapaComercial:false, etapaSalida:false, estado:"Pendiente"});
             }
-            if(maxId > 0 && maxId >= nextId) nextId = maxId + 1;
             renderAll();
-            mostrarMensaje(`✅ Se importaron ${nuevos} informes y ${equipos.length} equipos`);
-            preview.style.display = "none";
-            btnConfirmar.style.display = "none";
-            document.getElementById("fileInput").value = "";
+            mostrarMensaje("Importación completada");
         };
     }
 
-    // TRAZABILIDAD
-    function verHistorialEquipo() {
-        const serial = document.getElementById("selectEquipoTraza").value;
-        if(serial) {
-            document.getElementById("buscarSerialInput").value = serial;
-            buscarSerialDirecto(serial);
-        }
-    }
-
-    document.getElementById("btnCargarTraza").onclick = verHistorialEquipo;
-    document.getElementById("btnBuscarSerial").onclick = () => {
-        const serial = document.getElementById("buscarSerialInput").value.trim();
-        buscarSerialDirecto(serial);
+    document.getElementById("btnExportarDatos").onclick=()=>{
+        const wb=XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(informes.map(i=>({NUMERO:i.numero,FECHA:i.fecha,SERIAL:i.serial,CLIENTE:i.cliente,SERVICIO:i.tipo,DIAGNOSTICO:i.diagnostico,ESTADO:i.estado}))),"INFORMES");
+        XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(equipos.map(e=>({CONSECUTIVO:e.consecutivo,SERIAL:e.serial,EQUIPO:e.equipo,CLIENTE:e.cliente,ESTADO:e.estado}))),"EQUIPOS");
+        XLSX.writeFile(wb,`CalibPro_${new Date().toISOString().slice(0,19)}.xlsx`);
+        mostrarMensaje("Exportado");
     };
 
-    // GENERAR PDF
-    window.generarPDF = async (id) => {
-        const inf = informes.find(i => i.id === id);
-        if(!inf) return;
-        const fechaActual = new Date().toLocaleDateString('es-CO');
-        let fotoHtml = inf.foto ? `<div><strong>Foto:</strong><br><img src="${inf.foto}" style="max-width:100%; max-height:250px;"></div>` : '';
-        let notaHtml = inf.notaFinal ? `<div><strong>Nota:</strong><br>${inf.notaFinal}</div>` : '';
-        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe ${inf.id}</title><style>body{font-family:Segoe UI;padding:40px;}.container{max-width:800px;margin:0 auto;}.header-logo{text-align:left;}.titulo{text-align:center;border-bottom:2px solid #0a2b4e;}.equipo-datos{background:#f5f5f5;padding:15px;margin:15px 0;}.firma{margin-top:30px;border-top:1px solid #ccc;}</style></head><body><div class="container"><div class="header-logo">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<h3>CI RENTELCOM SAS</h3>'}</div><div class="titulo"><h2>INFORME TÉCNICO DE LABORATORIO</h2></div><div><strong>Fecha:</strong> ${fechaActual}</div><div><strong>Reporte N°:</strong> ${inf.id}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="equipo-datos"><div><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Servicio:</strong> ${inf.tipo}</div></div><div><strong>Diagnóstico:</strong><br>${inf.diagnostico}</div><div><strong>Valores:</strong><br>${inf.valores || 'No especificado'}</div>${fotoHtml}${notaHtml}<div class="firma"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div class="pie">Carrera 19A No. 150-50 Bogotá D.C.</div></div></body></html>`;
-        const blob = new Blob([docHtml], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    document.getElementById("btnCargarEjemplo").onclick=()=>{
+        equipos=[{consecutivo:"ENT-001",serial:"AA432002010275",equipo:"Empalmadora",marca:"ILSINTECH",modelo:"KF4",cliente:"CONECTAR TV SAS",accesorios:"Maletín, cargador",registradoPor:"Stephania Garcia",etapaLab:true,etapaComercial:false,etapaSalida:false,estado:"Pendiente diagnóstico"}];
+        informes=[{numero:"INF-447",fecha:"2023-11-23",serial:"AA432002010275",cliente:"CONECTAR TV SAS",marca:"ILSINTECH",modelo:"KF4",tipo:"Reparación",diagnostico:"DAÑO MECANISMO DE AJUSTE DE FOCO",valores:"",notaFinal:"",foto:"",estado:"Pendiente"}];
+        nextId=453;
+        renderAll();
+        mostrarMensaje("Datos de ejemplo cargados");
     };
+    document.getElementById("btnAgregarEquipo").onclick=()=>{ document.querySelector('.tab-btn[data-tab="nuevoEquipo"]').click(); };
 
-    // DASHBOARD CLICKEABLE
-    function activarDashboardClick() {
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('click', () => {
-                const accion = card.getAttribute('data-accion');
-                if(accion === 'equipos') { document.querySelector('.tab-btn[data-tab="equipos"]').click(); }
-                else if(accion === 'informes-todos') { filtroActual = 'todos'; document.getElementById('filtroInfo').innerHTML = ''; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderInformesConFiltro(); }
-                else if(accion === 'informes-pendientes') { filtroActual = 'pendientes'; document.getElementById('filtroInfo').innerHTML = '<span class="filtro-activo">📌 Mostrando solo pendientes</span>'; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderInformesConFiltro(); }
-                else if(accion === 'informes-aprobados') { filtroActual = 'aprobados'; document.getElementById('filtroInfo').innerHTML = '<span class="filtro-activo">✅ Mostrando solo aprobados</span>'; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderInformesConFiltro(); }
-            });
-        });
-    }
-
-    // TABS
-    document.querySelectorAll(".tab-btn").forEach(btn => btn.addEventListener("click", () => {
-        document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active-pane"));
-        document.getElementById(btn.dataset.tab).classList.add("active-pane");
-        if(btn.dataset.tab === "informes") renderInformesConFiltro();
-    }));
-
-    document.getElementById("btnCargarEjemplo").onclick = cargarDatosEjemplo;
-    
-    setupImport();
+    document.querySelectorAll(".tab-btn").forEach(btn=>btn.addEventListener("click",()=>{ document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active-pane")); document.getElementById(btn.dataset.tab).classList.add("active-pane"); if(btn.dataset.tab==="importar") setupImport(); }));
+    function activarDashboard(){document.querySelectorAll('.card').forEach(c=>c.addEventListener('click',()=>{const a=c.dataset.accion; if(a==='equipos')document.querySelector('.tab-btn[data-tab="equipos"]').click(); else if(a==='informes-todos')document.querySelector('.tab-btn[data-tab="informes"]').click(); else if(a==='pendientes'){filtroActual='pendientes'; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderAll();} else if(a==='finalizados'){filtroActual='aprobados'; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderAll();}}));}
+    activarDashboard();
     cargarDatos();
-    activarDashboardClick();
 </script>
 </body>
 </html>
-
