@@ -87,6 +87,11 @@
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
         
         .delete-section { border-top: 1px solid var(--gray-border); margin-top: 20px; padding-top: 20px; }
+        
+        /* Mapeo de columnas */
+        .column-mapping { background: var(--secondary); padding: 15px; border-radius: 12px; margin: 15px 0; }
+        .column-mapping h4 { margin-bottom: 10px; color: var(--primary); }
+        .column-mapping p { font-size: 13px; margin: 5px 0; }
     </style>
 </head>
 <body>
@@ -210,11 +215,21 @@
     <div id="importar" class="tab-pane">
         <div class="form-card">
             <h3>Importar datos desde archivo</h3>
-            <p style="margin-bottom: 15px;">Puedes importar tus informes desde un archivo CSV o Excel.</p>
+            <div class="column-mapping">
+                <h4>📋 Formato esperado para tu archivo (MATRIZ INFORMES)</h4>
+                <p>✅ <strong># informe</strong> → Número del informe</p>
+                <p>✅ <strong>fecha</strong> → Fecha del informe</p>
+                <p>✅ <strong>con</strong> → Cliente</p>
+                <p>✅ <strong>equipo</strong> → Tipo de equipo</p>
+                <p>✅ <strong>marca</strong> → Marca</p>
+                <p>✅ <strong>modelo</strong> → Modelo</p>
+                <p>✅ <strong>serial</strong> → Serial del equipo</p>
+                <p>✅ <strong>diagnostico</strong> → Diagnóstico</p>
+            </div>
             <div class="import-area" id="importArea">
                 <div style="font-size: 48px;">📂</div>
-                <p>Arrastra tu archivo CSV/Excel aquí o haz clic para seleccionar</p>
-                <p style="font-size: 12px; color: var(--text-gray); margin-top: 10px;">Formatos soportados: .csv, .xlsx</p>
+                <p>Arrastra tu archivo Excel (.xlsx) aquí o haz clic para seleccionar</p>
+                <p style="font-size: 12px; color: var(--text-gray); margin-top: 10px;">Tu archivo debe tener las columnas: # informe, fecha, con, equipo, marca, modelo, serial, diagnostico</p>
             </div>
             <input type="file" id="fileInput" accept=".csv,.xlsx" style="display: none;">
             <div id="importPreview" style="margin-top: 20px; display: none;"></div>
@@ -231,7 +246,7 @@
             <button id="btnGuardarLogo">Guardar Logo</button>
             
             <div class="delete-section">
-                <h3 style="color: var(--danger);">Peligro - Eliminar datos</h3>
+                <h3 style="color: var(--danger);">⚠️ Peligro - Eliminar datos</h3>
                 <p style="margin-bottom: 15px;">Esta acción eliminará TODOS los informes y equipos guardados. No se puede deshacer.</p>
                 <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
             </div>
@@ -314,7 +329,7 @@
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
         if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td>${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td></tr>`).join('');
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
     function renderAll() {
@@ -328,7 +343,7 @@
         document.getElementById("selectInforme").innerHTML = options;
         document.getElementById("selectEditar").innerHTML = options;
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td></tr>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">No hay equipos registrados</td>' + '</tr>';
         else eb.innerHTML = equipos.map((e, idx) => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td><td class="status-badge">${e.estado || "Pendiente"}</td><td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td></tr>`).join('');
         cargarSelectEquiposTraza();
         guardarDatos();
@@ -339,7 +354,7 @@
         if(nuevo) { equipos[idx].estado = nuevo; renderAll(); mostrarMensaje("Estado actualizado"); }
     };
 
-    // ==================== IMPORTAR DATOS ====================
+    // ==================== IMPORTAR DATOS - FORMATO MATRIZ ====================
     function setupImport() {
         const importArea = document.getElementById("importArea");
         const fileInput = document.getElementById("fileInput");
@@ -376,32 +391,65 @@
             datos = XLSX.utils.sheet_to_json(sheet);
         }
         
+        // Mostrar vista previa del mapeo
         preview.style.display = "block";
-        preview.innerHTML = `<h4>Vista previa (${datos.length} registros encontrados)</h4>
-            <table style="font-size:12px; width:100%;"><thead><tr>${Object.keys(datos[0] || {}).map(k => `<th>${k}</th>`).join('')}</tr></thead>
-            <tbody>${datos.slice(0,5).map(row => `<tr>${Object.values(row).map(v => `<td>${String(v).substring(0,30)}</td>`).join('')}</tr>`).join('')}</tbody></table>
-            <p style="margin-top:10px;">Se importarán ${datos.length} informes.</p>`;
+        if(datos.length > 0) {
+            const primerRegistro = datos[0];
+            preview.innerHTML = `<h4>✅ Vista previa de la importación (${datos.length} registros encontrados)</h4>
+                <div class="column-mapping" style="margin:10px 0;">
+                    <p><strong>📌 Mapeo detectado:</strong></p>
+                    <p>🔢 # informe → ${primerRegistro["# informe"] || primerRegistro["#informe"] || 'No encontrado'}</p>
+                    <p>📅 fecha → ${primerRegistro.fecha || 'No encontrado'}</p>
+                    <p>🏢 con/cliente → ${primerRegistro.con || primerRegistro.CLIENTE || 'No encontrado'}</p>
+                    <p>🔧 equipo → ${primerRegistro.equipo || 'No encontrado'}</p>
+                    <p>🏷️ marca → ${primerRegistro.marca || 'No encontrado'}</p>
+                    <p>📟 modelo → ${primerRegistro.modelo || 'No encontrado'}</p>
+                    <p>🔢 serial → ${primerRegistro.serial || 'No encontrado'}</p>
+                    <p>📋 diagnostico → ${primerRegistro.diagnostico ? primerRegistro.diagnostico.substring(0,50)+'...' : 'No encontrado'}</p>
+                </div>
+                <p style="margin-top:10px;">Se importarán ${datos.length} informes.</p>`;
+        } else {
+            preview.innerHTML = `<p>❌ No se encontraron datos en el archivo. Asegúrate de que tenga las columnas correctas.</p>`;
+            btnConfirmar.style.display = "none";
+            return;
+        }
+        
         btnConfirmar.style.display = "block";
         
         btnConfirmar.onclick = () => {
             let nuevosInformes = 0;
+            let maxId = 0;
+            
             for(const row of datos) {
-                const id = nextId++;
-                const fecha = row.FECHA || row.fecha || row.Fecha || new Date().toISOString().slice(0,10);
-                const serial = row.SERIAL || row.serial || row.Serial || `EQ-${id}`;
-                const cliente = row.CLIENTE || row.cliente || row.Cliente || row.con || "CLIENTE GENERAL";
-                const diagnostico = row.DIAGNOSTICO || row.diagnostico || row.Diagnóstico || "Diagnóstico registrado en importación";
-                const tipo = row.TIPO || row.tipo || row.Servicio || row.equipo || "Calibración";
-                const marca = row.MARCA || row.marca || "GENERICO";
-                const modelo = row.MODELO || row.modelo || "MODELO";
+                // Obtener el número de informe de la columna "# informe"
+                let id = row["# informe"] || row["#informe"] || row["ITEM"] || row["id"];
+                if(id && !isNaN(parseInt(id))) {
+                    id = parseInt(id);
+                    if(id > maxId) maxId = id;
+                } else {
+                    id = nextId++;
+                }
                 
-                informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
+                const fecha = row.fecha ? (row.fecha.includes('/') ? row.fecha.split('/').reverse().join('-') : row.fecha).substring(0,10) : new Date().toISOString().slice(0,10);
+                const serial = row.serial || row.Serial || `EQ-${id}`;
+                const cliente = row.con || row.CLIENTE || row.cliente || "CLIENTE GENERAL";
+                const diagnostico = row.diagnostico || row.DIAGNOSTICO || "Diagnóstico registrado en importación";
+                const tipo = row.equipo || row.TIPO || row.tipo || "Calibración";
+                const marca = row.marca || row.MARCA || "GENERICO";
+                const modelo = row.modelo || row.MODELO || "MODELO";
+                const estado = row["ESTADO INFORME"] || row.estado || "Pendiente";
+                const estadoFinal = (estado === "entregado" || estado === "Aprobado") ? "Aprobado" : "Pendiente";
+                
+                informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores: "", notaFinal: "", foto: "", estado: estadoFinal, fechaEnvio: "", obsCliente: "" });
                 nuevosInformes++;
                 
                 if(!equipos.find(e => e.serial === serial)) {
                     equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
                 }
             }
+            
+            if(maxId > 0 && maxId >= nextId) nextId = maxId + 1;
+            
             renderAll();
             mostrarMensaje(`✅ Se importaron ${nuevosInformes} informes correctamente`);
             preview.style.display = "none";
