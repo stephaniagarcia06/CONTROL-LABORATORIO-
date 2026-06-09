@@ -59,6 +59,8 @@
         button:hover { background: var(--primary-dark); transform: translateY(-1px); }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #b91c1c; }
         
         table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
@@ -83,6 +85,8 @@
         .filtro-activo { background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; margin-left: 10px; }
         .import-area { border: 2px dashed var(--gray-border); padding: 30px; text-align: center; border-radius: 16px; margin: 20px 0; cursor: pointer; transition: all 0.2s; }
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
+        
+        .delete-section { border-top: 1px solid var(--gray-border); margin-top: 20px; padding-top: 20px; }
     </style>
 </head>
 <body>
@@ -206,7 +210,7 @@
     <div id="importar" class="tab-pane">
         <div class="form-card">
             <h3>Importar datos desde archivo</h3>
-            <p style="margin-bottom: 15px;">Puedes importar tus informes desde un archivo CSV o Excel. El formato debe tener las columnas: ID, Fecha, Serial, Cliente, Diagnóstico, etc.</p>
+            <p style="margin-bottom: 15px;">Puedes importar tus informes desde un archivo CSV o Excel.</p>
             <div class="import-area" id="importArea">
                 <div style="font-size: 48px;">📂</div>
                 <p>Arrastra tu archivo CSV/Excel aquí o haz clic para seleccionar</p>
@@ -225,7 +229,12 @@
             <input type="file" id="logoEmpresa" accept="image/*">
             <div id="logoPreview"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
-            <p style="margin-top:15px; font-size:12px; color:var(--text-gray);">El logo aparecerá en la parte superior de los informes PDF.</p>
+            
+            <div class="delete-section">
+                <h3 style="color: var(--danger);">Peligro - Eliminar datos</h3>
+                <p style="margin-bottom: 15px;">Esta acción eliminará TODOS los informes y equipos guardados. No se puede deshacer.</p>
+                <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
+            </div>
         </div>
     </div>
     
@@ -253,6 +262,19 @@
         cargarSelectEquiposTraza();
     }
 
+    function eliminarTodosLosDatos() {
+        const confirmar = confirm("⚠️ ¿ESTÁS SEGURA?\n\nEsta acción eliminará TODOS los informes y equipos guardados.\n\nNo se puede deshacer.");
+        if(confirmar) {
+            equipos = [];
+            informes = [];
+            nextId = 100;
+            guardarDatos();
+            renderAll();
+            cargarSelectEquiposTraza();
+            mostrarMensaje("✅ Todos los datos han sido eliminados correctamente");
+        }
+    }
+
     function mostrarMensaje(texto, tipo = "success") {
         const msg = document.getElementById("mensajeExito");
         msg.innerText = texto;
@@ -274,6 +296,8 @@
             reader.onload = function() { logoEmpresaBase64 = reader.result; guardarDatos(); actualizarVistaLogo(); mostrarMensaje("Logo guardado correctamente"); };
         }
     };
+
+    document.getElementById("btnEliminarTodos").onclick = eliminarTodosLosDatos;
 
     function fileToBase64(file) {
         return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
@@ -315,13 +339,12 @@
         if(nuevo) { equipos[idx].estado = nuevo; renderAll(); mostrarMensaje("Estado actualizado"); }
     };
 
-    // ==================== IMPORTAR DATOS DESDE CSV ====================
+    // ==================== IMPORTAR DATOS ====================
     function setupImport() {
         const importArea = document.getElementById("importArea");
         const fileInput = document.getElementById("fileInput");
         
         importArea.onclick = () => fileInput.click();
-        
         importArea.ondragover = (e) => { e.preventDefault(); importArea.style.borderColor = "var(--primary)"; };
         importArea.ondragleave = () => importArea.style.borderColor = "var(--gray-border)";
         importArea.ondrop = (e) => { e.preventDefault(); importArea.style.borderColor = "var(--gray-border)"; handleFile(e.dataTransfer.files[0]); };
@@ -332,11 +355,11 @@
         const preview = document.getElementById("importPreview");
         const btnConfirmar = document.getElementById("btnConfirmarImport");
         
+        let datos = [];
         if(file.name.endsWith('.csv')) {
             const text = await file.text();
             const lines = text.split('\n');
             const headers = lines[0].split(',');
-            const datos = [];
             for(let i = 1; i < lines.length; i++) {
                 if(lines[i].trim()) {
                     const values = lines[i].split(',');
@@ -345,38 +368,30 @@
                     datos.push(row);
                 }
             }
-            mostrarVistaPrevia(datos);
         } 
         else if(file.name.endsWith('.xlsx')) {
             const data = await file.arrayBuffer();
             const workbook = XLSX.read(data);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            const datos = XLSX.utils.sheet_to_json(sheet);
-            mostrarVistaPrevia(datos);
+            datos = XLSX.utils.sheet_to_json(sheet);
         }
-    }
-
-    function mostrarVistaPrevia(datos) {
-        const preview = document.getElementById("importPreview");
-        const btnConfirmar = document.getElementById("btnConfirmarImport");
         
         preview.style.display = "block";
         preview.innerHTML = `<h4>Vista previa (${datos.length} registros encontrados)</h4>
             <table style="font-size:12px; width:100%;"><thead><tr>${Object.keys(datos[0] || {}).map(k => `<th>${k}</th>`).join('')}</tr></thead>
             <tbody>${datos.slice(0,5).map(row => `<tr>${Object.values(row).map(v => `<td>${String(v).substring(0,30)}</td>`).join('')}</tr>`).join('')}</tbody></table>
-            <p style="margin-top:10px;">Se importarán ${datos.length} informes. Los números de informe se generarán automáticamente.</p>`;
+            <p style="margin-top:10px;">Se importarán ${datos.length} informes.</p>`;
         btnConfirmar.style.display = "block";
         
-        let datosImport = datos;
         btnConfirmar.onclick = () => {
             let nuevosInformes = 0;
-            for(const row of datosImport) {
+            for(const row of datos) {
                 const id = nextId++;
                 const fecha = row.FECHA || row.fecha || row.Fecha || new Date().toISOString().slice(0,10);
                 const serial = row.SERIAL || row.serial || row.Serial || `EQ-${id}`;
-                const cliente = row.CLIENTE || row.cliente || row.Cliente || "CLIENTE GENERAL";
+                const cliente = row.CLIENTE || row.cliente || row.Cliente || row.con || "CLIENTE GENERAL";
                 const diagnostico = row.DIAGNOSTICO || row.diagnostico || row.Diagnóstico || "Diagnóstico registrado en importación";
-                const tipo = row.TIPO || row.tipo || row.Servicio || "Calibración";
+                const tipo = row.TIPO || row.tipo || row.Servicio || row.equipo || "Calibración";
                 const marca = row.MARCA || row.marca || "GENERICO";
                 const modelo = row.MODELO || row.modelo || "MODELO";
                 
@@ -391,11 +406,11 @@
             mostrarMensaje(`✅ Se importaron ${nuevosInformes} informes correctamente`);
             preview.style.display = "none";
             btnConfirmar.style.display = "none";
-            document.getElementById("fileInput").value = "";
+            fileInput.value = "";
         };
     }
 
-    // ==================== GENERAR PDF SIN about:blank ====================
+    // ==================== GENERAR PDF ====================
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
