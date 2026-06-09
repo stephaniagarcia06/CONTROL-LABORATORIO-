@@ -137,7 +137,7 @@
     <!-- INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card"><h3>Listado de informes técnicos <span id="filtroInfo" style="font-size:0.7rem;"></span></h3>
-            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead><tbody id="informesBody"></tbody></table>
+            <tr><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead><tbody id="informesBody"></tbody></table>
         </div>
     </div>
 
@@ -218,7 +218,7 @@
         </div>
     </div>
 
-    <!-- EQUIPOS - MEJORADA CON FOTO Y OBSERVACIONES -->
+    <!-- EQUIPOS - MEJORADA CON FOTO, OBSERVACIONES Y REGISTRADO POR -->
     <div id="equipos" class="tab-pane">
         <div class="form-card">
             <h3>Gestión de equipos</h3>
@@ -333,8 +333,8 @@
 
     function cargarDatosEjemplo() {
         equipos = [
-            { id: 1, serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller", foto: "", observaciones: "Equipo con golpes en la carcasa, viene con maletín de transporte, cargador y kit de limpieza. La pantalla presenta una pequeña fisura." },
-            { id: 2, serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "Equipo completo: cargador, batería adicional, 2 conectores. Presenta daño en el conector de carga." }
+            { id: 1, serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller", foto: "", observaciones: "Equipo con golpes en la carcasa, viene con maletín de transporte, cargador y kit de limpieza.", registradoPor: "Stephania Garcia" },
+            { id: 2, serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "Equipo completo: cargador, batería adicional, 2 conectores.", registradoPor: "Stephania Garcia" }
         ];
         
         informes = [
@@ -392,6 +392,7 @@
                         <div><strong>🏢 Cliente:</strong> ${eq.cliente}</div>
                         <div><strong>📍 Estado:</strong> <span class="status-badge">${eq.estado || "Pendiente"}</span></div>
                         <div><strong>📝 Accesorios / Observaciones:</strong><br>${eq.observaciones || "Ninguna"}</div>
+                        <div><strong>👤 Registrado por:</strong> ${eq.registradoPor || "No especificado"}</div>
                     </div>
                     <div style="flex: 1; text-align: center;">
                         ${eq.foto ? `<img src="${eq.foto}" class="equipo-foto"><br>` : '<div style="width:150px; height:100px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border-radius:8px;">Sin foto</div>'}
@@ -414,6 +415,7 @@
         const nuevoCliente = prompt("Cliente:", eq.cliente);
         const nuevoEstado = prompt("Estado (Pendiente diagnóstico, En taller, Entregado):", eq.estado);
         const nuevasObs = prompt("Observaciones / Accesorios:", eq.observaciones || "");
+        const nuevoRegistradoPor = prompt("Registrado por (técnico que ingresa los datos):", eq.registradoPor || "Stephania Garcia");
         
         if(nuevoEquipo) eq.equipo = nuevoEquipo;
         if(nuevaMarca) eq.marca = nuevaMarca;
@@ -421,6 +423,7 @@
         if(nuevoCliente) eq.cliente = nuevoCliente;
         if(nuevoEstado) eq.estado = nuevoEstado;
         if(nuevasObs !== null) eq.observaciones = nuevasObs;
+        if(nuevoRegistradoPor) eq.registradoPor = nuevoRegistradoPor;
         
         // Preguntar si quiere cambiar la foto
         const cambiarFoto = confirm("¿Desea cambiar la foto del equipo?");
@@ -444,7 +447,7 @@
         mostrarMensaje("Equipo actualizado");
     };
 
-    // Generar PDF individual del equipo
+    // Generar PDF individual del equipo (SIN FIRMA)
     window.generarPDFEquipo = (idx) => {
         const eq = equipos[idx];
         if(!eq) return;
@@ -465,7 +468,6 @@
                 .info-equipo { background: #f5f5f5; padding: 20px; border-radius: 12px; margin: 20px 0; }
                 .foto-equipo { text-align: center; margin: 20px 0; }
                 .foto-equipo img { max-width: 300px; max-height: 250px; border-radius: 8px; border: 1px solid #ccc; }
-                .firma { margin-top: 40px; border-top: 1px solid #ccc; padding-top: 15px; }
                 .pie { margin-top: 20px; font-size: 10px; text-align: center; color: #666; }
                 .label { font-weight: bold; }
             </style>
@@ -474,7 +476,7 @@
             <div class="container">
                 <div class="header">
                     ${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;"><br>` : '<h3>CI RENTELCOM SAS</h3>'}
-                    <h2>FICHA TÉCNICA DEL EQUIPO</h2>
+                    <h2>FICHA DE REGISTRO DEL EQUIPO</h2>
                 </div>
                 
                 <div><strong>Fecha de registro:</strong> ${fechaActual}</div>
@@ -488,16 +490,11 @@
                     <div><span class="label">🏢 Cliente:</span> ${eq.cliente}</div>
                     <div><span class="label">📍 Estado actual:</span> ${eq.estado || "Pendiente"}</div>
                     <div><span class="label">📝 Accesorios / Observaciones:</span><br>${eq.observaciones || "Ninguna"}</div>
+                    <div><span class="label">👤 Registrado por:</span> ${eq.registradoPor || "No especificado"}</div>
                 </div>
                 
                 ${eq.foto ? `<div class="foto-equipo"><span class="label">📷 Foto del equipo al ingreso:</span><br><img src="${eq.foto}"></div>` : '<div class="foto-equipo"><span class="label">📷 Foto:</span><br><em>No se registró fotografía</em></div>'}
                 
-                <div class="firma">
-                    <strong>Verificado por:</strong><br>
-                    Ing. Stephania Garcia<br>
-                    Ingeniero de Laboratorio y Calidad<br>
-                    Auditor ISO/IEC 17025:2017
-                </div>
                 <div class="pie">
                     Carrera 19A No. 150-50 - Bogotá D.C. | Teléfono: 9399167 - 3185586239
                 </div>
@@ -511,7 +508,7 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
-    // Agregar nuevo equipo con foto y observaciones
+    // Agregar nuevo equipo con foto, observaciones y registrado por
     document.getElementById("btnAgregarEquipo").onclick = async () => {
         const serial = prompt("Serial del equipo:");
         if(!serial) return;
@@ -520,6 +517,7 @@
         const modelo = prompt("Modelo:");
         const cliente = prompt("Cliente:");
         const observaciones = prompt("Observaciones / Accesorios (ej: maletín, cargador, conectores, estado físico):");
+        const registradoPor = prompt("Registrado por (técnico que ingresa los datos):", "Stephania Garcia");
         
         let foto = "";
         const agregarFoto = confirm("¿Desea agregar una foto del equipo?");
@@ -535,6 +533,7 @@
                     id: nuevoId, serial, equipo, marca, modelo, cliente, 
                     estado: "Pendiente diagnóstico", 
                     observaciones: observaciones || "",
+                    registradoPor: registradoPor || "Stephania Garcia",
                     foto: foto 
                 });
                 guardarDatos();
@@ -548,6 +547,7 @@
                 id: nuevoId, serial, equipo, marca, modelo, cliente, 
                 estado: "Pendiente diagnóstico", 
                 observaciones: observaciones || "",
+                registradoPor: registradoPor || "Stephania Garcia",
                 foto: "" 
             });
             guardarDatos();
@@ -586,8 +586,8 @@
         filtrados.sort((a, b) => b.id - a.id);
         if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</table>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
+        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
+        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}NzAQ73${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}NzAQ73${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}NzAQ73<button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
     function cargarInformesPorSerial(selectSerialId, selectInformeId) {
@@ -698,7 +698,7 @@
         informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
         
         if(!equipos.find(e => e.serial === serial)) {
-            equipos.push({ id: equipos.length+1, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", foto: "" });
+            equipos.push({ id: equipos.length+1, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Stephania Garcia", foto: "" });
         }
         
         document.getElementById("nuevoId").value = ""; document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = ""; document.getElementById("notaFinal").value = ""; document.getElementById("fotoEquipo").value = "";
@@ -792,7 +792,8 @@
             "CONSECUTIVO": `EQ-${eq.id}`,
             "SERIAL": eq.serial, "EQUIPO": eq.equipo, "MARCA": eq.marca, "MODELO": eq.modelo, 
             "CLIENTE": eq.cliente, "ESTADO": eq.estado || "Pendiente",
-            "ACCESORIOS_OBSERVACIONES": eq.observaciones || ""
+            "ACCESORIOS_OBSERVACIONES": eq.observaciones || "",
+            "REGISTRADO_POR": eq.registradoPor || ""
         }));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(informesExport), "INFORMES");
@@ -876,7 +877,7 @@
                 nuevos++;
                 
                 if(!equipos.find(e => e.serial === serial)) {
-                    equipos.push({ id: equipos.length+1, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", foto: "" });
+                    equipos.push({ id: equipos.length+1, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Importación automática", foto: "" });
                 }
             }
             if(maxId > 0 && maxId >= nextId) nextId = maxId + 1;
@@ -910,7 +911,7 @@
         const fechaActual = new Date().toLocaleDateString('es-CO');
         let fotoHtml = inf.foto ? `<div><strong>Foto:</strong><br><img src="${inf.foto}" style="max-width:100%; max-height:250px;"></div>` : '';
         let notaHtml = inf.notaFinal ? `<div><strong>Nota:</strong><br>${inf.notaFinal}</div>` : '';
-        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe ${inf.id}</title><style>body{font-family:Segoe UI;padding:40px;}.container{max-width:800px;margin:0 auto;}.header-logo{text-align:left;}.titulo{text-align:center;border-bottom:2px solid #0a2b4e;}.equipo-datos{background:#f5f5f5;padding:15px;margin:15px 0;}.firma{margin-top:30px;border-top:1px solid #ccc;}</style></head><body><div class="container"><div class="header-logo">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<h3>CI RENTELCOM SAS</h3>'}</div><div class="titulo"><h2>INFORME TÉCNICO DE LABORATORIO</h2></div><div><strong>Fecha:</strong> ${fechaActual}</div><div><strong>Reporte N°:</strong> ${inf.id}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="equipo-datos"><div><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Servicio:</strong> ${inf.tipo}</div></div><div><strong>Diagnóstico:</strong><br>${inf.diagnostico}</div><div><strong>Valores:</strong><br>${inf.valores || 'No especificado'}</div>${fotoHtml}${notaHtml}<div class="firma"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div class="pie">Carrera 19A No. 150-50 Bogotá D.C.</div></div></body></html>`;
+        const docHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe ${inf.id}</title><style>body{font-family:Segoe UI;padding:40px;}.container{max-width:800px;margin:0 auto;}.header-logo{text-align:left;}.titulo{text-align:center;border-bottom:2px solid #0a2b4e;}.equipo-datos{background:#f5f5f5;padding:15px;margin:15px 0;}.firma{margin-top:30px;border-top:1px solid #ccc;}</style></head><body><div class="container"><div class="header-logo">${logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : '<h3>CI RENTELCOM SAS</h3>'}</div><div class="titulo"><h2>INFORME TÉCNICO DE LABORATORIO</h2></div><div><strong>Fecha:</strong> ${fechaActual}</div><div><strong>Reporte N°:</strong> ${inf.id}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="equipo-datos"><div><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Servicio:</strong> ${inf.tipo}</div></div><div><strong>Diagnóstico:</strong><br>${inf.diagnostico}</div><div><strong>Valores:</strong><br>${inf.valores || 'No especificado'}</div>${fotoHtml}${notaHtml}<div class="firma"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Ingeniero de Laboratorio y Calidad<br>Auditor ISO/IEC 17025:2017</div><div class="pie">Carrera 19A No. 150-50 - Bogotá D.C. | Teléfono: 9399167 - 3185586239</div></div></body></html>`;
         const blob = new Blob([docHtml], { type: 'text/html' });
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
