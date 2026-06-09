@@ -73,8 +73,8 @@
         .badge-pendiente { background: #fef3c7; color: #d97706; }
         .badge-aprobado { background: #d1fae5; color: #059669; }
         
-        .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
-        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
+        .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
+        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; border: none; cursor: pointer; }
         .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--gray-border); }
         .logo-preview { max-width: 150px; max-height: 60px; margin-top: 5px; }
         .next-id-info { background: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; color: var(--primary); }
@@ -100,12 +100,8 @@
         .busqueda-serial .input-group { flex: 1; margin-bottom: 0; }
         .busqueda-serial button { margin-bottom: 0; height: 48px; }
         
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: white; border-radius: 20px; padding: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h3 { color: var(--primary); }
-        .close-modal { font-size: 24px; cursor: pointer; color: var(--text-gray); }
-        .close-modal:hover { color: var(--danger); }
+        .equipo-card { border: 1px solid var(--gray-border); border-radius: 16px; padding: 15px; margin-bottom: 15px; background: var(--white); }
+        .equipo-foto { max-width: 150px; max-height: 150px; border-radius: 8px; object-fit: cover; margin-top: 10px; }
     </style>
 </head>
 <body>
@@ -141,7 +137,9 @@
     <!-- INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card"><h3>Listado de informes técnicos <span id="filtroInfo" style="font-size:0.7rem;"></span></h3>
-            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead><tbody id="informesBody"></tbody></table>
+            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>Acciones</th></tr></thead>
+            <tbody id="informesBody"></tbody>
+        </table>
         </div>
     </div>
 
@@ -149,9 +147,8 @@
     <div id="nuevo" class="tab-pane">
         <div class="form-card">
             <h3>Registrar nuevo informe</h3>
-            <div class="next-id-info">Próximo número disponible: <span id="nextIdDisplay">100</span></div>
             <div class="form-grid">
-                <div class="input-group"><label>Número de informe</label><input type="number" id="nuevoId" placeholder="Automático"></div>
+                <div class="input-group"><label>Número de informe</label><input type="number" id="nuevoId" placeholder="Ej: 447"></div>
                 <div class="input-group"><label>Fecha</label><input type="date" id="fecha"></div>
                 <div class="input-group"><label>Serial</label><input id="serial" placeholder="Ej: AA432002010275"></div>
                 <div class="input-group"><label>Marca</label><input id="marca" placeholder="ILSINTECH"></div>
@@ -184,9 +181,9 @@
             <button id="btnCargarEditar" class="btn-outline">Cargar datos</button>
             <div id="formEditar" style="display:none; margin-top:20px;">
                 <div class="form-grid">
-                    <div class="input-group"><label>Número</label><input type="number" id="editId" readonly></div>
+                    <div class="input-group"><label>Número</label><input type="number" id="editId"></div>
                     <div class="input-group"><label>Fecha</label><input type="date" id="editFecha"></div>
-                    <div class="input-group"><label>Serial</label><input id="editSerial" readonly></div>
+                    <div class="input-group"><label>Serial</label><input id="editSerial"></div>
                     <div class="input-group"><label>Marca</label><input id="editMarca"></div>
                     <div class="input-group"><label>Modelo</label><input id="editModelo"></div>
                     <div class="input-group"><label>Cliente</label><input id="editCliente"></div>
@@ -222,51 +219,12 @@
         </div>
     </div>
 
-    <!-- EQUIPOS - TABLA COMO INFORMES -->
+    <!-- EQUIPOS -->
     <div id="equipos" class="tab-pane">
-        <div class="table-card">
+        <div class="form-card">
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Agregar equipo</button>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Consecutivo</th>
-                        <th>Serial</th>
-                        <th>Equipo</th>
-                        <th>Marca</th>
-                        <th>Modelo</th>
-                        <th>Cliente</th>
-                        <th>Estado</th>
-                        <th>Registrado por</th>
-                        <th>Foto</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="equiposBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Modal Editar Equipo -->
-    <div id="modalEditarEquipo" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>✏️ Editar equipo</h3>
-                <span class="close-modal" onclick="cerrarModalEquipo()">&times;</span>
-            </div>
-            <div class="form-grid">
-                <div class="input-group"><label>Consecutivo</label><input type="text" id="editEqConsecutivo" readonly></div>
-                <div class="input-group"><label>Serial</label><input id="editEqSerial" readonly></div>
-                <div class="input-group"><label>Tipo de equipo</label><input id="editEqEquipo"></div>
-                <div class="input-group"><label>Marca</label><input id="editEqMarca"></div>
-                <div class="input-group"><label>Modelo</label><input id="editEqModelo"></div>
-                <div class="input-group"><label>Cliente</label><input id="editEqCliente"></div>
-                <div class="input-group"><label>Estado</label><select id="editEqEstado"><option>Pendiente diagnóstico</option><option>En taller</option><option>Diagnóstico</option><option>Entregado</option></select></div>
-                <div class="input-group"><label>Registrado por</label><input id="editEqRegistradoPor"></div>
-                <div class="input-group"><label>Observaciones / Accesorios</label><textarea id="editEqObservaciones" rows="2"></textarea></div>
-                <div class="input-group"><label>Foto del equipo</label><input type="file" id="editEqFoto" accept="image/*"></div>
-            </div>
-            <button id="btnGuardarEdicionEquipo" style="margin-top:15px; width:100%;">💾 Guardar cambios</button>
+            <div id="listaEquipos"></div>
         </div>
     </div>
 
@@ -348,7 +306,6 @@
 
 <script>
     let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "", filtroActual = "todos";
-    let equipoEditandoIdx = null;
 
     function guardarDatos() {
         localStorage.setItem("calibpro_equipos", JSON.stringify(equipos));
@@ -374,14 +331,18 @@
 
     function cargarDatosEjemplo() {
         equipos = [
-            { id: 1, serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller", foto: "", observaciones: "Equipo con golpes en la carcasa, viene con maletín de transporte.", registradoPor: "Stephania Garcia" },
-            { id: 2, serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "Equipo completo: cargador, batería adicional.", registradoPor: "Stephania Garcia" }
+            { consecutivo: "EQ-001", serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller", foto: "", observaciones: "Equipo con golpes en la carcasa", registradoPor: "Stephania Garcia" },
+            { consecutivo: "EQ-002", serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "", registradoPor: "Stephania Garcia" },
+            { consecutivo: "EQ-003", serial: "45970", equipo: "OTDR", marca: "VIAVI", modelo: "SMART OTDR", cliente: "CONECTAR TV SAS", estado: "Pendiente", foto: "", observaciones: "", registradoPor: "Stephania Garcia" }
         ];
+        
         informes = [
             { id: 447, fecha: "2023-11-23", serial: "AA432002010275", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", tipo: "Reparación", diagnostico: "DAÑO MECANISMO DE AJUSTE DE FOCO", valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" },
-            { id: 448, fecha: "2023-11-23", serial: "TF3C02PA010869", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", tipo: "Calibración", diagnostico: "REPOTENCIACION DE BATERIA", valores: "", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-11-25", obsCliente: "Cliente autorizó" }
+            { id: 448, fecha: "2023-11-23", serial: "TF3C02PA010869", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", tipo: "Calibración", diagnostico: "REPOTENCIACION DE BATERIA", valores: "", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-11-25", obsCliente: "Cliente autorizó" },
+            { id: 452, fecha: "2023-12-01", serial: "45970", marca: "VIAVI", modelo: "SMART OTDR", cliente: "CONECTAR TV SAS", tipo: "Calibración", diagnostico: "CAMBIO DE PIGTAIL 1310-1550", valores: "$220.000 + IVA", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "", obsCliente: "" }
         ];
-        nextId = 449;
+        
+        nextId = 453;
         guardarDatos();
         renderAll();
         mostrarMensaje("✅ Datos de ejemplo cargados correctamente");
@@ -413,84 +374,94 @@
         return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
     }
 
-    // ==================== RENDERIZAR EQUIPOS EN TABLA ====================
     function renderEquipos() {
-        const tbody = document.getElementById("equiposBody");
+        const container = document.getElementById("listaEquipos");
         if(equipos.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10">No hay equipos registrados</td>' + '</tr>';
+            container.innerHTML = '<p style="text-align:center; color:var(--text-gray);">No hay equipos registrados</p>';
             return;
         }
         
-        tbody.innerHTML = equipos.map((eq, idx) => `
-            <tr>
-                <td>EQ-${eq.id || idx+1}</td>
-                <td class="serial-link" onclick="buscarPorSerial('${eq.serial}')">${eq.serial}</td>
-                <td>${eq.equipo}</td>
-                <td>${eq.marca}</td>
-                <td>${eq.modelo}</td>
-                <td>${eq.cliente}</td>
-                <td><span class="status-badge">${eq.estado || "Pendiente"}</span></td>
-                <td>${eq.registradoPor || "No especificado"}</td>
-                <td>${eq.foto ? '<img src="'+eq.foto+'" class="foto-miniatura">' : '—'}</td>
-                <td>
-                    <button class="edit-btn" onclick="abrirModalEditarEquipo(${idx})">✏️ Editar</button>
-                    <button class="pdf-btn" onclick="generarPDFEquipo(${idx})" style="background:#10b981;">📄 PDF</button>
-                </td>
-            </tr>
+        container.innerHTML = equipos.map((eq, idx) => `
+            <div class="equipo-card">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                    <div style="flex: 2;">
+                        <div><strong style="font-size:1.1rem;">📟 ${eq.equipo} ${eq.marca} ${eq.modelo}</strong></div>
+                        <div><strong>🔢 Consecutivo:</strong> <input type="text" value="${eq.consecutivo || 'EQ-'+(idx+1)}" class="edit-consecutivo" data-idx="${idx}" style="width:100px; padding:4px; border-radius:8px; border:1px solid var(--gray-border);"></div>
+                        <div><strong>🔧 Serial:</strong> ${eq.serial}</div>
+                        <div><strong>🏢 Cliente:</strong> ${eq.cliente}</div>
+                        <div><strong>📍 Estado:</strong> <span class="status-badge">${eq.estado || "Pendiente"}</span></div>
+                        <div><strong>📝 Accesorios / Observaciones:</strong><br>${eq.observaciones || "Ninguna"}</div>
+                        <div><strong>👤 Registrado por:</strong> ${eq.registradoPor || "No especificado"}</div>
+                    </div>
+                    <div style="flex: 1; text-align: center;">
+                        ${eq.foto ? `<img src="${eq.foto}" class="equipo-foto"><br>` : '<div style="width:150px; height:100px; background:#f0f0f0; display:flex; align-items:center; justify-content:center; border-radius:8px;">Sin foto</div>'}
+                        <div style="margin-top: 10px;">
+                            <button class="edit-btn" onclick="editarEquipo(${idx})">✏️ Editar</button>
+                            <button class="pdf-btn" onclick="generarPDFEquipo(${idx})" style="background:#10b981;">📄 PDF Equipo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `).join('');
-    }
-
-    // Abrir modal editar equipo
-    window.abrirModalEditarEquipo = (idx) => {
-        equipoEditandoIdx = idx;
-        const eq = equipos[idx];
-        document.getElementById("editEqConsecutivo").value = `EQ-${eq.id || idx+1}`;
-        document.getElementById("editEqSerial").value = eq.serial;
-        document.getElementById("editEqEquipo").value = eq.equipo;
-        document.getElementById("editEqMarca").value = eq.marca;
-        document.getElementById("editEqModelo").value = eq.modelo;
-        document.getElementById("editEqCliente").value = eq.cliente;
-        document.getElementById("editEqEstado").value = eq.estado || "Pendiente diagnóstico";
-        document.getElementById("editEqRegistradoPor").value = eq.registradoPor || "Stephania Garcia";
-        document.getElementById("editEqObservaciones").value = eq.observaciones || "";
-        document.getElementById("modalEditarEquipo").style.display = "flex";
-    };
-
-    function cerrarModalEquipo() {
-        document.getElementById("modalEditarEquipo").style.display = "none";
-        equipoEditandoIdx = null;
-    }
-
-    document.getElementById("btnGuardarEdicionEquipo").onclick = async () => {
-        if(equipoEditandoIdx === null) return;
-        const eq = equipos[equipoEditandoIdx];
         
-        eq.equipo = document.getElementById("editEqEquipo").value;
-        eq.marca = document.getElementById("editEqMarca").value;
-        eq.modelo = document.getElementById("editEqModelo").value;
-        eq.cliente = document.getElementById("editEqCliente").value;
-        eq.estado = document.getElementById("editEqEstado").value;
-        eq.registradoPor = document.getElementById("editEqRegistradoPor").value;
-        eq.observaciones = document.getElementById("editEqObservaciones").value;
-        
-        const fotoFile = document.getElementById("editEqFoto").files[0];
-        if(fotoFile) {
-            eq.foto = await fileToBase64(fotoFile);
+        document.querySelectorAll('.edit-consecutivo').forEach(input => {
+            input.removeEventListener('change', guardarConsecutivo);
+            input.addEventListener('change', guardarConsecutivo);
+        });
+    }
+    
+    function guardarConsecutivo(e) {
+        const idx = e.target.dataset.idx;
+        const nuevoConsecutivo = e.target.value;
+        if(equipos[idx]) {
+            equipos[idx].consecutivo = nuevoConsecutivo;
+            guardarDatos();
+            mostrarMensaje("✅ Consecutivo actualizado");
         }
+    }
+
+    window.editarEquipo = async (idx) => {
+        const eq = equipos[idx];
+        const nuevoEquipo = prompt("Tipo de equipo:", eq.equipo);
+        const nuevaMarca = prompt("Marca:", eq.marca);
+        const nuevoModelo = prompt("Modelo:", eq.modelo);
+        const nuevoCliente = prompt("Cliente:", eq.cliente);
+        const nuevoEstado = prompt("Estado:", eq.estado);
+        const nuevasObs = prompt("Observaciones / Accesorios:", eq.observaciones || "");
+        const nuevoRegistrado = prompt("Registrado por:", eq.registradoPor || "Stephania Garcia");
         
-        guardarDatos();
-        renderAll();
-        cerrarModalEquipo();
-        mostrarMensaje("✅ Equipo actualizado");
+        if(nuevoEquipo) eq.equipo = nuevoEquipo;
+        if(nuevaMarca) eq.marca = nuevaMarca;
+        if(nuevoModelo) eq.modelo = nuevoModelo;
+        if(nuevoCliente) eq.cliente = nuevoCliente;
+        if(nuevoEstado) eq.estado = nuevoEstado;
+        if(nuevasObs !== null) eq.observaciones = nuevasObs;
+        if(nuevoRegistrado) eq.registradoPor = nuevoRegistrado;
+        
+        const cambiarFoto = confirm("¿Desea cambiar la foto del equipo?");
+        if(cambiarFoto) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if(file) eq.foto = await fileToBase64(file);
+                renderAll();
+                mostrarMensaje("Equipo actualizado");
+            };
+            input.click();
+        } else {
+            renderAll();
+            mostrarMensaje("Equipo actualizado");
+        }
     };
 
-    // Generar PDF del equipo
     window.generarPDFEquipo = (idx) => {
         const eq = equipos[idx];
         if(!eq) return;
         
         const fechaActual = new Date().toLocaleDateString('es-CO');
-        const consecutivo = `EQ-${eq.id || idx+1}`;
+        const consecutivo = eq.consecutivo || `EQ-${idx+1}`;
         
         const docHtml = `<!DOCTYPE html>
         <html>
@@ -545,16 +516,17 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
-    // Agregar nuevo equipo
     document.getElementById("btnAgregarEquipo").onclick = async () => {
+        const consecutivo = prompt("Consecutivo del equipo (ej: EQ-001):");
+        if(!consecutivo) return;
         const serial = prompt("Serial del equipo:");
         if(!serial) return;
-        const equipo = prompt("Tipo de equipo (OTDR/Empalmadora/etc):");
+        const equipo = prompt("Tipo de equipo:");
         const marca = prompt("Marca:");
         const modelo = prompt("Modelo:");
         const cliente = prompt("Cliente:");
         const observaciones = prompt("Observaciones / Accesorios:");
-        const registradoPor = prompt("Registrado por (técnico):", "Stephania Garcia");
+        const registradoPor = prompt("Registrado por:", "Stephania Garcia");
         
         let foto = "";
         const agregarFoto = confirm("¿Desea agregar una foto del equipo?");
@@ -565,17 +537,13 @@
             input.onchange = async (e) => {
                 const file = e.target.files[0];
                 if(file) foto = await fileToBase64(file);
-                const nuevoId = equipos.length + 1;
-                equipos.push({ id: nuevoId, serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: observaciones || "", registradoPor: registradoPor || "Stephania Garcia", foto: foto });
-                guardarDatos();
+                equipos.push({ consecutivo, serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: observaciones || "", registradoPor: registradoPor || "Stephania Garcia", foto: foto });
                 renderAll();
                 mostrarMensaje(`✅ Equipo ${serial} agregado`);
             };
             input.click();
         } else {
-            const nuevoId = equipos.length + 1;
-            equipos.push({ id: nuevoId, serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: observaciones || "", registradoPor: registradoPor || "Stephania Garcia", foto: "" });
-            guardarDatos();
+            equipos.push({ consecutivo, serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: observaciones || "", registradoPor: registradoPor || "Stephania Garcia", foto: "" });
             renderAll();
             mostrarMensaje(`✅ Equipo ${serial} agregado`);
         }
@@ -588,7 +556,33 @@
         document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
         document.getElementById("nextIdDisplay").innerText = nextId;
         
-        renderInformesConFiltro();
+        // Renderizar informes correctamente
+        const tbody = document.getElementById("informesBody");
+        let filtrados = [...informes];
+        filtrados.sort((a, b) => b.id - a.id);
+        if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
+        if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
+        
+        if(filtrados.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td></tr>';
+        } else {
+            tbody.innerHTML = filtrados.map(i => {
+                const estadoClass = i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente';
+                return `
+                    <tr>
+                        <td style="font-weight:bold;">${i.id}</td>
+                        <td>${i.fecha}</td>
+                        <td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td>
+                        <td>${i.cliente}</td>
+                        <td>${i.tipo}</td>
+                        <td><span class="status-badge ${estadoClass}">${i.estado}</span></td>
+                        <td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}</td>
+                        <td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
         renderEquipos();
         
         const seriales = equipos.map(e => e.serial).sort();
@@ -602,16 +596,6 @@
         if(selectAprobacionSerial) selectAprobacionSerial.innerHTML = options;
         
         guardarDatos();
-    }
-
-    function renderInformesConFiltro() {
-        const tbody = document.getElementById("informesBody");
-        let filtrados = [...informes];
-        filtrados.sort((a, b) => b.id - a.id);
-        if(filtroActual === 'pendientes') filtrados = filtrados.filter(i => i.estado === 'Pendiente');
-        if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
-        if(filtrados.length === 0) { tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>'; return; }
-        tbody.innerHTML = filtrados.map(i => `<tr><td style="font-weight:bold;">${i.id}</td><td>${i.fecha}</td><td class="serial-link" onclick="buscarPorSerial('${i.serial}')">${i.serial}</td><td>${i.cliente}NzAQ73${i.tipo}</td><td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}NzAQ73${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : '—'}NzAQ73<button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>`).join('');
     }
 
     function cargarInformesPorSerial(selectSerialId, selectInformeId) {
@@ -701,9 +685,9 @@
     // GUARDAR NUEVO INFORME
     document.getElementById("btnGuardar").onclick = async () => {
         let id = parseInt(document.getElementById("nuevoId").value);
-        if(isNaN(id)) id = nextId++;
-        else if(informes.find(i => i.id === id)) { alert("Ese número ya existe"); return; }
-        else if(id >= nextId) nextId = id + 1;
+        if(isNaN(id)) { alert("Ingrese un número de informe válido"); return; }
+        if(informes.find(i => i.id === id)) { alert("Ese número de informe ya existe"); return; }
+        if(id >= nextId) nextId = id + 1;
         
         const fecha = document.getElementById("fecha").value || new Date().toISOString().slice(0,10);
         const serial = document.getElementById("serial").value.trim();
@@ -717,12 +701,12 @@
         const file = document.getElementById("fotoEquipo").files[0];
         let foto = file ? await fileToBase64(file) : "";
         
-        if(!serial || !cliente || !diagnostico) { alert("Complete campos"); return; }
+        if(!serial || !cliente || !diagnostico) { alert("Complete campos obligatorios"); return; }
         
         informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
         
         if(!equipos.find(e => e.serial === serial)) {
-            equipos.push({ id: equipos.length+1, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Importación automática", foto: "" });
+            equipos.push({ consecutivo: `EQ-${equipos.length+1}`, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Importación automática", foto: "" });
         }
         
         document.getElementById("nuevoId").value = ""; document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = ""; document.getElementById("notaFinal").value = ""; document.getElementById("fotoEquipo").value = "";
@@ -758,7 +742,9 @@
         const id = parseInt(document.getElementById("editId").value);
         const inf = informes.find(i => i.id === id);
         if(inf) {
+            inf.id = parseInt(document.getElementById("editId").value);
             inf.fecha = document.getElementById("editFecha").value;
+            inf.serial = document.getElementById("editSerial").value;
             inf.marca = document.getElementById("editMarca").value;
             inf.modelo = document.getElementById("editModelo").value;
             inf.cliente = document.getElementById("editCliente").value;
@@ -770,6 +756,7 @@
             if(newFoto) inf.foto = await fileToBase64(newFoto);
             const equipo = equipos.find(e => e.serial === inf.serial);
             if(equipo) { equipo.marca = inf.marca; equipo.modelo = inf.modelo; equipo.cliente = inf.cliente; }
+            if(inf.id >= nextId) nextId = inf.id + 1;
             renderAll();
             mostrarMensaje(`✅ Informe #${id} actualizado`);
             document.getElementById("formEditar").style.display = "none";
@@ -813,7 +800,7 @@
             "ESTADO_COMERCIAL": inf.estado, "FECHA_ENVIO_CLIENTE": inf.fechaEnvio || "", "OBSERVACIONES_CLIENTE": inf.obsCliente || ""
         }));
         const equiposExport = equipos.map(eq => ({
-            "CONSECUTIVO": `EQ-${eq.id}`,
+            "CONSECUTIVO": eq.consecutivo,
             "SERIAL": eq.serial, "EQUIPO": eq.equipo, "MARCA": eq.marca, "MODELO": eq.modelo, 
             "CLIENTE": eq.cliente, "ESTADO": eq.estado || "Pendiente",
             "ACCESORIOS_OBSERVACIONES": eq.observaciones || "",
@@ -901,7 +888,7 @@
                 nuevos++;
                 
                 if(!equipos.find(e => e.serial === serial)) {
-                    equipos.push({ id: equipos.length+1, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Importación automática", foto: "" });
+                    equipos.push({ consecutivo: `EQ-${equipos.length+1}`, serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico", observaciones: "", registradoPor: "Importación automática", foto: "" });
                 }
             }
             if(maxId > 0 && maxId >= nextId) nextId = maxId + 1;
@@ -942,21 +929,15 @@
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
 
-    // Cerrar modal al hacer clic fuera
-    window.onclick = function(event) {
-        const modal = document.getElementById("modalEditarEquipo");
-        if (event.target === modal) cerrarModalEquipo();
-    };
-
     // DASHBOARD CLICKEABLE
     function activarDashboardClick() {
         document.querySelectorAll('.card').forEach(card => {
             card.addEventListener('click', () => {
                 const accion = card.getAttribute('data-accion');
                 if(accion === 'equipos') { document.querySelector('.tab-btn[data-tab="equipos"]').click(); }
-                else if(accion === 'informes-todos') { filtroActual = 'todos'; document.getElementById('filtroInfo').innerHTML = ''; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderInformesConFiltro(); }
-                else if(accion === 'informes-pendientes') { filtroActual = 'pendientes'; document.getElementById('filtroInfo').innerHTML = '<span class="filtro-activo">📌 Mostrando solo pendientes</span>'; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderInformesConFiltro(); }
-                else if(accion === 'informes-aprobados') { filtroActual = 'aprobados'; document.getElementById('filtroInfo').innerHTML = '<span class="filtro-activo">✅ Mostrando solo aprobados</span>'; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderInformesConFiltro(); }
+                else if(accion === 'informes-todos') { filtroActual = 'todos'; document.getElementById('filtroInfo').innerHTML = ''; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderAll(); }
+                else if(accion === 'informes-pendientes') { filtroActual = 'pendientes'; document.getElementById('filtroInfo').innerHTML = '<span class="filtro-activo">📌 Mostrando solo pendientes</span>'; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderAll(); }
+                else if(accion === 'informes-aprobados') { filtroActual = 'aprobados'; document.getElementById('filtroInfo').innerHTML = '<span class="filtro-activo">✅ Mostrando solo aprobados</span>'; document.querySelector('.tab-btn[data-tab="informes"]').click(); renderAll(); }
             });
         });
     }
@@ -967,7 +948,7 @@
         btn.classList.add("active");
         document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active-pane"));
         document.getElementById(btn.dataset.tab).classList.add("active-pane");
-        if(btn.dataset.tab === "informes") renderInformesConFiltro();
+        if(btn.dataset.tab === "informes") renderAll();
     }));
 
     document.getElementById("btnCargarEjemplo").onclick = cargarDatosEjemplo;
