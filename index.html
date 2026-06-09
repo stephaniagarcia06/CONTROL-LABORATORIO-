@@ -73,8 +73,8 @@
         .badge-pendiente { background: #fef3c7; color: #d97706; }
         .badge-aprobado { background: #d1fae5; color: #059669; }
         
-        .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
-        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; border: none; cursor: pointer; }
+        .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; }
+        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; color: white; }
         .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid var(--gray-border); }
         .logo-preview { max-width: 150px; max-height: 60px; margin-top: 5px; }
         .next-id-info { background: var(--secondary); padding: 8px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; display: inline-block; margin-bottom: 20px; color: var(--primary); }
@@ -332,17 +332,15 @@
     function cargarDatosEjemplo() {
         equipos = [
             { consecutivo: "EQ-001", serial: "AA432002010275", equipo: "Empalmadora", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", estado: "En taller", foto: "", observaciones: "Equipo con golpes en la carcasa", registradoPor: "Stephania Garcia" },
-            { consecutivo: "EQ-002", serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "", registradoPor: "Stephania Garcia" },
-            { consecutivo: "EQ-003", serial: "45970", equipo: "OTDR", marca: "VIAVI", modelo: "SMART OTDR", cliente: "CONECTAR TV SAS", estado: "Pendiente", foto: "", observaciones: "", registradoPor: "Stephania Garcia" }
+            { consecutivo: "EQ-002", serial: "TF3C02PA010869", equipo: "OTDR", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", estado: "Diagnóstico", foto: "", observaciones: "", registradoPor: "Stephania Garcia" }
         ];
         
         informes = [
             { id: 447, fecha: "2023-11-23", serial: "AA432002010275", marca: "ILSINTECH", modelo: "KF4", cliente: "CONECTAR TV SAS", tipo: "Reparación", diagnostico: "DAÑO MECANISMO DE AJUSTE DE FOCO", valores: "", notaFinal: "", foto: "", estado: "Pendiente", fechaEnvio: "", obsCliente: "" },
-            { id: 448, fecha: "2023-11-23", serial: "TF3C02PA010869", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", tipo: "Calibración", diagnostico: "REPOTENCIACION DE BATERIA", valores: "", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-11-25", obsCliente: "Cliente autorizó" },
-            { id: 452, fecha: "2023-12-01", serial: "45970", marca: "VIAVI", modelo: "SMART OTDR", cliente: "CONECTAR TV SAS", tipo: "Calibración", diagnostico: "CAMBIO DE PIGTAIL 1310-1550", valores: "$220.000 + IVA", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "", obsCliente: "" }
+            { id: 448, fecha: "2023-11-23", serial: "TF3C02PA010869", marca: "VEEX", modelo: "VEPAL FX-300", cliente: "ACT TELEMATICA", tipo: "Calibración", diagnostico: "REPOTENCIACION DE BATERIA", valores: "", notaFinal: "", foto: "", estado: "Aprobado", fechaEnvio: "2023-11-25", obsCliente: "Cliente autorizó" }
         ];
         
-        nextId = 453;
+        nextId = 449;
         guardarDatos();
         renderAll();
         mostrarMensaje("✅ Datos de ejemplo cargados correctamente");
@@ -374,6 +372,7 @@
         return new Promise((resolve) => { const reader = new FileReader(); reader.readAsDataURL(file); reader.onload = () => resolve(reader.result); });
     }
 
+    // Renderizar equipos (tarjetas)
     function renderEquipos() {
         const container = document.getElementById("listaEquipos");
         if(equipos.length === 0) {
@@ -556,7 +555,7 @@
         document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
         document.getElementById("nextIdDisplay").innerText = nextId;
         
-        // Renderizar informes correctamente
+        // Tabla de informes
         const tbody = document.getElementById("informesBody");
         let filtrados = [...informes];
         filtrados.sort((a, b) => b.id - a.id);
@@ -564,7 +563,7 @@
         if(filtroActual === 'aprobados') filtrados = filtrados.filter(i => i.estado === 'Aprobado');
         
         if(filtrados.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8">No hay informes registrados</td>' + '</tr>';
         } else {
             tbody.innerHTML = filtrados.map(i => {
                 const estadoClass = i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente';
