@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalibPro - Gestión de Calibraciones</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: #1e293b; }
@@ -248,7 +247,7 @@
         if(selEditar) selEditar.innerHTML = options;
         
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">Sin equipos</td></tr>';
+        if(equipos.length === 0) eb.innerHTML = '<td><td colspan="7">Sin equipos</td></tr>';
         else eb.innerHTML = equipos.map((e, idx) => `
             <tr>
                 <td>${e.serial}</td>
@@ -369,7 +368,7 @@
         } else alert("Seleccione un informe");
     };
 
-    // ==================== PDF FUNCIONAL ====================
+    // ==================== PDF FUNCIONAL CON WINDOW.PRINT ====================
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
@@ -380,55 +379,57 @@
         let notaHtml = inf.notaFinal ? `<div style="margin:15px 0;"><strong>📝 Nota final / Recomendaciones:</strong><br>${inf.notaFinal.replace(/\n/g,'<br>')}</div>` : '';
         
         const pdfHtml = `
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; background: white;">
-                ${logoHtml}
-                <div style="text-align: right; margin-bottom: 20px;">${fechaActual}</div>
-                <div><strong>Señores:</strong> ${inf.cliente}</div>
-                <div><strong>Reporte Técnico N° ${inf.id}</strong></div>
-                <div style="margin: 15px 0;"><strong>Observación inicial.</strong> Se recibe ${inf.marca} ${inf.modelo} con serie ${inf.serial}, se solicita ${inf.tipo.toLowerCase()}.</div>
-                <div style="margin: 15px 0;"><strong>Diagnóstico</strong><br>${inf.diagnostico.replace(/\n/g,'<br>')}</div>
-                <div style="margin: 15px 0;"><strong>Valores</strong><br>${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div>
-                ${fotoHtml}
-                ${notaHtml}
-                <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 15px;">
-                    <strong>Verificado por:</strong><br>
-                    Ing. Stephania Garcia<br>
-                    Ing. De Laboratorio y Calidad<br>
-                    Auditor ISO/IEC 17025:2017
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Informe ${inf.id}</title>
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; margin: 0; }
+                    .container { max-width: 800px; margin: 0 auto; background: white; }
+                    .text-right { text-align: right; margin-bottom: 20px; }
+                    .mt-15 { margin-top: 15px; margin-bottom: 15px; }
+                    .mt-40 { margin-top: 40px; }
+                    .border-top { border-top: 1px solid #ccc; padding-top: 15px; }
+                    .text-center { text-align: center; }
+                    .small { font-size: 10px; color: #666; }
+                    img { max-width: 100%; max-height: 250px; border-radius: 8px; }
+                    .logo { max-height: 70px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    ${logoHtml}
+                    <div class="text-right">${fechaActual}</div>
+                    <div><strong>Señores:</strong> ${inf.cliente}</div>
+                    <div><strong>Reporte Técnico N° ${inf.id}</strong></div>
+                    <div class="mt-15"><strong>Observación inicial.</strong> Se recibe ${inf.marca} ${inf.modelo} con serie ${inf.serial}, se solicita ${inf.tipo.toLowerCase()}.</div>
+                    <div class="mt-15"><strong>Diagnóstico</strong><br>${inf.diagnostico.replace(/\n/g,'<br>')}</div>
+                    <div class="mt-15"><strong>Valores</strong><br>${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div>
+                    ${fotoHtml}
+                    ${notaHtml}
+                    <div class="mt-40 border-top">
+                        <strong>Verificado por:</strong><br>
+                        Ing. Stephania Garcia<br>
+                        Ing. De Laboratorio y Calidad<br>
+                        Auditor ISO/IEC 17025:2017
+                    </div>
+                    <div class="text-center small mt-15">
+                        CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239
+                    </div>
                 </div>
-                <div style="margin-top: 20px; font-size: 10px; text-align: center; color: #666;">
-                    CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239
-                </div>
-            </div>
+                <script>
+                    window.onload = function() {
+                        window.print();
+                    };
+                <\/script>
+            </body>
+            </html>
         `;
         
-        const element = document.createElement('div');
-        element.style.position = 'absolute';
-        element.style.left = '-9999px';
-        element.style.top = '0';
-        element.style.backgroundColor = 'white';
-        element.style.padding = '20px';
-        element.innerHTML = pdfHtml;
-        document.body.appendChild(element);
-        
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        const opt = {
-            margin: [0.5, 0.5, 0.5, 0.5],
-            filename: `INFORME_${inf.id}_${inf.serial}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, logging: false, useCORS: true },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-        
-        try {
-            await html2pdf().set(opt).from(element).save();
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Error al generar PDF. Intenta de nuevo.");
-        }
-        
-        document.body.removeChild(element);
+        const ventana = window.open('', '_blank');
+        ventana.document.write(pdfHtml);
+        ventana.document.close();
     };
 
     // ==================== AGREGAR EQUIPO ====================
