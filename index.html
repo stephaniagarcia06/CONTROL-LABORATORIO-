@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalibPro - Gestión de Calibraciones</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Librerías más confiables para PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px 20px; color: #1e293b; }
@@ -35,6 +37,25 @@
         .badge-pendiente { background: #fff3e0; color: #e67e22; }
         .badge-aprobado { background: #e6f7e6; color: #2e7d32; }
         .pdf-btn { background: #dc2626; margin-left: 8px; padding: 6px 14px; font-size: 0.75rem; }
+        
+        /* Estilos para el PDF (se usan solo al generar) */
+        .pdf-container {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+        }
+        .pdf-container h2 { color: #1e40af; margin-bottom: 10px; }
+        .pdf-header { text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 25px; }
+        .pdf-fecha { text-align: right; margin-bottom: 20px; }
+        .pdf-destinatario { margin-bottom: 15px; }
+        .pdf-reporte { margin-bottom: 20px; font-weight: bold; }
+        .pdf-diagnostico { margin-bottom: 20px; }
+        .pdf-diagnostico p { margin: 5px 0; }
+        .pdf-valores { margin-bottom: 25px; }
+        .pdf-firma { margin-top: 40px; border-top: 1px solid #ccc; padding-top: 15px; }
+        .pdf-pie { margin-top: 25px; font-size: 10px; text-align: center; color: #666; }
     </style>
 </head>
 <body>
@@ -61,8 +82,7 @@
     <!-- LISTA DE INFORMES -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card">
-            <table>
-                <thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>PDF</th></tr></thead>
+            <table><thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>PDF</th></tr></thead>
                 <tbody id="informesBody"></tbody>
             </table>
         </div>
@@ -136,8 +156,8 @@
         sel.innerHTML = '<option value="">Seleccionar</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
         
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="5">Sin equipos</tr>';
-        else eb.innerHTML = equipos.map(e => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td></tr>`).join('');
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="5">Sin equipos</td></tr>';
+        else eb.innerHTML = equipos.map(e => `<td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td></tr>`).join('');
     }
 
     document.getElementById("btnGuardar").onclick = () => {
@@ -184,87 +204,96 @@
         }
     };
 
-    // GENERAR PDF - FORMATO EXACTO COMO EL QUE COMPARTISTE
+    // GENERAR PDF CON JSPDF + HTML2CANVAS (MÁS CONFIABLE)
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
         
         const fechaActual = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
         
-        const pdfHtml = `
-            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto;">
-                <div style="text-align: center; border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 25px;">
-                    <h2 style="color: #1e40af; margin: 0;">INFORME GENERAL</h2>
-                    <p style="margin: 5px 0 0;">CI RENTELCOM SAS - Laboratorio de Calibración</p>
-                </div>
-                
-                <div style="text-align: right; margin-bottom: 20px;">
-                    <p style="margin: 0;">${fechaActual}</p>
-                </div>
-                
-                <div style="margin-bottom: 15px;">
-                    <p style="margin: 0;"><strong>Señores:</strong> ${inf.cliente}</p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <p style="margin: 0;"><strong>Reporte Técnico N° ${inf.id}</strong></p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <p style="margin: 0;"><strong>Revisión de entrada.</strong> Se recibe ${inf.marca} ${inf.modelo} con serie ${inf.serial}, se solicita ${inf.tipo.toLowerCase()}.</p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <p style="margin: 0 0 5px 0;"><strong>Diagnóstico</strong></p>
-                    <p style="margin: 0;">${inf.diagnostico.replace(/\n/g, '<br>')}</p>
-                </div>
-                
-                <div style="margin-bottom: 25px;">
-                    <p style="margin: 0 0 5px 0;"><strong>Valores</strong></p>
-                    <p style="margin: 0;">${inf.valores ? inf.valores.replace(/\n/g, '<br>') : 'No especificado'}</p>
-                </div>
-                
-                <div style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 15px;">
-                    <p style="margin: 0;"><strong>Verificado por:</strong></p>
-                    <p style="margin: 0;">Ing. Stephania Garcia</p>
-                    <p style="margin: 0;">Ing. De Laboratorio y Calidad</p>
-                    <p style="margin: 0;">Auditor ISO/IEC 17025:2017</p>
-                </div>
-                
-                <div style="margin-top: 25px; font-size: 10px; text-align: center; color: #666;">
-                    <p style="margin: 0;">CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239</p>
-                </div>
+        // Crear el HTML del PDF
+        const pdfContent = document.createElement('div');
+        pdfContent.className = 'pdf-container';
+        pdfContent.style.position = 'absolute';
+        pdfContent.style.left = '-9999px';
+        pdfContent.style.top = '0';
+        pdfContent.style.backgroundColor = 'white';
+        pdfContent.style.width = '800px';
+        pdfContent.style.padding = '40px';
+        
+        pdfContent.innerHTML = `
+            <div class="pdf-header">
+                <h2>INFORME GENERAL</h2>
+                <p>CI RENTELCOM SAS - Laboratorio de Calibración</p>
+            </div>
+            <div class="pdf-fecha">${fechaActual}</div>
+            <div class="pdf-destinatario"><strong>Señores:</strong> ${inf.cliente}</div>
+            <div class="pdf-reporte">Reporte Técnico N° ${inf.id}</div>
+            <div class="pdf-diagnostico">
+                <strong>Revisión de entrada.</strong> Se recibe ${inf.marca} ${inf.modelo} con serie ${inf.serial}, se solicita ${inf.tipo.toLowerCase()}.
+            </div>
+            <div class="pdf-diagnostico">
+                <strong>Diagnóstico</strong><br>
+                ${inf.diagnostico.replace(/\n/g, '<br>')}
+            </div>
+            <div class="pdf-valores">
+                <strong>Valores</strong><br>
+                ${inf.valores ? inf.valores.replace(/\n/g, '<br>') : 'No especificado'}
+            </div>
+            <div class="pdf-firma">
+                <strong>Verificado por:</strong><br>
+                Ing. Stephania Garcia<br>
+                Ing. De Laboratorio y Calidad<br>
+                Auditor ISO/IEC 17025:2017
+            </div>
+            <div class="pdf-pie">
+                CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239
             </div>
         `;
         
-        // Crear un elemento temporal para el PDF
-        const element = document.createElement('div');
-        element.style.position = 'absolute';
-        element.style.left = '-9999px';
-        element.style.top = '0';
-        element.style.backgroundColor = 'white';
-        element.innerHTML = pdfHtml;
-        document.body.appendChild(element);
-        
-        // Pequeña pausa para asegurar renderizado
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const opt = {
-            margin: [0.5, 0.5, 0.5, 0.5],
-            filename: `INFORME_${inf.id}_${inf.serial}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, logging: false },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
+        document.body.appendChild(pdfContent);
         
         try {
-            await html2pdf().set(opt).from(element).save();
+            // Usar html2canvas para capturar el contenido
+            const canvas = await html2canvas(pdfContent, {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                logging: false
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF({
+                unit: 'mm',
+                format: 'letter',
+                orientation: 'portrait'
+            });
+            
+            const imgWidth = 210; // Ancho A4 en mm
+            const pageHeight = 297;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let position = 0;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            
+            // Si la imagen es más larga que una página, agregar otra
+            if (imgHeight > pageHeight) {
+                let remainingHeight = imgHeight - pageHeight;
+                while (remainingHeight > 0) {
+                    position -= pageHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    remainingHeight -= pageHeight;
+                }
+            }
+            
+            pdf.save(`INFORME_${inf.id}_${inf.serial}.pdf`);
         } catch (error) {
-            console.error("Error:", error);
-            alert("Error al generar PDF. Intenta de nuevo.");
+            console.error("Error generando PDF:", error);
+            alert("Error al generar el PDF. Intenta de nuevo.");
         }
         
-        document.body.removeChild(element);
+        document.body.removeChild(pdfContent);
     };
 
     document.getElementById("btnAgregarEquipo").onclick = () => {
