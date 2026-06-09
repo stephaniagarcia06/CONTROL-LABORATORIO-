@@ -35,6 +35,9 @@
         .badge-pendiente { background: #fff3e0; color: #e67e22; }
         .badge-aprobado { background: #e6f7e6; color: #2e7d32; }
         .pdf-btn { background: #dc2626; margin-left: 8px; padding: 6px 14px; font-size: 0.75rem; }
+        /* Estilo para la foto en la tabla */
+        .foto-miniatura { max-width: 50px; max-height: 50px; border-radius: 8px; border: 1px solid #ddd; }
+        .foto-input { margin-top: 5px; }
     </style>
 </head>
 <body>
@@ -58,17 +61,21 @@
         <button class="tab-btn" data-tab="equipos">📋 Equipos</button>
     </div>
 
-    <!-- LISTA DE INFORMES -->
+    <!-- LISTA DE INFORMES (ahora con columna de foto) -->
     <div id="informes" class="tab-pane active-pane">
         <div class="table-card">
             <table>
-                <thead><tr><th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>PDF</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>ID</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Foto</th><th>PDF</th>
+                    </tr>
+                </thead>
                 <tbody id="informesBody"></tbody>
             </table>
         </div>
     </div>
 
-    <!-- NUEVO INFORME -->
+    <!-- NUEVO INFORME (con campo para foto) -->
     <div id="nuevo" class="tab-pane">
         <div class="form-card">
             <div class="form-grid">
@@ -81,11 +88,15 @@
             </div>
             <div class="input-group"><label>📋 Diagnóstico</label><textarea id="diagnostico" rows="3" placeholder="Descripción técnica..."></textarea></div>
             <div class="input-group"><label>💰 Valores</label><textarea id="valores" rows="2" placeholder="Ej: Calibración: $583.333 + IVA"></textarea></div>
+            
+            <!-- NUEVO CAMPO PARA FOTO -->
+            <div class="input-group"><label>📷 Evidencia fotográfica (opcional)</label><input type="file" id="fotoEquipo" accept="image/*"></div>
+            
             <button id="btnGuardar" style="width:100%">💾 Guardar informe</button>
         </div>
     </div>
 
-    <!-- APROBACIÓN COMERCIAL -->
+    <!-- APROBACIÓN COMERCIAL (sin cambios) -->
     <div id="aprobacion" class="tab-pane">
         <div class="form-card">
             <div class="input-group"><label>Seleccionar informe</label><select id="selectInforme"></select></div>
@@ -96,7 +107,7 @@
         </div>
     </div>
 
-    <!-- EQUIPOS -->
+    <!-- EQUIPOS (sin cambios) -->
     <div id="equipos" class="tab-pane">
         <div class="table-card">
             <button id="btnAgregarEquipo">+ Agregar equipo</button>
@@ -110,25 +121,51 @@
     let informes = [];
     let nextId = 100;
 
+    // Función para convertir foto a Base64
+    function fotoToBase64(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+        });
+    }
+
     function renderAll() {
         document.getElementById("totalEquipos").innerText = equipos.length;
         document.getElementById("totalInformes").innerText = informes.length;
         document.getElementById("pendientes").innerText = informes.filter(i => i.estado === "Pendiente").length;
         document.getElementById("aprobados").innerText = informes.filter(i => i.estado === "Aprobado").length;
         
+        // Tabla de informes (con foto)
         const ib = document.getElementById("informesBody");
-        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="7">Sin informes</td></tr>';
-        else ib.innerHTML = informes.map(i => `<tr><td>${i.id}</td><td>${i.fecha}</td><td>${i.serial}</td><td>${i.cliente}</td><td>${i.tipo}</td><td class="${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td><td><button class="pdf-btn" onclick="generarPDF(${i.id})">📄 PDF</button></td></tr>`).join('');
+        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="8">Sin informes</tr>';
+        else {
+            ib.innerHTML = informes.map(i => `
+                <tr>
+                    <td>${i.id}</td>
+                    <td>${i.fecha}</td>
+                    <td>${i.serial}</td>
+                    <td>${i.cliente}</td>
+                    <td>${i.tipo}</td>
+                    <td class="${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td>
+                    <td>${i.foto ? `<img src="${i.foto}" class="foto-miniatura">` : 'Sin foto'}</td>
+                    <td><button class="pdf-btn" onclick="generarPDF(${i.id})">📄 PDF</button></td>
+                </tr>
+            `).join('');
+        }
         
+        // Select aprobación
         const sel = document.getElementById("selectInforme");
         sel.innerHTML = '<option value="">Seleccionar</option>' + informes.map(i => `<option value="${i.id}">#${i.id} - ${i.serial} - ${i.cliente}</option>`).join('');
         
+        // Tabla equipos
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="5">Sin equipos</td></tr>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="5">Sin equipos</tr>';
         else eb.innerHTML = equipos.map(e => `<tr><td>${e.serial}</td><td>${e.equipo}</td><td>${e.marca}</td><td>${e.modelo}</td><td>${e.cliente}</td></tr>`).join('');
     }
 
-    document.getElementById("btnGuardar").onclick = () => {
+    // Guardar informe (con foto)
+    document.getElementById("btnGuardar").onclick = async () => {
         const fecha = document.getElementById("fecha").value || new Date().toISOString().slice(0,10);
         const serial = document.getElementById("serial").value.trim();
         const marca = document.getElementById("marca").value.trim();
@@ -137,29 +174,101 @@
         const tipo = document.getElementById("tipo").value;
         const diagnostico = document.getElementById("diagnostico").value.trim();
         const valores = document.getElementById("valores").value.trim();
+        
+        // Leer foto si se seleccionó
+        const fileInput = document.getElementById("fotoEquipo");
+        let fotoBase64 = '';
+        if(fileInput.files.length > 0) {
+            fotoBase64 = await fotoToBase64(fileInput.files[0]);
+        }
+        
         if(!serial || !cliente || !diagnostico) { alert("Complete serial, cliente y diagnóstico"); return; }
+        
         const nuevoId = nextId++;
-        informes.push({ id: nuevoId, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
+        informes.push({ 
+            id: nuevoId, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, 
+            foto: fotoBase64,
+            estado: "Pendiente", fechaEnvio: "", obsCliente: "" 
+        });
+        
         if(!equipos.find(e => e.serial === serial)) equipos.push({ serial, equipo: tipo, marca, modelo, cliente });
-        document.getElementById("serial").value = ""; document.getElementById("marca").value = ""; document.getElementById("modelo").value = ""; document.getElementById("cliente").value = ""; document.getElementById("diagnostico").value = ""; document.getElementById("valores").value = "";
+        
+        // Limpiar formulario
+        document.getElementById("serial").value = "";
+        document.getElementById("marca").value = "";
+        document.getElementById("modelo").value = "";
+        document.getElementById("cliente").value = "";
+        document.getElementById("diagnostico").value = "";
+        document.getElementById("valores").value = "";
+        document.getElementById("fotoEquipo").value = ""; // limpiar input de foto
+        
         renderAll();
         alert(`Informe #${nuevoId} guardado`);
     };
 
+    // Actualizar aprobación (sin cambios)
     document.getElementById("btnActualizar").onclick = () => {
         const id = parseInt(document.getElementById("selectInforme").value);
         if(!id) { alert("Seleccione un informe"); return; }
         const inf = informes.find(i => i.id === id);
-        if(inf) { inf.fechaEnvio = document.getElementById("fechaEnvio").value; inf.estado = document.getElementById("estadoFinal").value; inf.obsCliente = document.getElementById("obsCliente").value; renderAll(); alert("Actualizado"); }
+        if(inf) { 
+            inf.fechaEnvio = document.getElementById("fechaEnvio").value; 
+            inf.estado = document.getElementById("estadoFinal").value; 
+            inf.obsCliente = document.getElementById("obsCliente").value; 
+            renderAll(); 
+            alert("Actualizado"); 
+        }
     };
 
+    // Generar PDF (con foto y pie de página)
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
         const fechaActual = new Date().toLocaleDateString('es-CO');
-        const pdfHtml = `<div style="font-family:'Segoe UI',sans-serif;padding:30px;"><div style="text-align:center;border-bottom:2px solid #2563eb;padding-bottom:15px;"><h2>INFORME GENERAL</h2><p>CI RENTELCOM SAS - Laboratorio de Calibración</p></div><div style="text-align:right;margin:15px 0;">${fechaActual}</div><div><strong>Señores:</strong> ${inf.cliente}</div><div><strong>Reporte Técnico N° ${inf.id}</strong></div><div style="margin:15px 0;">Se recibe ${inf.marca} ${inf.modelo} (Serial: ${inf.serial}) para ${inf.tipo}.</div><div><strong>Diagnóstico:</strong><br>${inf.diagnostico.replace(/\n/g,'<br>')}</div><div style="margin:15px 0;"><strong>Valores:</strong><br>${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div><div style="margin-top:30px;border-top:1px solid #ccc;padding-top:15px;"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div style="margin-top:20px;font-size:10px;text-align:center;">CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239</div></div>`;
-        const tempDiv = document.createElement('div'); tempDiv.style.position = 'absolute'; tempDiv.style.left = '-9999px'; tempDiv.innerHTML = pdfHtml; document.body.appendChild(tempDiv);
-        await html2pdf().set({ margin: [0.5,0.5,0.5,0.5], filename: `INFORME_${inf.id}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(tempDiv).save();
+        
+        // Sección de foto en el PDF (si existe)
+        let fotoHtml = '';
+        if(inf.foto) {
+            fotoHtml = `<div style="margin:15px 0;"><strong>📷 Evidencia fotográfica:</strong><br><img src="${inf.foto}" style="max-width:100%; max-height:300px; border-radius:8px; border:1px solid #ccc;"></div>`;
+        }
+        
+        const pdfHtml = `
+            <div style="font-family:'Segoe UI',sans-serif;padding:30px;">
+                <div style="text-align:center;border-bottom:2px solid #2563eb;padding-bottom:15px;">
+                    <h2>INFORME GENERAL</h2>
+                    <p>CI RENTELCOM SAS - Laboratorio de Calibración</p>
+                </div>
+                <div style="text-align:right;margin:15px 0;">${fechaActual}</div>
+                <div><strong>Señores:</strong> ${inf.cliente}</div>
+                <div><strong>Reporte Técnico N° ${inf.id}</strong></div>
+                <div style="margin:15px 0;">Se recibe ${inf.marca} ${inf.modelo} (Serial: ${inf.serial}) para ${inf.tipo}.</div>
+                <div><strong>Diagnóstico:</strong><br>${inf.diagnostico.replace(/\n/g,'<br>')}</div>
+                <div style="margin:15px 0;"><strong>Valores:</strong><br>${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div>
+                ${fotoHtml}
+                <div style="margin-top:30px;border-top:1px solid #ccc;padding-top:15px;">
+                    <strong>Verificado por:</strong><br>
+                    Ing. Stephania Garcia<br>
+                    Auditor ISO/IEC 17025:2017
+                </div>
+                <!-- PIE DE PÁGINA -->
+                <div style="margin-top:20px; font-size:10px; text-align:center; color:#666;">
+                    CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239
+                </div>
+            </div>
+        `;
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        tempDiv.innerHTML = pdfHtml;
+        document.body.appendChild(tempDiv);
+        await html2pdf().set({ 
+            margin: [0.5,0.5,0.5,0.5], 
+            filename: `INFORME_${inf.id}.pdf`, 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2 }, 
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
+        }).from(tempDiv).save();
         document.body.removeChild(tempDiv);
     };
 
@@ -169,7 +278,16 @@
         equipos.push({ serial, equipo, marca, modelo, cliente }); renderAll();
     };
 
-    document.querySelectorAll(".tab-btn").forEach(btn => { btn.addEventListener("click", () => { document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active-pane")); document.getElementById(btn.dataset.tab).classList.add("active-pane"); }); });
+    // Tabs
+    document.querySelectorAll(".tab-btn").forEach(btn => { 
+        btn.addEventListener("click", () => { 
+            document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active")); 
+            btn.classList.add("active"); 
+            document.querySelectorAll(".tab-pane").forEach(p=>p.classList.remove("active-pane")); 
+            document.getElementById(btn.dataset.tab).classList.add("active-pane"); 
+        }); 
+    });
+    
     renderAll();
 </script>
 </body>
