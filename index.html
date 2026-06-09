@@ -226,7 +226,7 @@
         document.getElementById("nextIdDisplay").innerText = nextId;
         
         const ib = document.getElementById("informesBody");
-        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="8">Sin informes</td></tr>';
+        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="8">Sin informes</td></td>';
         else ib.innerHTML = informes.map(i => `
             <tr>
                 <td>${i.id}</td>
@@ -247,7 +247,7 @@
         if(selEditar) selEditar.innerHTML = options;
         
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<td><td colspan="7">Sin equipos</td></tr>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">Sin equipos</td></td>';
         else eb.innerHTML = equipos.map((e, idx) => `
             <tr>
                 <td>${e.serial}</td>
@@ -368,14 +368,20 @@
         } else alert("Seleccione un informe");
     };
 
-    // ==================== PDF FUNCIONAL CON WINDOW.PRINT ====================
+    // ==================== PDF CON DISEÑO MEJORADO ====================
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
         
         const fechaActual = new Date().toLocaleDateString('es-CO');
-        let logoHtml = logoEmpresaBase64 ? `<div style="text-align:center; margin-bottom:15px;"><img src="${logoEmpresaBase64}" style="max-height:70px;"></div>` : '';
+        
+        // Logo a la izquierda
+        let logoHtml = logoEmpresaBase64 ? `<div style="text-align:left; margin-bottom:20px;"><img src="${logoEmpresaBase64}" style="max-height:70px;"></div>` : '';
+        
+        // Foto si existe
         let fotoHtml = inf.foto ? `<div style="margin:15px 0;"><strong>📷 Evidencia fotográfica:</strong><br><img src="${inf.foto}" style="max-width:100%; max-height:250px; border-radius:8px;"></div>` : '';
+        
+        // Nota final si existe
         let notaHtml = inf.notaFinal ? `<div style="margin:15px 0;"><strong>📝 Nota final / Recomendaciones:</strong><br>${inf.notaFinal.replace(/\n/g,'<br>')}</div>` : '';
         
         const pdfHtml = `
@@ -385,36 +391,142 @@
                 <meta charset="UTF-8">
                 <title>Informe ${inf.id}</title>
                 <style>
-                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; margin: 0; }
-                    .container { max-width: 800px; margin: 0 auto; background: white; }
-                    .text-right { text-align: right; margin-bottom: 20px; }
-                    .mt-15 { margin-top: 15px; margin-bottom: 15px; }
-                    .mt-40 { margin-top: 40px; }
-                    .border-top { border-top: 1px solid #ccc; padding-top: 15px; }
-                    .text-center { text-align: center; }
-                    .small { font-size: 10px; color: #666; }
-                    img { max-width: 100%; max-height: 250px; border-radius: 8px; }
-                    .logo { max-height: 70px; }
+                    body { 
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+                        padding: 40px; 
+                        margin: 0; 
+                        background: white;
+                    }
+                    .container { 
+                        max-width: 800px; 
+                        margin: 0 auto; 
+                        background: white; 
+                    }
+                    .header-logo {
+                        text-align: left;
+                        margin-bottom: 30px;
+                    }
+                    .titulo-principal {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        padding-bottom: 15px;
+                        border-bottom: 2px solid #2563eb;
+                    }
+                    .titulo-principal h2 {
+                        color: #1e40af;
+                        font-size: 24px;
+                        margin: 0;
+                    }
+                    .info-linea {
+                        margin-bottom: 8px;
+                    }
+                    .seccion {
+                        margin-top: 20px;
+                        margin-bottom: 20px;
+                    }
+                    .seccion-titulo {
+                        font-weight: bold;
+                        margin-bottom: 8px;
+                        font-size: 14px;
+                    }
+                    .seccion-contenido {
+                        margin-left: 0;
+                        line-height: 1.4;
+                    }
+                    .foto-evidencia {
+                        margin: 20px 0;
+                    }
+                    .foto-evidencia img {
+                        max-width: 100%;
+                        max-height: 250px;
+                        border-radius: 8px;
+                        border: 1px solid #ccc;
+                    }
+                    .firma {
+                        margin-top: 40px;
+                        border-top: 1px solid #ccc;
+                        padding-top: 15px;
+                    }
+                    .pie-pagina {
+                        margin-top: 25px;
+                        font-size: 10px;
+                        text-align: center;
+                        color: #666;
+                    }
+                    .text-bold { font-weight: bold; }
+                    .mt-10 { margin-top: 10px; }
+                    .mb-10 { margin-bottom: 10px; }
                 </style>
             </head>
             <body>
                 <div class="container">
-                    ${logoHtml}
-                    <div class="text-right">${fechaActual}</div>
-                    <div><strong>Señores:</strong> ${inf.cliente}</div>
-                    <div><strong>Reporte Técnico N° ${inf.id}</strong></div>
-                    <div class="mt-15"><strong>Observación inicial.</strong> Se recibe ${inf.marca} ${inf.modelo} con serie ${inf.serial}, se solicita ${inf.tipo.toLowerCase()}.</div>
-                    <div class="mt-15"><strong>Diagnóstico</strong><br>${inf.diagnostico.replace(/\n/g,'<br>')}</div>
-                    <div class="mt-15"><strong>Valores</strong><br>${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}</div>
-                    ${fotoHtml}
-                    ${notaHtml}
-                    <div class="mt-40 border-top">
-                        <strong>Verificado por:</strong><br>
-                        Ing. Stephania Garcia<br>
-                        Ing. De Laboratorio y Calidad<br>
-                        Auditor ISO/IEC 17025:2017
+                    <!-- Logo izquierda -->
+                    <div class="header-logo">
+                        ${logoHtml}
                     </div>
-                    <div class="text-center small mt-15">
+                    
+                    <!-- Título principal -->
+                    <div class="titulo-principal">
+                        <h2>INFORME TÉCNICO DE LABORATORIO</h2>
+                    </div>
+                    
+                    <!-- Datos del informe (izquierda) -->
+                    <div class="seccion">
+                        <div class="info-linea"><span class="text-bold">Fecha:</span> ${fechaActual}</div>
+                        <div class="info-linea"><span class="text-bold">Reporte Técnico N°:</span> ${inf.id}</div>
+                        <div class="info-linea"><span class="text-bold">Señores:</span> ${inf.cliente}</div>
+                    </div>
+                    
+                    <!-- Datos del equipo -->
+                    <div class="seccion">
+                        <div class="seccion-titulo">DATOS DEL EQUIPO</div>
+                        <div class="seccion-contenido">
+                            <div>🔧 Equipo: ${inf.marca} ${inf.modelo}</div>
+                            <div>🔢 Serial: ${inf.serial}</div>
+                            <div>📋 Servicio solicitado: ${inf.tipo}</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Observación inicial -->
+                    <div class="seccion">
+                        <div class="seccion-titulo">OBSERVACIÓN INICIAL</div>
+                        <div class="seccion-contenido">
+                            Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para ${inf.tipo.toLowerCase()}.
+                        </div>
+                    </div>
+                    
+                    <!-- Diagnóstico -->
+                    <div class="seccion">
+                        <div class="seccion-titulo">DIAGNÓSTICO</div>
+                        <div class="seccion-contenido">
+                            ${inf.diagnostico.replace(/\n/g,'<br>')}
+                        </div>
+                    </div>
+                    
+                    <!-- Valores -->
+                    <div class="seccion">
+                        <div class="seccion-titulo">VALORES</div>
+                        <div class="seccion-contenido">
+                            ${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}
+                        </div>
+                    </div>
+                    
+                    <!-- Foto -->
+                    ${fotoHtml ? `<div class="seccion"><div class="seccion-titulo">📷 EVIDENCIA FOTOGRÁFICA</div><div class="foto-evidencia">${fotoHtml.replace('📷 Evidencia fotográfica:<br>', '')}</div></div>` : ''}
+                    
+                    <!-- Nota final -->
+                    ${notaHtml ? `<div class="seccion"><div class="seccion-titulo">📝 NOTA FINAL / RECOMENDACIONES</div><div class="seccion-contenido">${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : ''}
+                    
+                    <!-- Firma -->
+                    <div class="firma">
+                        <div><strong>Verificado por:</strong></div>
+                        <div>Ing. Stephania Garcia</div>
+                        <div>Ing. De Laboratorio y Calidad</div>
+                        <div>Auditor ISO/IEC 17025:2017</div>
+                    </div>
+                    
+                    <!-- Pie de página -->
+                    <div class="pie-pagina">
                         CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239
                     </div>
                 </div>
