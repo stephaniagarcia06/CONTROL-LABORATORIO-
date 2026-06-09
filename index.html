@@ -51,19 +51,19 @@
     <div id="mensajeExito" class="alert-success"></div>
 
     <div class="dashboard">
-        <div class="card"><h3>📟 Equipos</h3><div class="number" id="totalEquipos">0</div></div>
-        <div class="card"><h3>📄 Informes</h3><div class="number" id="totalInformes">0</div></div>
-        <div class="card"><h3>⏳ Pendientes</h3><div class="number" id="pendientes">0</div></div>
-        <div class="card"><h3>✅ Aprobados</h3><div class="number" id="aprobados">0</div></div>
+        <div class="card"><h3>Equipos</h3><div class="number" id="totalEquipos">0</div></div>
+        <div class="card"><h3>Informes</h3><div class="number" id="totalInformes">0</div></div>
+        <div class="card"><h3>Pendientes</h3><div class="number" id="pendientes">0</div></div>
+        <div class="card"><h3>Aprobados</h3><div class="number" id="aprobados">0</div></div>
     </div>
 
     <div class="tabs">
-        <button class="tab-btn active" data-tab="informes">🗂️ Informes</button>
-        <button class="tab-btn" data-tab="nuevo">📝 Nuevo informe</button>
-        <button class="tab-btn" data-tab="editar">✏️ Editar informe</button>
-        <button class="tab-btn" data-tab="aprobacion">✅ Aprobación comercial</button>
-        <button class="tab-btn" data-tab="equipos">📋 Equipos</button>
-        <button class="tab-btn" data-tab="configuracion">⚙️ Configuración</button>
+        <button class="tab-btn active" data-tab="informes">Informes</button>
+        <button class="tab-btn" data-tab="nuevo">Nuevo informe</button>
+        <button class="tab-btn" data-tab="editar">Editar informe</button>
+        <button class="tab-btn" data-tab="aprobacion">Aprobación comercial</button>
+        <button class="tab-btn" data-tab="equipos">Equipos</button>
+        <button class="tab-btn" data-tab="configuracion">Configuración</button>
     </div>
 
     <!-- LISTA DE INFORMES -->
@@ -78,21 +78,21 @@
     <!-- NUEVO INFORME -->
     <div id="nuevo" class="tab-pane">
         <div class="form-card">
-            <div class="next-id-info">📌 Próximo número disponible: <span id="nextIdDisplay">100</span></div>
+            <div class="next-id-info">Próximo número disponible: <span id="nextIdDisplay">100</span></div>
             <div class="form-grid">
-                <div class="input-group"><label>🔢 Número de informe</label><input type="number" id="nuevoId" placeholder="Automático"></div>
-                <div class="input-group"><label>📅 Fecha</label><input type="date" id="fecha"></div>
-                <div class="input-group"><label>🔧 Serial</label><input id="serial" placeholder="Ej: 1095120"></div>
-                <div class="input-group"><label>🏷️ Marca</label><input id="marca" placeholder="EXFO"></div>
-                <div class="input-group"><label>📟 Modelo</label><input id="modelo" placeholder="MAX715"></div>
-                <div class="input-group"><label>👤 Cliente</label><input id="cliente" placeholder="INMEL INGENIERIA SAS"></div>
-                <div class="input-group"><label>🔧 Servicio</label><select id="tipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
+                <div class="input-group"><label>Número de informe</label><input type="number" id="nuevoId" placeholder="Automático"></div>
+                <div class="input-group"><label>Fecha</label><input type="date" id="fecha"></div>
+                <div class="input-group"><label>Serial</label><input id="serial" placeholder="Ej: 1095120"></div>
+                <div class="input-group"><label>Marca</label><input id="marca" placeholder="EXFO"></div>
+                <div class="input-group"><label>Modelo</label><input id="modelo" placeholder="MAX715"></div>
+                <div class="input-group"><label>Cliente</label><input id="cliente" placeholder="INMEL INGENIERIA SAS"></div>
+                <div class="input-group"><label>Servicio</label><select id="tipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
             </div>
-            <div class="input-group"><label>📋 Diagnóstico</label><textarea id="diagnostico" rows="3"></textarea></div>
-            <div class="input-group"><label>💰 Valores</label><textarea id="valores" rows="2"></textarea></div>
-            <div class="input-group"><label>📝 Nota final</label><textarea id="notaFinal" rows="2"></textarea></div>
-            <div class="input-group"><label>📷 Foto (opcional)</label><input type="file" id="fotoEquipo" accept="image/*"></div>
-            <button id="btnGuardar">💾 Guardar informe</button>
+            <div class="input-group"><label>Diagnóstico</label><textarea id="diagnostico" rows="3"></textarea></div>
+            <div class="input-group"><label>Valores</label><textarea id="valores" rows="2"></textarea></div>
+            <div class="input-group"><label>Nota final</label><textarea id="notaFinal" rows="2"></textarea></div>
+            <div class="input-group"><label>Evidencia fotográfica (opcional)</label><input type="file" id="fotoEquipo" accept="image/*"></div>
+            <button id="btnGuardar">Guardar informe</button>
         </div>
     </div>
 
@@ -103,19 +103,19 @@
             <button id="btnCargarEditar">Cargar datos</button>
             <div id="formEditar" style="display:none; margin-top:20px;">
                 <div class="form-grid">
-                    <div class="input-group"><label>🔢 Número</label><input type="number" id="editId" readonly></div>
-                    <div class="input-group"><label>📅 Fecha</label><input type="date" id="editFecha"></div>
-                    <div class="input-group"><label>🔧 Serial</label><input id="editSerial"></div>
-                    <div class="input-group"><label>🏷️ Marca</label><input id="editMarca"></div>
-                    <div class="input-group"><label>📟 Modelo</label><input id="editModelo"></div>
-                    <div class="input-group"><label>👤 Cliente</label><input id="editCliente"></div>
-                    <div class="input-group"><label>🔧 Servicio</label><select id="editTipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
+                    <div class="input-group"><label>Número</label><input type="number" id="editId" readonly></div>
+                    <div class="input-group"><label>Fecha</label><input type="date" id="editFecha"></div>
+                    <div class="input-group"><label>Serial</label><input id="editSerial"></div>
+                    <div class="input-group"><label>Marca</label><input id="editMarca"></div>
+                    <div class="input-group"><label>Modelo</label><input id="editModelo"></div>
+                    <div class="input-group"><label>Cliente</label><input id="editCliente"></div>
+                    <div class="input-group"><label>Servicio</label><select id="editTipo"><option>Calibración</option><option>Ajuste mecánico</option><option>Ambos</option><option>Reparación</option></select></div>
                 </div>
-                <div class="input-group"><label>📋 Diagnóstico</label><textarea id="editDiagnostico" rows="3"></textarea></div>
-                <div class="input-group"><label>💰 Valores</label><textarea id="editValores" rows="2"></textarea></div>
-                <div class="input-group"><label>📝 Nota final</label><textarea id="editNotaFinal" rows="2"></textarea></div>
-                <div class="input-group"><label>📷 Cambiar foto</label><input type="file" id="editFoto" accept="image/*"></div>
-                <button id="btnGuardarEdicion">💾 Guardar cambios</button>
+                <div class="input-group"><label>Diagnóstico</label><textarea id="editDiagnostico" rows="3"></textarea></div>
+                <div class="input-group"><label>Valores</label><textarea id="editValores" rows="2"></textarea></div>
+                <div class="input-group"><label>Nota final</label><textarea id="editNotaFinal" rows="2"></textarea></div>
+                <div class="input-group"><label>Cambiar foto</label><input type="file" id="editFoto" accept="image/*"></div>
+                <button id="btnGuardarEdicion">Guardar cambios</button>
             </div>
         </div>
     </div>
@@ -124,9 +124,9 @@
     <div id="aprobacion" class="tab-pane">
         <div class="form-card">
             <div class="input-group"><label>Seleccionar informe</label><select id="selectInforme"></select></div>
-            <div class="input-group"><label>📅 Fecha envío al cliente</label><input type="date" id="fechaEnvio"></div>
-            <div class="input-group"><label>📎 Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
-            <div class="input-group"><label>💬 Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
+            <div class="input-group"><label>Fecha envío al cliente</label><input type="date" id="fechaEnvio"></div>
+            <div class="input-group"><label>Estado</label><select id="estadoFinal"><option>Pendiente</option><option>Aprobado</option><option>Rechazado</option></select></div>
+            <div class="input-group"><label>Observaciones del cliente</label><textarea id="obsCliente" rows="2"></textarea></div>
             <button id="btnActualizar">Actualizar</button>
         </div>
     </div>
@@ -144,7 +144,7 @@
     <!-- CONFIGURACIÓN -->
     <div id="configuracion" class="tab-pane">
         <div class="form-card">
-            <h3>Logo de la empresa</h3>
+            <h3>Configuración - Logo de la empresa</h3>
             <input type="file" id="logoEmpresa" accept="image/*">
             <div id="logoPreview"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
@@ -226,7 +226,7 @@
         document.getElementById("nextIdDisplay").innerText = nextId;
         
         const ib = document.getElementById("informesBody");
-        if(informes.length === 0) ib.innerHTML = '<tr><td colspan="8">Sin informes</td></td>';
+        if(informes.length === 0) ib.innerHTML = '</tr><td colspan="8">Sin informes</tr>';
         else ib.innerHTML = informes.map(i => `
             <tr>
                 <td>${i.id}</td>
@@ -236,7 +236,7 @@
                 <td>${i.tipo}</td>
                 <td class="status-badge ${i.estado === 'Aprobado' ? 'badge-aprobado' : 'badge-pendiente'}">${i.estado}</td>
                 <td>${i.foto ? '<img src="'+i.foto+'" class="foto-miniatura">' : 'Sin foto'}</td>
-                <td><button class="pdf-btn" onclick="generarPDF(${i.id})">📄 PDF</button></td>
+                <td><button class="pdf-btn" onclick="generarPDF(${i.id})">PDF</button></td>
             </tr>
         `).join('');
         
@@ -247,7 +247,7 @@
         if(selEditar) selEditar.innerHTML = options;
         
         const eb = document.getElementById("equiposBody");
-        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">Sin equipos</td></td>';
+        if(equipos.length === 0) eb.innerHTML = '<tr><td colspan="7">Sin equipos</tr>';
         else eb.innerHTML = equipos.map((e, idx) => `
             <tr>
                 <td>${e.serial}</td>
@@ -256,7 +256,7 @@
                 <td>${e.modelo}</td>
                 <td>${e.cliente}</td>
                 <td class="status-badge">${e.estado || "Pendiente"}</td>
-                <td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">🔄 Cambiar</button></td>
+                <td><button class="edit-btn" onclick="cambiarEstadoEquipo(${idx})">Cambiar</button></td>
             </tr>
         `).join('');
         
@@ -297,7 +297,7 @@
         informes.push({ id, fecha, serial, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal, foto, estado: "Pendiente", fechaEnvio: "", obsCliente: "" });
         
         if(!equipos.find(e => e.serial === serial)) {
-            equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "📝 Pendiente diagnóstico" });
+            equipos.push({ serial, equipo: tipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
         }
         
         document.getElementById("nuevoId").value = "";
@@ -311,7 +311,7 @@
         document.getElementById("fotoEquipo").value = "";
         
         renderAll();
-        mostrarMensaje(`✅ Informe #${id} guardado correctamente`);
+        mostrarMensaje(`Informe #${id} guardado correctamente`);
     };
 
     // ==================== EDITAR INFORME ====================
@@ -349,7 +349,7 @@
             const newFoto = document.getElementById("editFoto").files[0];
             if(newFoto) inf.foto = await fileToBase64(newFoto);
             renderAll();
-            mostrarMensaje(`✅ Informe #${id} actualizado`);
+            mostrarMensaje(`Informe #${id} actualizado`);
             document.getElementById("formEditar").style.display = "none";
             document.getElementById("editFoto").value = "";
         }
@@ -364,38 +364,44 @@
             inf.estado = document.getElementById("estadoFinal").value; 
             inf.obsCliente = document.getElementById("obsCliente").value; 
             renderAll(); 
-            mostrarMensaje(`✅ Informe #${id} actualizado`);
+            mostrarMensaje(`Informe #${id} actualizado`);
         } else alert("Seleccione un informe");
     };
 
-    // ==================== PDF CON DISEÑO MEJORADO ====================
+    // ==================== PDF PROFESIONAL (SIN EMOJIS) ====================
     window.generarPDF = async (id) => {
         const inf = informes.find(i => i.id === id);
         if(!inf) return;
         
-        const fechaActual = new Date().toLocaleDateString('es-CO');
+        const fechaActual = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
         
-        // Logo a la izquierda
-        let logoHtml = logoEmpresaBase64 ? `<div style="text-align:left; margin-bottom:20px;"><img src="${logoEmpresaBase64}" style="max-height:70px;"></div>` : '';
+        // Logo a la izquierda (sin emojis)
+        let logoHtml = logoEmpresaBase64 ? `<div style="text-align:left; margin-bottom:25px;"><img src="${logoEmpresaBase64}" style="max-height:70px;"></div>` : '';
         
-        // Foto si existe
-        let fotoHtml = inf.foto ? `<div style="margin:15px 0;"><strong>📷 Evidencia fotográfica:</strong><br><img src="${inf.foto}" style="max-width:100%; max-height:250px; border-radius:8px;"></div>` : '';
+        // Foto si existe (sin emojis)
+        let fotoHtml = inf.foto ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Evidencia fotográfica</div><img src="${inf.foto}" style="max-width:100%; max-height:250px; border-radius:4px; border:1px solid #ccc;"></div>` : '';
         
-        // Nota final si existe
-        let notaHtml = inf.notaFinal ? `<div style="margin:15px 0;"><strong>📝 Nota final / Recomendaciones:</strong><br>${inf.notaFinal.replace(/\n/g,'<br>')}</div>` : '';
+        // Nota final si existe (sin emojis)
+        let notaHtml = inf.notaFinal ? `<div style="margin:20px 0;"><div style="font-weight:bold; margin-bottom:8px;">Nota final / Recomendaciones</div><div style="line-height:1.4;">${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : '';
         
         const pdfHtml = `
             <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
-                <title>Informe ${inf.id}</title>
+                <title>Informe Tecnico ${inf.id}</title>
                 <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
                     body { 
                         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
                         padding: 40px; 
                         margin: 0; 
                         background: white;
+                        color: #1a1a2e;
                     }
                     .container { 
                         max-width: 800px; 
@@ -410,124 +416,117 @@
                         text-align: center;
                         margin-bottom: 30px;
                         padding-bottom: 15px;
-                        border-bottom: 2px solid #2563eb;
+                        border-bottom: 2px solid #1e40af;
                     }
                     .titulo-principal h2 {
                         color: #1e40af;
-                        font-size: 24px;
+                        font-size: 22px;
                         margin: 0;
+                        letter-spacing: 1px;
                     }
                     .info-linea {
-                        margin-bottom: 8px;
+                        margin-bottom: 6px;
+                        line-height: 1.4;
                     }
                     .seccion {
                         margin-top: 20px;
                         margin-bottom: 20px;
                     }
                     .seccion-titulo {
-                        font-weight: bold;
+                        font-weight: 600;
                         margin-bottom: 8px;
                         font-size: 14px;
+                        color: #1e40af;
+                        border-left: 3px solid #1e40af;
+                        padding-left: 10px;
                     }
                     .seccion-contenido {
-                        margin-left: 0;
-                        line-height: 1.4;
+                        margin-left: 13px;
+                        line-height: 1.45;
+                        text-align: justify;
                     }
-                    .foto-evidencia {
-                        margin: 20px 0;
-                    }
-                    .foto-evidencia img {
-                        max-width: 100%;
-                        max-height: 250px;
+                    .equipo-datos {
+                        background: #f8fafc;
+                        padding: 12px 15px;
                         border-radius: 8px;
-                        border: 1px solid #ccc;
+                        margin: 15px 0;
+                    }
+                    .equipo-datos div {
+                        margin-bottom: 4px;
                     }
                     .firma {
                         margin-top: 40px;
                         border-top: 1px solid #ccc;
-                        padding-top: 15px;
+                        padding-top: 20px;
+                    }
+                    .firma div {
+                        margin-bottom: 4px;
                     }
                     .pie-pagina {
-                        margin-top: 25px;
-                        font-size: 10px;
+                        margin-top: 30px;
+                        font-size: 9px;
                         text-align: center;
                         color: #666;
+                        border-top: 1px solid #eee;
+                        padding-top: 15px;
                     }
-                    .text-bold { font-weight: bold; }
-                    .mt-10 { margin-top: 10px; }
-                    .mb-10 { margin-bottom: 10px; }
+                    .text-bold { font-weight: 600; }
+                    .text-small { font-size: 12px; }
                 </style>
             </head>
             <body>
                 <div class="container">
-                    <!-- Logo izquierda -->
-                    <div class="header-logo">
-                        ${logoHtml}
-                    </div>
+                    ${logoHtml}
                     
-                    <!-- Título principal -->
                     <div class="titulo-principal">
                         <h2>INFORME TÉCNICO DE LABORATORIO</h2>
                     </div>
                     
-                    <!-- Datos del informe (izquierda) -->
                     <div class="seccion">
-                        <div class="info-linea"><span class="text-bold">Fecha:</span> ${fechaActual}</div>
-                        <div class="info-linea"><span class="text-bold">Reporte Técnico N°:</span> ${inf.id}</div>
-                        <div class="info-linea"><span class="text-bold">Señores:</span> ${inf.cliente}</div>
+                        <div class="info-linea"><span class="text-bold">Fecha de emisión:</span> ${fechaActual}</div>
+                        <div class="info-linea"><span class="text-bold">Reporte N°:</span> ${inf.id}</div>
+                        <div class="info-linea"><span class="text-bold">Cliente:</span> ${inf.cliente}</div>
                     </div>
                     
-                    <!-- Datos del equipo -->
+                    <div class="equipo-datos">
+                        <div><span class="text-bold">Equipo:</span> ${inf.marca} ${inf.modelo}</div>
+                        <div><span class="text-bold">Serial:</span> ${inf.serial}</div>
+                        <div><span class="text-bold">Servicio solicitado:</span> ${inf.tipo}</div>
+                    </div>
+                    
                     <div class="seccion">
-                        <div class="seccion-titulo">DATOS DEL EQUIPO</div>
+                        <div class="seccion-titulo">Observación inicial</div>
                         <div class="seccion-contenido">
-                            <div>🔧 Equipo: ${inf.marca} ${inf.modelo}</div>
-                            <div>🔢 Serial: ${inf.serial}</div>
-                            <div>📋 Servicio solicitado: ${inf.tipo}</div>
+                            Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para servicio de ${inf.tipo.toLowerCase()}.
                         </div>
                     </div>
                     
-                    <!-- Observación inicial -->
                     <div class="seccion">
-                        <div class="seccion-titulo">OBSERVACIÓN INICIAL</div>
-                        <div class="seccion-contenido">
-                            Se recibe equipo ${inf.marca} ${inf.modelo} con serial ${inf.serial} para ${inf.tipo.toLowerCase()}.
-                        </div>
-                    </div>
-                    
-                    <!-- Diagnóstico -->
-                    <div class="seccion">
-                        <div class="seccion-titulo">DIAGNÓSTICO</div>
+                        <div class="seccion-titulo">Diagnóstico</div>
                         <div class="seccion-contenido">
                             ${inf.diagnostico.replace(/\n/g,'<br>')}
                         </div>
                     </div>
                     
-                    <!-- Valores -->
                     <div class="seccion">
-                        <div class="seccion-titulo">VALORES</div>
+                        <div class="seccion-titulo">Valores</div>
                         <div class="seccion-contenido">
                             ${inf.valores ? inf.valores.replace(/\n/g,'<br>') : 'No especificado'}
                         </div>
                     </div>
                     
-                    <!-- Foto -->
-                    ${fotoHtml ? `<div class="seccion"><div class="seccion-titulo">📷 EVIDENCIA FOTOGRÁFICA</div><div class="foto-evidencia">${fotoHtml.replace('📷 Evidencia fotográfica:<br>', '')}</div></div>` : ''}
+                    ${fotoHtml}
+                    ${notaHtml}
                     
-                    <!-- Nota final -->
-                    ${notaHtml ? `<div class="seccion"><div class="seccion-titulo">📝 NOTA FINAL / RECOMENDACIONES</div><div class="seccion-contenido">${inf.notaFinal.replace(/\n/g,'<br>')}</div></div>` : ''}
-                    
-                    <!-- Firma -->
                     <div class="firma">
-                        <div><strong>Verificado por:</strong></div>
+                        <div><span class="text-bold">Verificado por:</span></div>
                         <div>Ing. Stephania Garcia</div>
-                        <div>Ing. De Laboratorio y Calidad</div>
+                        <div>Ingeniero de Laboratorio y Calidad</div>
                         <div>Auditor ISO/IEC 17025:2017</div>
                     </div>
                     
-                    <!-- Pie de página -->
                     <div class="pie-pagina">
-                        CARRERA 19A No. 150-50 BOGOTA D.C. TELÉFONO 9399167 - 318 5586239
+                        Carrera 19A No. 150-50 - Bogotá D.C. | Teléfono: 9399167 - 3185586239
                     </div>
                 </div>
                 <script>
@@ -551,7 +550,7 @@
         const marca = prompt("Marca:"); 
         const modelo = prompt("Modelo:"); 
         const cliente = prompt("Cliente:");
-        equipos.push({ serial, equipo, marca, modelo, cliente, estado: "📝 Pendiente diagnóstico" });
+        equipos.push({ serial, equipo, marca, modelo, cliente, estado: "Pendiente diagnóstico" });
         renderAll();
         mostrarMensaje(`Equipo ${serial} agregado`);
     };
