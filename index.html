@@ -57,6 +57,7 @@
         .btn-outline:hover { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); }
         .btn-success { background: var(--success); }
+        .btn-warning { background: var(--warning); }
         
         table { width: 100%; border-collapse: collapse; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
@@ -68,9 +69,11 @@
         .badge-rechazado { background: #ffe6e6; color: #c62828; }
         
         .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
-        .delete-btn { background: #b91c1c; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
-        .delete-btn:hover { background: #7f1a1a; }
-        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; }
+        .edit-btn { background: var(--warning); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
+        .delete-btn { background: #6b7280; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
+        .edit-btn:hover { background: #d97706; }
+        .delete-btn:hover { background: #4b5563; }
+        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; cursor: pointer; }
         .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .import-area { border: 2px dashed var(--gray-border); padding: 20px; text-align: center; border-radius: 16px; cursor: pointer; margin: 10px 0; }
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
@@ -119,7 +122,7 @@
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Nueva entrada</button>
             <div class="table-responsive">
-                <table>
+                <tr>
                     <thead>
                         <tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Cliente</th><th>Registrado por</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
@@ -162,7 +165,7 @@
         </div>
         <div id="modalInforme" class="modal">
             <div class="modal-content">
-                <div class="modal-header"><h3>📝 Informe de laboratorio</h3><span class="close-modal" onclick="cerrarModalInforme()">&times;</span></div>
+                <div class="modal-header"><h3 id="modalInformeTitulo">📝 Informe de laboratorio</h3><span class="close-modal" onclick="cerrarModalInforme()">&times;</span></div>
                 <div class="form-grid">
                     <div class="input-group"><label>N° Informe</label><input type="text" id="infoNumero" placeholder="INF-001"></div>
                     <div class="input-group"><label>Serial</label><input id="infoSerial"></div>
@@ -174,6 +177,7 @@
                 <div class="input-group"><label>Nota final</label><textarea id="infoNotaFinal" rows="2"></textarea></div>
                 <div class="input-group"><label>📷 Evidencias</label><input type="file" id="infoFoto" accept="image/*"></div>
                 <button id="btnGuardarInforme">Guardar informe</button>
+                <button id="btnActualizarInforme" style="display:none;">Actualizar informe</button>
             </div>
         </div>
     </div>
@@ -258,6 +262,7 @@
 
 <script>
     let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "";
+    let informeEditandoIndex = null; // Índice del informe que se está editando
 
     function guardarDatos() {
         localStorage.setItem("equipos", JSON.stringify(equipos));
@@ -323,6 +328,26 @@
         }
     };
 
+    // ========== EDITAR INFORME ==========
+    window.editarInforme = (index) => {
+        const inf = informes[index];
+        informeEditandoIndex = index;
+        
+        document.getElementById("infoNumero").value = inf.numero;
+        document.getElementById("infoSerial").value = inf.serial;
+        document.getElementById("infoFecha").value = inf.fecha || "";
+        document.getElementById("infoTipo").value = inf.tipo || "Calibración";
+        document.getElementById("infoDiagnostico").value = inf.diagnostico || "";
+        document.getElementById("infoValores").value = inf.valores || "";
+        document.getElementById("infoNotaFinal").value = inf.notaFinal || "";
+        document.getElementById("infoFoto").value = "";
+        
+        document.getElementById("modalInformeTitulo").innerText = "✏️ EDITAR INFORME";
+        document.getElementById("btnGuardarInforme").style.display = "none";
+        document.getElementById("btnActualizarInforme").style.display = "block";
+        document.getElementById("modalInforme").style.display = "flex";
+    };
+
     window.buscarPorSerial = function(serial) {
         document.getElementById("buscarSerialTraza").value = serial;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -335,13 +360,13 @@
     // ========== PDFs con FIRMA COMPLETA ==========
     window.generarPDFEntrada = async function(eq, consecutivo) {
         const fecha = new Date().toLocaleDateString('es-CO');
-        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Entrada_${eq.serial}</title><style>body{font-family:'Segoe UI',Arial,sans-serif;padding:40px;margin:0;} .header-logo{text-align:center;margin-bottom:20px;} .titulo{text-align:center;color:#0a2b4e;margin-bottom:30px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;} .firma{margin-top:40px;border-top:1px solid #ccc;padding-top:20px;text-align:center;}</style></head><body>${getLogoHtml()}<h2 class="titulo">REGISTRO DE ENTRADA DE EQUIPO</h2><div><strong>Fecha:</strong> ${fecha}</div><div><strong>Consecutivo:</strong> ${consecutivo}</div><div class="info"><strong>Serial:</strong> ${eq.serial}<br><strong>Equipo:</strong> ${eq.equipo}<br><strong>Marca/Modelo:</strong> ${eq.marca} ${eq.modelo}<br><strong>Cliente:</strong> ${eq.cliente}<br><strong>Accesorios:</strong> ${eq.accesorios || "Ninguno"}<br><strong>Registrado por:</strong> ${eq.registradoPor}</div>${eq.fotoEntrada ? `<div><strong>Foto ingreso:</strong><br><img src="${eq.fotoEntrada}" style="max-width:300px; border-radius:8px;"></div>` : ""}<div class="firma"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017<br>Laboratorio de Metrología<br>CI RENTELCOM SAS</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></body></html>`;
+        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Entrada_${eq.serial}</title><style>body{font-family:'Segoe UI',Arial,sans-serif;padding:40px;margin:0;} .titulo{text-align:center;color:#0a2b4e;margin-bottom:30px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;} .firma{margin-top:40px;border-top:1px solid #ccc;padding-top:20px;text-align:center;}</style></head><body>${getLogoHtml()}<h2 class="titulo">REGISTRO DE ENTRADA DE EQUIPO</h2><div><strong>Fecha:</strong> ${fecha}</div><div><strong>Consecutivo:</strong> ${consecutivo}</div><div class="info"><strong>Serial:</strong> ${eq.serial}<br><strong>Equipo:</strong> ${eq.equipo}<br><strong>Marca/Modelo:</strong> ${eq.marca} ${eq.modelo}<br><strong>Cliente:</strong> ${eq.cliente}<br><strong>Accesorios:</strong> ${eq.accesorios || "Ninguno"}<br><strong>Registrado por:</strong> ${eq.registradoPor}</div>${eq.fotoEntrada ? `<div><strong>Foto ingreso:</strong><br><img src="${eq.fotoEntrada}" style="max-width:300px; border-radius:8px;"></div>` : ""}<div class="firma"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017<br>Laboratorio de Metrología<br>CI RENTELCOM SAS</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></body></html>`;
         const blob = new Blob([doc], {type: 'text/html'}); 
         window.open(URL.createObjectURL(blob), '_blank');
     };
 
     window.generarPDFInforme = async function(inf) {
-        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe_${inf.numero}</title><style>body{font-family:'Segoe UI',Arial,sans-serif;padding:40px;margin:0;} .header-logo{text-align:center;margin-bottom:20px;} .titulo{text-align:center;color:#0a2b4e;margin-bottom:30px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;} .firma{margin-top:40px;border-top:1px solid #ccc;padding-top:20px;text-align:center;}</style></head><body>${getLogoHtml()}<h2 class="titulo">INFORME TÉCNICO DE LABORATORIO</h2><div><strong>N° Informe:</strong> ${inf.numero}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="info"><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}<br><strong>Servicio:</strong> ${inf.tipo}<br><strong>Diagnóstico:</strong> ${inf.diagnostico}<br><strong>Valores de medición:</strong> ${inf.valores || "No especificado"}<br><strong>Nota final:</strong> ${inf.notaFinal || "Ninguna"}</div>${inf.foto ? `<div><strong>Evidencias:</strong><br><img src="${inf.foto}" style="max-width:300px; border-radius:8px;"></div>` : ""}<div class="firma"><strong>Elaboró y Verificó:</strong><br>Ing. Stephania Garcia<br>Coordinadora de Laboratorio<br>Auditor ISO/IEC 17025:2017<br>CI RENTELCOM SAS</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></body></html>`;
+        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe_${inf.numero}</title><style>body{font-family:'Segoe UI',Arial,sans-serif;padding:40px;margin:0;} .titulo{text-align:center;color:#0a2b4e;margin-bottom:30px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;} .firma{margin-top:40px;border-top:1px solid #ccc;padding-top:20px;text-align:center;}</style></head><body>${getLogoHtml()}<h2 class="titulo">INFORME TÉCNICO DE LABORATORIO</h2><div><strong>N° Informe:</strong> ${inf.numero}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="info"><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}<br><strong>Servicio:</strong> ${inf.tipo}<br><strong>Diagnóstico:</strong> ${inf.diagnostico}<br><strong>Valores de medición:</strong> ${inf.valores || "No especificado"}<br><strong>Nota final:</strong> ${inf.notaFinal || "Ninguna"}</div>${inf.foto ? `<div><strong>Evidencias:</strong><br><img src="${inf.foto}" style="max-width:300px; border-radius:8px;"></div>` : ""}<div class="firma"><strong>Elaboró y Verificó:</strong><br>Ing. Stephania Garcia<br>Coordinadora de Laboratorio<br>Auditor ISO/IEC 17025:2017<br>CI RENTELCOM SAS</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></body></html>`;
         const blob = new Blob([doc], {type: 'text/html'}); 
         window.open(URL.createObjectURL(blob), '_blank');
     };
@@ -412,7 +437,7 @@
         // Tabla EQUIPOS
         const tbodyEquipos = document.getElementById("equiposBody");
         if(equipos.length === 0) {
-            tbodyEquipos.innerHTML = '<td><td colspan="7" style="text-align:center;">No hay equipos registrados</td></tr>';
+            tbodyEquipos.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay equipos registrados</td></tr>';
         } else {
             tbodyEquipos.innerHTML = equipos.map((e, idx) => `
                 <tr>
@@ -435,7 +460,6 @@
         if(informes.length === 0) {
             tbodyInformes.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
         } else {
-            // Ordenar por fecha (del más antiguo al más nuevo)
             const informesOrdenados = [...informes].sort((a, b) => {
                 if(!a.fecha) return 1;
                 if(!b.fecha) return -1;
@@ -457,6 +481,7 @@
                         <td><span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span></td>
                         <td>
                             <button class="pdf-btn" onclick="generarPDFInforme(informes[${originalIdx}])">PDF</button>
+                            <button class="edit-btn" onclick="editarInforme(${originalIdx})">✏️</button>
                             <button class="delete-btn" onclick="eliminarInforme(${originalIdx})">🗑️</button>
                         </td>
                     </tr>
@@ -494,7 +519,6 @@
         guardarDatos();
         renderAll();
         
-        // Limpiar formulario
         document.getElementById("entradaConsecutivo").value = "";
         document.getElementById("entradaSerial").value = "";
         document.getElementById("entradaEquipo").value = "";
@@ -512,13 +536,27 @@
         document.querySelector('.tab-btn[data-tab="nuevoEquipo"]').click();
     };
 
-    // Modal Informe
+    // Modal Informe - Nuevo
     function cerrarModalInforme() {
         document.getElementById("modalInforme").style.display = "none";
+        informeEditandoIndex = null;
+        document.getElementById("modalInformeTitulo").innerText = "📝 Informe de laboratorio";
+        document.getElementById("btnGuardarInforme").style.display = "block";
+        document.getElementById("btnActualizarInforme").style.display = "none";
+        document.getElementById("infoNumero").value = "";
+        document.getElementById("infoSerial").value = "";
+        document.getElementById("infoDiagnostico").value = "";
+        document.getElementById("infoValores").value = "";
+        document.getElementById("infoNotaFinal").value = "";
+        document.getElementById("infoFoto").value = "";
     }
     window.cerrarModalInforme = cerrarModalInforme;
 
     document.getElementById("btnNuevoInforme").onclick = () => {
+        informeEditandoIndex = null;
+        document.getElementById("modalInformeTitulo").innerText = "📝 Informe de laboratorio";
+        document.getElementById("btnGuardarInforme").style.display = "block";
+        document.getElementById("btnActualizarInforme").style.display = "none";
         document.getElementById("infoNumero").value = "";
         document.getElementById("infoSerial").value = "";
         document.getElementById("infoFecha").value = new Date().toISOString().slice(0,10);
@@ -530,6 +568,7 @@
         document.getElementById("modalInforme").style.display = "flex";
     };
 
+    // Guardar nuevo informe
     document.getElementById("btnGuardarInforme").onclick = async () => {
         const numero = document.getElementById("infoNumero").value.trim();
         const serial = document.getElementById("infoSerial").value.trim();
@@ -563,6 +602,44 @@
         renderAll();
         cerrarModalInforme();
         mostrarMensaje(`✅ Informe ${numero} guardado`);
+    };
+
+    // Actualizar informe existente
+    document.getElementById("btnActualizarInforme").onclick = async () => {
+        if(informeEditandoIndex === null) {
+            mostrarMensaje("⚠️ No hay informe seleccionado para editar");
+            return;
+        }
+        
+        const numero = document.getElementById("infoNumero").value.trim();
+        const serial = document.getElementById("infoSerial").value.trim();
+        if(!numero || !serial) { mostrarMensaje("⚠️ N° Informe y Serial son obligatorios"); return; }
+        
+        const equipo = equipos.find(e => e.serial === serial);
+        
+        let fotoBase64 = informes[informeEditandoIndex].foto || "";
+        const fotoFile = document.getElementById("infoFoto").files[0];
+        if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
+        
+        informes[informeEditandoIndex] = {
+            ...informes[informeEditandoIndex],
+            numero: numero,
+            serial: serial,
+            fecha: document.getElementById("infoFecha").value,
+            tipo: document.getElementById("infoTipo").value,
+            diagnostico: document.getElementById("infoDiagnostico").value,
+            valores: document.getElementById("infoValores").value,
+            notaFinal: document.getElementById("infoNotaFinal").value,
+            foto: fotoBase64,
+            cliente: equipo ? equipo.cliente : informes[informeEditandoIndex].cliente,
+            marca: equipo ? equipo.marca : informes[informeEditandoIndex].marca,
+            modelo: equipo ? equipo.modelo : informes[informeEditandoIndex].modelo
+        };
+        
+        guardarDatos();
+        renderAll();
+        cerrarModalInforme();
+        mostrarMensaje(`✅ Informe ${numero} actualizado correctamente`);
     };
 
     document.getElementById("btnRegistrarAprobacion").onclick = async () => {
