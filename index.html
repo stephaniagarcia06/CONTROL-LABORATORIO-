@@ -123,7 +123,7 @@
             <div class="table-responsive">
                 <table>
                     <thead>
-                        <tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Cliente</th><th>Registrado por</th><th>Estado</th><th>Acciones</th></tr>
+                        <tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Registrado por</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
                     <tbody id="equiposBody"></tbody>
                 </table>
@@ -157,7 +157,9 @@
             <button id="btnNuevoInforme" class="btn-outline" style="margin-bottom:15px;">+ Nuevo informe</button>
             <div class="table-responsive">
                 <table>
-                    <thead><tr><th>N° Informe</th><th>Fecha</th><th>Serial</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead>
+                    <thead>
+                        <tr><th>N° Informe</th><th>Fecha</th><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Acciones</th>
+                    </thead>
                     <tbody id="informesBody"></tbody>
                 </table>
             </div>
@@ -228,7 +230,7 @@
                 </div>
                 <div class="import-box">
                     <h4>📄 IMPORTAR INFORMES</h4>
-                    <p style="font-size:12px;">Columnas: numero, fecha, serial, tipo, diagnostico, valores, notaFinal</p>
+                    <p style="font-size:12px;">Columnas: numero, fecha, serial, equipo, marca, modelo, cliente, tipo, diagnostico, valores, notaFinal</p>
                     <div class="import-area" id="importInformesArea"><div>📂</div><p>Arrastra Excel de INFORMES</p></div>
                     <input type="file" id="fileInformesInput" accept=".xlsx" style="display:none;">
                     <div id="importInformesPreview"></div>
@@ -365,7 +367,7 @@
     };
 
     window.generarPDFInforme = async function(inf) {
-        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe_${inf.numero}</title><style>body{font-family:'Segoe UI',Arial,sans-serif;padding:40px;margin:0;} .titulo{text-align:center;color:#0a2b4e;margin-bottom:30px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;} .firma{margin-top:40px;border-top:1px solid #ccc;padding-top:20px;text-align:center;}</style></head><body>${getLogoHtml()}<h2 class="titulo">INFORME TÉCNICO DE LABORATORIO</h2><div><strong>N° Informe:</strong> ${inf.numero}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="info"><strong>Equipo:</strong> ${inf.marca} ${inf.modelo}<br><strong>Servicio:</strong> ${inf.tipo}<br><strong>Diagnóstico:</strong> ${inf.diagnostico}<br><strong>Valores de medición:</strong> ${inf.valores || "No especificado"}<br><strong>Nota final:</strong> ${inf.notaFinal || "Ninguna"}</div>${inf.foto ? `<div><strong>Evidencias:</strong><br><img src="${inf.foto}" style="max-width:300px; border-radius:8px;"></div>` : ""}<div class="firma"><strong>Elaboró y Verificó:</strong><br>Ing. Stephania Garcia<br>Coordinadora de Laboratorio<br>Auditor ISO/IEC 17025:2017<br>CI RENTELCOM SAS</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></body></html>`;
+        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Informe_${inf.numero}</title><style>body{font-family:'Segoe UI',Arial,sans-serif;padding:40px;margin:0;} .titulo{text-align:center;color:#0a2b4e;margin-bottom:30px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;} .firma{margin-top:40px;border-top:1px solid #ccc;padding-top:20px;text-align:center;}</style></head><body>${getLogoHtml()}<h2 class="titulo">INFORME TÉCNICO DE LABORATORIO</h2><div><strong>N° Informe:</strong> ${inf.numero}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="info"><strong>Equipo:</strong> ${inf.equipo} ${inf.marca} ${inf.modelo}<br><strong>Servicio:</strong> ${inf.tipo}<br><strong>Diagnóstico:</strong> ${inf.diagnostico}<br><strong>Valores de medición:</strong> ${inf.valores || "No especificado"}<br><strong>Nota final:</strong> ${inf.notaFinal || "Ninguna"}</div>${inf.foto ? `<div><strong>Evidencias:</strong><br><img src="${inf.foto}" style="max-width:300px; border-radius:8px;"></div>` : ""}<div class="firma"><strong>Elaboró y Verificó:</strong><br>Ing. Stephania Garcia<br>Coordinadora de Laboratorio<br>Auditor ISO/IEC 17025:2017<br>CI RENTELCOM SAS</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></body></html>`;
         const blob = new Blob([doc], {type: 'text/html'}); 
         window.open(URL.createObjectURL(blob), '_blank');
     };
@@ -408,7 +410,7 @@
                 let estadoClass = "badge-pendiente";
                 if(inf.estadoAprobacion === "Aprobado") estadoClass = "badge-aprobado";
                 if(inf.estadoAprobacion === "Rechazado") estadoClass = "badge-rechazado";
-                html += `<div class="timeline-item"><strong>📄 INFORME TÉCNICO</strong><br>N° Informe: ${inf.numero}<br>Fecha: ${inf.fecha}<br>Servicio: ${inf.tipo}<br>Diagnóstico: ${inf.diagnostico}<br>Estado aprobación: <span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span>${inf.fechaEnvioCliente ? `<br>📅 Envío al cliente: ${inf.fechaEnvioCliente}` : ""}${inf.obsCliente ? `<br>💬 Observaciones: ${inf.obsCliente}` : ""}${inf.foto ? `<br><img src="${inf.foto}" class="foto-miniatura">` : ""}</div>`;
+                html += `<div class="timeline-item"><strong>📄 INFORME TÉCNICO</strong><br>N° Informe: ${inf.numero}<br>Fecha: ${inf.fecha}<br>Serial: ${inf.serial}<br>Equipo: ${inf.equipo || "-"}<br>Marca: ${inf.marca || "-"}<br>Modelo: ${inf.modelo || "-"}<br>Cliente: ${inf.cliente || "-"}<br>Servicio: ${inf.tipo || "-"}<br>Estado: <span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span>${inf.fechaEnvioCliente ? `<br>📅 Envío al cliente: ${inf.fechaEnvioCliente}` : ""}${inf.obsCliente ? `<br>💬 Observaciones: ${inf.obsCliente}` : ""}${inf.foto ? `<br><img src="${inf.foto}" class="foto-miniatura">` : ""}</div>`;
             });
         }
         resultadosDiv.innerHTML = html;
@@ -436,13 +438,15 @@
         // Tabla EQUIPOS
         const tbodyEquipos = document.getElementById("equiposBody");
         if(equipos.length === 0) {
-            tbodyEquipos.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay equipos registrados</td></tr>';
+            tbodyEquipos.innerHTML = '<tr><td colspan="9" style="text-align:center;">No hay equipos registrados</td></tr>';
         } else {
             tbodyEquipos.innerHTML = equipos.map((e, idx) => `
                 <tr>
                     <td style="font-weight:bold;">${e.consecutivo || ("ENT-" + (idx+1))}</td>
                     <td class="serial-link" onclick="buscarPorSerial('${e.serial}')">${e.serial}</td>
                     <td>${e.equipo || "-"}</td>
+                    <td>${e.marca || "-"}</td>
+                    <td>${e.modelo || "-"}</td>
                     <td>${e.cliente || "-"}</td>
                     <td>${e.registradoPor || "No especificado"}</td>
                     <td><span class="status-badge badge-pendiente">${e.estado || "Activo"}</span></td>
@@ -450,19 +454,19 @@
                         <button class="pdf-btn" onclick="generarPDFEntrada(equipos[${idx}], '${e.consecutivo || ("ENT-" + (idx+1))}')">PDF</button>
                         <button class="delete-btn" onclick="eliminarEquipo(${idx})">🗑️</button>
                     </td>
-                </tr>
+                </table>
             `).join('');
         }
         
-        // ========== INFORMES ORDENADOS (MÁS ANTIGUO PRIMERO, ÚLTIMO AL FINAL) ==========
+        // ========== INFORMES ORDENADOS (MÁS NUEVO PRIMERO) ==========
         const tbodyInformes = document.getElementById("informesBody");
         if(informes.length === 0) {
-            tbodyInformes.innerHTML = '<td><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
+            tbodyInformes.innerHTML = '<tr><td colspan="10" style="text-align:center;">No hay informes registrados</td></tr>';
         } else {
             const informesOrdenados = [...informes].sort((a, b) => {
                 if(!a.fecha) return 1;
                 if(!b.fecha) return -1;
-                return new Date(a.fecha) - new Date(b.fecha);
+                return new Date(b.fecha) - new Date(a.fecha);
             });
             
             tbodyInformes.innerHTML = informesOrdenados.map((inf) => {
@@ -475,6 +479,9 @@
                         <td style="font-weight:bold;">${inf.numero}</td>
                         <td>${inf.fecha || "-"}</td>
                         <td class="serial-link" onclick="buscarPorSerial('${inf.serial}')">${inf.serial}</td>
+                        <td>${inf.equipo || "-"}</td>
+                        <td>${inf.marca || "-"}</td>
+                        <td>${inf.modelo || "-"}</td>
                         <td>${inf.cliente || "-"}</td>
                         <td>${inf.tipo || "-"}</td>
                         <td><span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span></td>
@@ -483,7 +490,7 @@
                             <button class="edit-btn" onclick="editarInforme(${originalIdx})">✏️</button>
                             <button class="delete-btn" onclick="eliminarInforme(${originalIdx})">🗑️</button>
                         </td>
-                    </tr>
+                    </table>
                 `;
             }).join('');
         }
@@ -580,9 +587,10 @@
             valores: document.getElementById("infoValores").value,
             notaFinal: document.getElementById("infoNotaFinal").value,
             foto: fotoBase64,
-            cliente: equipo ? equipo.cliente : "No especificado",
+            equipo: equipo ? equipo.equipo : "No especificado",
             marca: equipo ? equipo.marca : "",
             modelo: equipo ? equipo.modelo : "",
+            cliente: equipo ? equipo.cliente : "No especificado",
             estadoAprobacion: "Pendiente",
             fechaEnvioCliente: "",
             obsCliente: ""
@@ -621,9 +629,10 @@
             valores: document.getElementById("infoValores").value,
             notaFinal: document.getElementById("infoNotaFinal").value,
             foto: fotoBase64,
-            cliente: equipo ? equipo.cliente : informes[informeEditandoIndex].cliente,
+            equipo: equipo ? equipo.equipo : informes[informeEditandoIndex].equipo,
             marca: equipo ? equipo.marca : informes[informeEditandoIndex].marca,
-            modelo: equipo ? equipo.modelo : informes[informeEditandoIndex].modelo
+            modelo: equipo ? equipo.modelo : informes[informeEditandoIndex].modelo,
+            cliente: equipo ? equipo.cliente : informes[informeEditandoIndex].cliente
         };
         
         guardarDatos();
@@ -709,8 +718,8 @@
             {id:2, consecutivo:"ENT-002", serial:"BB789012", equipo:"Power Meter", marca:"JDSU", modelo:"OLP-85", cliente:"TELECOM SAS", accesorios:"Conectores, batería", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"}
         ];
         informes = [
-            {numero:"INF-001", serial:"AA123456", fecha:"2025-01-15", tipo:"Calibración", diagnostico:"Equipo dentro de especificaciones", valores:"Potencia: OK", notaFinal:"Aprobado", cliente:"INMEL INGENIERIA", marca:"EXFO", modelo:"MAX-715", estadoAprobacion:"Aprobado", fechaEnvioCliente:"2025-01-20", obsCliente:"Conforme", foto:""},
-            {numero:"INF-002", serial:"BB789012", fecha:"2025-01-20", tipo:"Reparación", diagnostico:"Sensor dañado reemplazado", valores:"OK", notaFinal:"Reparado", cliente:"TELECOM SAS", marca:"JDSU", modelo:"OLP-85", estadoAprobacion:"Pendiente", fechaEnvioCliente:"", obsCliente:"", foto:""}
+            {numero:"INF-001", serial:"AA123456", fecha:"2025-01-15", tipo:"Calibración", diagnostico:"Equipo dentro de especificaciones", valores:"Potencia: OK", notaFinal:"Aprobado", cliente:"INMEL INGENIERIA", equipo:"OTDR", marca:"EXFO", modelo:"MAX-715", estadoAprobacion:"Aprobado", fechaEnvioCliente:"2025-01-20", obsCliente:"Conforme", foto:""},
+            {numero:"INF-002", serial:"BB789012", fecha:"2025-01-20", tipo:"Reparación", diagnostico:"Sensor dañado reemplazado", valores:"OK", notaFinal:"Reparado", cliente:"TELECOM SAS", equipo:"Power Meter", marca:"JDSU", modelo:"OLP-85", estadoAprobacion:"Pendiente", fechaEnvioCliente:"", obsCliente:"", foto:""}
         ];
         nextId = 103;
         guardarDatos();
@@ -728,7 +737,7 @@
     };
 
     document.getElementById("btnExportarInformes").onclick = () => {
-        const data = informes.map(i => ({Numero:i.numero, Serial:i.serial, Fecha:i.fecha, Servicio:i.tipo, Diagnostico:i.diagnostico, Valores:i.valores, NotaFinal:i.notaFinal, EstadoAprobacion:i.estadoAprobacion}));
+        const data = informes.map(i => ({Numero:i.numero, Serial:i.serial, Fecha:i.fecha, Equipo:i.equipo, Marca:i.marca, Modelo:i.modelo, Cliente:i.cliente, Servicio:i.tipo, Diagnostico:i.diagnostico, Valores:i.valores, NotaFinal:i.notaFinal, EstadoAprobacion:i.estadoAprobacion}));
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Informes");
@@ -737,7 +746,7 @@
 
     document.getElementById("btnExportarCompleto").onclick = () => {
         const dataEquipos = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Cliente:e.cliente}));
-        const dataInformes = informes.map(i => ({Numero:i.numero, Serial:i.serial, Servicio:i.tipo, Estado:i.estadoAprobacion}));
+        const dataInformes = informes.map(i => ({Numero:i.numero, Serial:i.serial, Equipo:i.equipo, Servicio:i.tipo, Estado:i.estadoAprobacion}));
         const wsEquipos = XLSX.utils.json_to_sheet(dataEquipos);
         const wsInformes = XLSX.utils.json_to_sheet(dataInformes);
         const wb = XLSX.utils.book_new();
@@ -765,13 +774,37 @@
                 if(isEquipos) {
                     rows.forEach(row => {
                         equipos.push({
-                            id: nextId++, consecutivo: row.consecutivo || row.Consecutivo || "", serial: row.serial || row.Serial || "", equipo: row.equipo || row.Equipo || "", marca: row.marca || row.Marca || "", modelo: row.modelo || row.Modelo || "", cliente: row.cliente || row.Cliente || "", accesorios: row.accesorios || row.Accesorios || "", registradoPor: row.registradoPor || row.RegistradoPor || "Importado", fotoEntrada: "", estado: "Activo"
+                            id: nextId++, 
+                            consecutivo: row.consecutivo || row.Consecutivo || "", 
+                            serial: row.serial || row.Serial || "", 
+                            equipo: row.equipo || row.Equipo || "", 
+                            marca: row.marca || row.Marca || "", 
+                            modelo: row.modelo || row.Modelo || "", 
+                            cliente: row.cliente || row.Cliente || "", 
+                            accesorios: row.accesorios || row.Accesorios || "", 
+                            registradoPor: row.registradoPor || row.RegistradoPor || "Importado", 
+                            fotoEntrada: "", 
+                            estado: "Activo"
                         });
                     });
                 } else {
                     rows.forEach(row => {
                         informes.push({
-                            numero: row.numero || row.Numero || "", serial: row.serial || row.Serial || "", fecha: row.fecha || row.Fecha || "", tipo: row.tipo || row.Tipo || "", diagnostico: row.diagnostico || row.Diagnostico || "", valores: row.valores || row.Valores || "", notaFinal: row.notaFinal || row.NotaFinal || "", foto: "", cliente: "Importado", marca: "", modelo: "", estadoAprobacion: "Pendiente"
+                            numero: row.numero || row.Numero || "", 
+                            serial: row.serial || row.Serial || "", 
+                            fecha: row.fecha || row.Fecha || "", 
+                            tipo: row.tipo || row.Tipo || "", 
+                            diagnostico: row.diagnostico || row.Diagnostico || "", 
+                            valores: row.valores || row.Valores || "", 
+                            notaFinal: row.notaFinal || row.NotaFinal || "", 
+                            foto: "", 
+                            equipo: row.equipo || row.Equipo || "No especificado",
+                            marca: row.marca || row.Marca || "",
+                            modelo: row.modelo || row.Modelo || "",
+                            cliente: row.cliente || row.Cliente || "Importado",
+                            estadoAprobacion: "Pendiente",
+                            fechaEnvioCliente: "",
+                            obsCliente: ""
                         });
                     });
                 }
