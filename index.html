@@ -35,29 +35,32 @@
         .card .number { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
         
         .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid var(--gray-border); margin-bottom: 28px; }
-        .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-radius: 30px; color: var(--text-gray); }
+        .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-radius: 30px; color: var(--text-gray); transition: all 0.2s; }
         .tab-btn:hover { background: var(--secondary); color: var(--primary); }
         .tab-btn.active { background: var(--primary); color: white; }
         
         .tab-pane { display: none; }
         .tab-pane.active-pane { display: block; }
         
-        .form-card, .table-card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 32px; border: 1px solid var(--gray-border); }
+        .form-card, .table-card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 32px; border: 1px solid var(--gray-border); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .form-card h3, .table-card h3 { margin-bottom: 20px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 12px; }
         
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
-        label { font-weight: 600; font-size: 0.8rem; color: var(--text-gray); text-transform: uppercase; }
-        input, select, textarea { padding: 12px; border: 1px solid var(--gray-border); border-radius: 12px; font-family: inherit; }
+        label { font-weight: 600; font-size: 0.75rem; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea { padding: 12px; border: 1px solid var(--gray-border); border-radius: 12px; font-family: inherit; font-size: 0.9rem; transition: border-color 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
         textarea { resize: vertical; min-height: 60px; }
         
-        button { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; }
-        button:hover { background: var(--primary-dark); }
+        button { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        button:hover { background: var(--primary-dark); transform: translateY(-1px); }
         .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
         .btn-outline:hover { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #b91c1c; }
         .btn-success { background: var(--success); }
         
+        .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
         th { background: var(--secondary); font-weight: 600; color: var(--primary); }
@@ -65,27 +68,30 @@
         .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
         .badge-pendiente { background: #fef3c7; color: #d97706; }
         .badge-aprobado { background: #d1fae5; color: #059669; }
-        .badge-rechazado { background: #ffe6e6; color: #c62828; }
+        .badge-rechazado { background: #fee2e2; color: #dc2626; }
         
         .pdf-btn { background: var(--danger); padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
-        .delete-btn { background: #b91c1c; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
-        .delete-btn:hover { background: #7f1a1a; }
-        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; }
-        .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .import-area { border: 2px dashed var(--gray-border); padding: 20px; text-align: center; border-radius: 16px; cursor: pointer; margin: 10px 0; }
+        .pdf-btn:hover { background: #b91c1c; }
+        .delete-btn { background: #6b7280; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
+        .delete-btn:hover { background: #4b5563; }
+        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; cursor: pointer; }
+        .alert-success { background: #d1fae5; color: #065f46; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .import-area { border: 2px dashed var(--gray-border); padding: 20px; text-align: center; border-radius: 16px; cursor: pointer; margin: 10px 0; transition: all 0.2s; }
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
         .app-footer { text-align: center; padding: 20px; color: var(--text-gray); font-size: 0.7rem; border-top: 1px solid var(--gray-border); margin-top: 20px; }
         .serial-link { color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline; }
+        .serial-link:hover { color: var(--primary-dark); }
         .timeline-item { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .table-responsive { overflow-x: auto; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; border-radius: 20px; padding: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-modal { font-size: 24px; cursor: pointer; }
+        .close-modal { font-size: 28px; cursor: pointer; color: var(--text-gray); }
+        .close-modal:hover { color: var(--danger); }
         .import-separado { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
         .import-box { border: 1px solid var(--gray-border); border-radius: 16px; padding: 20px; background: var(--secondary); }
         .export-buttons { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
-        @media (max-width: 768px) { .import-separado { grid-template-columns: 1fr; } }
+        hr { margin: 20px 0; border: none; border-top: 1px solid var(--gray-border); }
+        @media (max-width: 768px) { .import-separado { grid-template-columns: 1fr; } body { padding: 16px; } }
     </style>
 </head>
 <body>
@@ -97,26 +103,26 @@
     <div id="mensajeExito" class="alert-success"></div>
 
     <div class="dashboard">
-        <div class="card" data-accion="equipos"><h3>Equipos</h3><div class="number" id="totalEquipos">0</div></div>
-        <div class="card" data-accion="informes"><h3>Informes</h3><div class="number" id="totalInformes">0</div></div>
-        <div class="card" data-accion="pendientes"><h3>Pendientes</h3><div class="number" id="pendientes">0</div></div>
-        <div class="card" data-accion="aprobados"><h3>Aprobados</h3><div class="number" id="aprobados">0</div></div>
+        <div class="card" data-accion="equipos"><h3>📡 Equipos</h3><div class="number" id="totalEquipos">0</div></div>
+        <div class="card" data-accion="informes"><h3>📄 Informes</h3><div class="number" id="totalInformes">0</div></div>
+        <div class="card" data-accion="pendientes"><h3>⏳ Pendientes</h3><div class="number" id="pendientes">0</div></div>
+        <div class="card" data-accion="aprobados"><h3>✅ Aprobados</h3><div class="number" id="aprobados">0</div></div>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" data-tab="equipos">📋 Equipos</button>
         <button class="tab-btn" data-tab="nuevoEquipo">📥 Nueva Entrada</button>
         <button class="tab-btn" data-tab="informes">📄 Informes</button>
-        <button class="tab-btn" data-tab="aprobacion">✅ Aprobación Comercial</button>
+        <button class="tab-btn" data-tab="aprobacion">✅ Aprobación</button>
         <button class="tab-btn" data-tab="trazabilidad">🔍 Trazabilidad</button>
-        <button class="tab-btn" data-tab="importar">📂 Importar datos</button>
+        <button class="tab-btn" data-tab="importar">📂 Importar</button>
         <button class="tab-btn" data-tab="configuracion">⚙️ Configuración</button>
     </div>
 
     <!-- EQUIPOS -->
     <div id="equipos" class="tab-pane active-pane">
         <div class="table-card">
-            <h3>Gestión de equipos</h3>
+            <h3>📋 Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Nueva entrada</button>
             <div class="table-responsive">
                 <table>
@@ -142,7 +148,7 @@
                 <div class="input-group"><label>Cliente</label><input id="entradaCliente" placeholder="INMEL INGENIERIA"></div>
                 <div class="input-group"><label>Accesorios</label><textarea id="entradaAccesorios" rows="2" placeholder="Maletín, cargador, conectores..."></textarea></div>
                 <div class="input-group"><label>📷 Foto ingreso</label><input type="file" id="entradaFoto" accept="image/*"></div>
-                <div class="input-group"><label>👤 Registrado por (técnico)</label><input id="entradaRegistradoPor" value="Stephania Garcia"></div>
+                <div class="input-group"><label>👤 Registrado por</label><input id="entradaRegistradoPor" value="Stephania Garcia"></div>
             </div>
             <button id="btnGuardarEntrada">💾 Guardar entrada y generar PDF</button>
         </div>
@@ -151,7 +157,7 @@
     <!-- INFORMES TÉCNICOS -->
     <div id="informes" class="tab-pane">
         <div class="table-card">
-            <h3>Informes técnicos de laboratorio</h3>
+            <h3>📄 Informes técnicos de laboratorio</h3>
             <button id="btnNuevoInforme" class="btn-outline" style="margin-bottom:15px;">+ Nuevo informe</button>
             <div class="table-responsive">
                 <table>
@@ -193,7 +199,7 @@
                         <option value="Negociacion">🔄 En negociación</option>
                     </select>
                 </div>
-                <div class="input-group"><label>💬 Observaciones del cliente</label><textarea id="obsClienteAprobacion" rows="3"></textarea></div>
+                <div class="input-group"><label>💬 Observaciones</label><textarea id="obsClienteAprobacion" rows="3"></textarea></div>
             </div>
             <button id="btnRegistrarAprobacion">💾 Registrar aprobación y generar PDF</button>
         </div>
@@ -214,18 +220,18 @@
     <!-- IMPORTAR DATOS -->
     <div id="importar" class="tab-pane">
         <div class="form-card">
-            <h3>Importar datos por separado</h3>
+            <h3>📂 Importar datos</h3>
             <div class="import-separado">
                 <div class="import-box">
                     <h4>📋 IMPORTAR EQUIPOS</h4>
                     <p style="font-size:12px;">Columnas: consecutivo, serial, equipo, marca, modelo, cliente, accesorios, registradoPor</p>
-                    <div class="import-area" id="importEquiposArea"><div>📂</div><p>Arrastra Excel de EQUIPOS</p></div>
+                    <div class="import-area" id="importEquiposArea"><div>📂</div><p>Haz clic o arrastra Excel de EQUIPOS</p></div>
                     <input type="file" id="fileEquiposInput" accept=".xlsx" style="display:none;">
                 </div>
                 <div class="import-box">
                     <h4>📄 IMPORTAR INFORMES</h4>
                     <p style="font-size:12px;">Columnas: numero, fecha, serial, tipo, diagnostico, valores, notaFinal</p>
-                    <div class="import-area" id="importInformesArea"><div>📂</div><p>Arrastra Excel de INFORMES</p></div>
+                    <div class="import-area" id="importInformesArea"><div>📂</div><p>Haz clic o arrastra Excel de INFORMES</p></div>
                     <input type="file" id="fileInformesInput" accept=".xlsx" style="display:none;">
                 </div>
             </div>
@@ -235,23 +241,23 @@
     <!-- CONFIGURACIÓN -->
     <div id="configuracion" class="tab-pane">
         <div class="form-card">
-            <h3>Configuración</h3>
+            <h3>⚙️ Configuración</h3>
             <div class="export-buttons">
                 <button id="btnExportarCompleto" class="btn-success">📊 Exportar TODO</button>
                 <button id="btnExportarEquipos" class="btn-outline">📋 Exportar EQUIPOS</button>
                 <button id="btnExportarInformes" class="btn-outline">📄 Exportar INFORMES</button>
             </div>
-            <hr style="margin:20px 0;">
-            <h3>Logo corporativo</h3>
+            <hr>
+            <h3>🖼️ Logo corporativo</h3>
             <input type="file" id="logoEmpresa" accept="image/*">
-            <div id="logoPreview"></div>
+            <div id="logoPreview" style="margin: 10px 0;"></div>
             <button id="btnGuardarLogo">Guardar Logo</button>
-            <hr style="margin:20px 0;">
+            <hr>
             <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
-            <button id="btnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar ejemplo</button>
+            <button id="btnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar datos de ejemplo</button>
         </div>
     </div>
-    <div class="app-footer">CI RENTELCOM SAS - Carrera 19A No. 150-50 Bogotá D.C.</div>
+    <div class="app-footer">CI RENTELCOM SAS - Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div>
 </div>
 
 <script>
@@ -286,7 +292,7 @@
             nextId = nextIdGuardado ? parseInt(nextIdGuardado) : 100;
             logoEmpresaBase64 = logoGuardado || "";
             
-            console.log("📀 Datos cargados:", { equipos: equipos.length, informes: informes.length, nextId: nextId });
+            console.log("📀 Datos cargados:", { equipos: equipos.length, informes: informes.length });
         } catch(e) {
             console.error("Error cargando:", e);
             equipos = [];
@@ -298,9 +304,11 @@
 
     function mostrarMensaje(msg) { 
         const d = document.getElementById("mensajeExito"); 
-        d.innerText = msg; 
-        d.style.display = "block"; 
-        setTimeout(() => d.style.display = "none", 3000);
+        if(d) {
+            d.innerText = msg; 
+            d.style.display = "block"; 
+            setTimeout(() => d.style.display = "none", 3000);
+        }
     }
     
     function fileToBase64(file) { 
@@ -323,7 +331,7 @@
         return logoEmpresaBase64 ? `<div style="text-align:center; margin-bottom:15px;"><img src="${logoEmpresaBase64}" style="max-height:70px;"></div>` : '<div style="text-align:center; margin-bottom:15px;"><h3>CI RENTELCOM SAS</h3></div>';
     }
 
-    // ========== ELIMINAR FUNCIONES GLOBALES ==========
+    // ========== ELIMINAR FUNCIONES ==========
     window.eliminarEquipo = (index) => {
         if(confirm(`¿Eliminar el equipo ${equipos[index].serial}? También se eliminarán sus informes asociados.`)){
             const serial = equipos[index].serial;
@@ -358,7 +366,7 @@
     // ========== PDFs ==========
     window.generarPDFEntrada = async function(eq, consecutivo) {
         const fecha = new Date().toLocaleDateString('es-CO');
-        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Entrada_${eq.serial}</title><style>body{font-family:Segoe UI;padding:40px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;}</style></head><body>${getLogoHtml()}<h2 style="text-align:center;">REGISTRO DE ENTRADA DE EQUIPO</h2><div><strong>Fecha:</strong> ${fecha}</div><div><strong>Consecutivo:</strong> ${consecutivo}</div><div class="info"><strong>Serial:</strong> ${eq.serial}<br><strong>Equipo:</strong> ${eq.equipo}<br><strong>Marca/Modelo:</strong> ${eq.marca} ${eq.modelo}<br><strong>Cliente:</strong> ${eq.cliente}<br><strong>Accesorios:</strong> ${eq.accesorios || "Ninguno"}<br><strong>Registrado por:</strong> ${eq.registradoPor}</div>${eq.fotoEntrada ? `<div><strong>Foto ingreso:</strong><br><img src="${eq.fotoEntrada}" style="max-width:300px; border-radius:8px;"></div>` : ""}<div style="margin-top:30px; border-top:1px solid #ccc; padding-top:15px;"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div></body></html>`;
+        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Entrada_${eq.serial}</title><style>body{font-family:Segoe UI;padding:40px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;}</style></head><body>${getLogoHtml()}<h2 style="text-align:center;">REGISTRO DE ENTRADA DE EQUIPO</h2><div><strong>Fecha:</strong> ${fecha}</div><div><strong>Consecutivo:</strong> ${consecutivo}</div><div class="info"><strong>Serial:</strong> ${eq.serial}<br><strong>Equipo:</strong> ${eq.equipo}<br><strong>Marca/Modelo:</strong> ${eq.marca} ${eq.modelo}<br><strong>Cliente:</strong> ${eq.cliente}<br><strong>Accesorios:</strong> ${eq.accesorios || "Ninguno"}<br><strong>Registrado por:</strong> ${eq.registradoPor}</div>${eq.fotoEntrada ? `<div><strong>Foto ingreso:</strong><br><img src="${eq.fotoEntrada}" style="max-width:300px; border-radius:8px;"></div>` : ""}<div style="margin-top:30px; border-top:1px solid #ccc; padding-top:15px;"><strong>Verificado por:</strong><br>Ing. Stephania Garcia<br>Auditor ISO/IEC 17025:2017</div><div style="margin-top:20px; font-size:10px; text-align:center;">Carrera 19A No. 150-50 Bogotá D.C.</div></body></html>`;
         const blob = new Blob([doc], {type: 'text/html'}); 
         window.open(URL.createObjectURL(blob), '_blank');
     };
@@ -373,7 +381,7 @@
         const fechaActual = new Date().toLocaleDateString('es-CO');
         const estadoTexto = estado === 'Aprobado' ? 'APROBADO' : (estado === 'Rechazado' ? 'RECHAZADO' : (estado === 'Negociacion' ? 'EN NEGOCIACIÓN' : 'PENDIENTE'));
         const colorEstado = estado === 'Aprobado' ? 'green' : (estado === 'Rechazado' ? 'red' : 'orange');
-        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Aprobacion_${inf.numero}</title><style>body{font-family:Segoe UI;padding:40px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;}</style></head><body>${getLogoHtml()}<h2 style="text-align:center;">APROBACIÓN COMERCIAL</h2><div><strong>Fecha de emisión:</strong> ${fechaActual}</div><div><strong>Informe N°:</strong> ${inf.numero}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="info"><strong>Fecha de envío al cliente:</strong> ${fechaEnvio}<br><strong>Estado de aprobación:</strong> <span style="color:${colorEstado}; font-weight:bold;">${estadoTexto}</span><br><strong>Observaciones del cliente:</strong> ${observaciones || "Ninguna"}</div><div style="margin-top:30px; border-top:1px solid #ccc; padding-top:15px;"><strong>Gestión comercial:</strong><br>Área Comercial CI RENTELCOM</div></body></html>`;
+        const doc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Aprobacion_${inf.numero}</title><style>body{font-family:Segoe UI;padding:40px;} .info{background:#f5f5f5;padding:20px;margin:20px 0;border-radius:12px;}</style></head><body>${getLogoHtml()}<h2 style="text-align:center;">APROBACIÓN COMERCIAL</h2><div><strong>Fecha de emisión:</strong> ${fechaActual}</div><div><strong>Informe N°:</strong> ${inf.numero}</div><div><strong>Serial:</strong> ${inf.serial}</div><div><strong>Cliente:</strong> ${inf.cliente}</div><div class="info"><strong>Fecha de envío al cliente:</strong> ${fechaEnvio}<br><strong>Estado de aprobación:</strong> <span style="color:${colorEstado}; font-weight:bold;">${estadoTexto}</span><br><strong>Observaciones:</strong> ${observaciones || "Ninguna"}</div><div style="margin-top:30px; border-top:1px solid #ccc; padding-top:15px;"><strong>Gestión comercial:</strong><br>Área Comercial CI RENTELCOM</div></body></html>`;
         const blob = new Blob([doc], {type: 'text/html'}); 
         window.open(URL.createObjectURL(blob), '_blank');
     };
@@ -407,7 +415,7 @@
                 let estadoClass = "badge-pendiente";
                 if(inf.estadoAprobacion === "Aprobado") estadoClass = "badge-aprobado";
                 if(inf.estadoAprobacion === "Rechazado") estadoClass = "badge-rechazado";
-                html += `<div class="timeline-item"><strong>📄 INFORME TÉCNICO</strong><br>N° Informe: ${inf.numero}<br>Fecha: ${inf.fecha}<br>Servicio: ${inf.tipo}<br>Diagnóstico: ${inf.diagnostico}<br>Estado aprobación: <span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span>${inf.fechaEnvioCliente ? `<br>📅 Envío al cliente: ${inf.fechaEnvioCliente}` : ""}${inf.obsCliente ? `<br>💬 Observaciones: ${inf.obsCliente}` : ""}${inf.foto ? `<br><img src="${inf.foto}" class="foto-miniatura">` : ""}</div>`;
+                html += `<div class="timeline-item"><strong>📄 INFORME TÉCNICO</strong><br>N° Informe: ${inf.numero}<br>Fecha: ${inf.fecha}<br>Servicio: ${inf.tipo}<br>Diagnóstico: ${inf.diagnostico}<br>Estado: <span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span>${inf.fechaEnvioCliente ? `<br>📅 Envío al cliente: ${inf.fechaEnvioCliente}` : ""}${inf.obsCliente ? `<br>💬 Observaciones: ${inf.obsCliente}` : ""}${inf.foto ? `<br><img src="${inf.foto}" class="foto-miniatura">` : ""}</div>`;
             });
         }
         resultadosDiv.innerHTML = html;
@@ -426,68 +434,57 @@
     }
 
     function renderAll() {
-        console.log("🎨 Renderizando...", { equipos: equipos.length, informes: informes.length });
-        
         // Dashboard
-        const totalEquiposEl = document.getElementById("totalEquipos");
-        const totalInformesEl = document.getElementById("totalInformes");
-        const pendientesEl = document.getElementById("pendientes");
-        const aprobadosEl = document.getElementById("aprobados");
-        
-        if(totalEquiposEl) totalEquiposEl.innerText = equipos.length;
-        if(totalInformesEl) totalInformesEl.innerText = informes.length;
-        if(pendientesEl) pendientesEl.innerText = informes.filter(i => i.estadoAprobacion === "Pendiente").length;
-        if(aprobadosEl) aprobadosEl.innerText = informes.filter(i => i.estadoAprobacion === "Aprobado").length;
+        document.getElementById("totalEquipos").innerText = equipos.length;
+        document.getElementById("totalInformes").innerText = informes.length;
+        document.getElementById("pendientes").innerText = informes.filter(i => i.estadoAprobacion === "Pendiente").length;
+        document.getElementById("aprobados").innerText = informes.filter(i => i.estadoAprobacion === "Aprobado").length;
         
         // Tabla EQUIPOS
         const tbodyEquipos = document.getElementById("equiposBody");
-        if(tbodyEquipos) {
-            if(equipos.length === 0) {
-                tbodyEquipos.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay equipos registrados</td></tr>';
-            } else {
-                tbodyEquipos.innerHTML = equipos.map((e, idx) => `
-                    <tr>
-                        <td>${e.consecutivo || ("ENT-" + (idx+1))}</td>
-                        <td class="serial-link" onclick="buscarPorSerial('${e.serial.replace(/'/g, "\\'")}')">${e.serial}</td>
-                        <td>${e.equipo || "-"}</td>
-                        <td>${e.cliente || "-"}</td>
-                        <td>${e.registradoPor || "No especificado"}</td>
-                        <td><span class="status-badge badge-pendiente">${e.estado || "Activo"}</span></td>
-                        <td>
-                            <button class="pdf-btn" onclick="generarPDFEntrada(equipos[${idx}], '${e.consecutivo || ("ENT-" + (idx+1))}')">PDF</button>
-                            <button class="delete-btn" onclick="eliminarEquipo(${idx})">🗑️</button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
+        if(equipos.length === 0) {
+            tbodyEquipos.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay equipos registrados</td></tr>';
+        } else {
+            tbodyEquipos.innerHTML = equipos.map((e, idx) => `
+                <tr>
+                    <td style="font-weight:bold;">${e.consecutivo || ("ENT-" + (idx+1))}</td>
+                    <td class="serial-link" onclick="buscarPorSerial('${e.serial.replace(/'/g, "\\'")}')">${e.serial}</td>
+                    <td>${e.equipo || "-"}</td>
+                    <td>${e.cliente || "-"}</td>
+                    <td>${e.registradoPor || "No especificado"}</td>
+                    <td><span class="status-badge badge-pendiente">${e.estado || "Activo"}</span></td>
+                    <td>
+                        <button class="pdf-btn" onclick="generarPDFEntrada(equipos[${idx}], '${e.consecutivo || ("ENT-" + (idx+1))}')">PDF</button>
+                        <button class="delete-btn" onclick="eliminarEquipo(${idx})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
         }
         
         // Tabla INFORMES
         const tbodyInformes = document.getElementById("informesBody");
-        if(tbodyInformes) {
-            if(informes.length === 0) {
-                tbodyInformes.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
-            } else {
-                tbodyInformes.innerHTML = informes.map((inf, idx) => {
-                    let estadoClass = "badge-pendiente";
-                    if(inf.estadoAprobacion === "Aprobado") estadoClass = "badge-aprobado";
-                    if(inf.estadoAprobacion === "Rechazado") estadoClass = "badge-rechazado";
-                    return `
-                        <tr>
-                            <td><strong>${inf.numero}</strong></td>
-                            <td>${inf.fecha || "-"}</td>
-                            <td class="serial-link" onclick="buscarPorSerial('${inf.serial.replace(/'/g, "\\'")}')">${inf.serial}</td>
-                            <td>${inf.cliente || "-"}</td>
-                            <td>${inf.tipo || "-"}</td>
-                            <td><span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span></td>
-                            <td>
-                                <button class="pdf-btn" onclick="generarPDFInforme(informes[${idx}])">PDF</button>
-                                <button class="delete-btn" onclick="eliminarInforme(${idx})">🗑️</button>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            }
+        if(informes.length === 0) {
+            tbodyInformes.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
+        } else {
+            tbodyInformes.innerHTML = informes.map((inf, idx) => {
+                let estadoClass = "badge-pendiente";
+                if(inf.estadoAprobacion === "Aprobado") estadoClass = "badge-aprobado";
+                if(inf.estadoAprobacion === "Rechazado") estadoClass = "badge-rechazado";
+                return `
+                    <tr>
+                        <td style="font-weight:bold;">${inf.numero}</td>
+                        <td>${inf.fecha || "-"}</td>
+                        <td class="serial-link" onclick="buscarPorSerial('${inf.serial.replace(/'/g, "\\'")}')">${inf.serial}</td>
+                        <td>${inf.cliente || "-"}</td>
+                        <td>${inf.tipo || "-"}</td>
+                        <td><span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span></td>
+                        <td>
+                            <button class="pdf-btn" onclick="generarPDFInforme(informes[${idx}])">PDF</button>
+                            <button class="delete-btn" onclick="eliminarInforme(${idx})">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         }
         
         cargarSelectAprobacion();
@@ -496,147 +493,127 @@
     // ==================== EVENTOS ====================
     function inicializarEventos() {
         // Guardar entrada
-        const btnGuardarEntrada = document.getElementById("btnGuardarEntrada");
-        if(btnGuardarEntrada) {
-            btnGuardarEntrada.onclick = async () => {
-                const serial = document.getElementById("entradaSerial").value.trim();
-                if(!serial) { mostrarMensaje("⚠️ El serial es obligatorio"); return; }
-                
-                let fotoBase64 = "";
-                const fotoFile = document.getElementById("entradaFoto").files[0];
-                if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
-                
-                const nuevoEquipo = {
-                    id: nextId++,
-                    consecutivo: document.getElementById("entradaConsecutivo").value,
-                    serial: serial,
-                    equipo: document.getElementById("entradaEquipo").value,
-                    marca: document.getElementById("entradaMarca").value,
-                    modelo: document.getElementById("entradaModelo").value,
-                    cliente: document.getElementById("entradaCliente").value,
-                    accesorios: document.getElementById("entradaAccesorios").value,
-                    registradoPor: document.getElementById("entradaRegistradoPor").value,
-                    fotoEntrada: fotoBase64,
-                    estado: "Activo"
-                };
-                
-                equipos.push(nuevoEquipo);
-                guardarDatos();
-                renderAll();
-                
-                // Limpiar formulario
-                document.getElementById("entradaConsecutivo").value = "";
-                document.getElementById("entradaSerial").value = "";
-                document.getElementById("entradaEquipo").value = "";
-                document.getElementById("entradaMarca").value = "";
-                document.getElementById("entradaModelo").value = "";
-                document.getElementById("entradaCliente").value = "";
-                document.getElementById("entradaAccesorios").value = "";
-                document.getElementById("entradaFoto").value = "";
-                
-                mostrarMensaje(`✅ Equipo ${serial} registrado correctamente`);
-                await generarPDFEntrada(nuevoEquipo, nuevoEquipo.consecutivo || ("ENT-" + equipos.length));
+        document.getElementById("btnGuardarEntrada").onclick = async () => {
+            const serial = document.getElementById("entradaSerial").value.trim();
+            if(!serial) { mostrarMensaje("⚠️ El serial es obligatorio"); return; }
+            
+            let fotoBase64 = "";
+            const fotoFile = document.getElementById("entradaFoto").files[0];
+            if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
+            
+            const nuevoEquipo = {
+                id: nextId++,
+                consecutivo: document.getElementById("entradaConsecutivo").value,
+                serial: serial,
+                equipo: document.getElementById("entradaEquipo").value,
+                marca: document.getElementById("entradaMarca").value,
+                modelo: document.getElementById("entradaModelo").value,
+                cliente: document.getElementById("entradaCliente").value,
+                accesorios: document.getElementById("entradaAccesorios").value,
+                registradoPor: document.getElementById("entradaRegistradoPor").value,
+                fotoEntrada: fotoBase64,
+                estado: "Activo"
             };
-        }
+            
+            equipos.push(nuevoEquipo);
+            guardarDatos();
+            renderAll();
+            
+            // Limpiar formulario
+            document.getElementById("entradaConsecutivo").value = "";
+            document.getElementById("entradaSerial").value = "";
+            document.getElementById("entradaEquipo").value = "";
+            document.getElementById("entradaMarca").value = "";
+            document.getElementById("entradaModelo").value = "";
+            document.getElementById("entradaCliente").value = "";
+            document.getElementById("entradaAccesorios").value = "";
+            document.getElementById("entradaFoto").value = "";
+            
+            mostrarMensaje(`✅ Equipo ${serial} registrado correctamente`);
+            await generarPDFEntrada(nuevoEquipo, nuevoEquipo.consecutivo || ("ENT-" + equipos.length));
+        };
 
-        // Botón agregar equipo
-        const btnAgregarEquipo = document.getElementById("btnAgregarEquipo");
-        if(btnAgregarEquipo) {
-            btnAgregarEquipo.onclick = () => {
-                const tabBtn = document.querySelector('.tab-btn[data-tab="nuevoEquipo"]');
-                if(tabBtn) tabBtn.click();
-            };
-        }
+        document.getElementById("btnAgregarEquipo").onclick = () => {
+            document.querySelector('.tab-btn[data-tab="nuevoEquipo"]').click();
+        };
 
         // Modal Informe
         window.cerrarModalInforme = function() {
-            const modal = document.getElementById("modalInforme");
-            if(modal) modal.style.display = "none";
+            document.getElementById("modalInforme").style.display = "none";
         };
 
-        const btnNuevoInforme = document.getElementById("btnNuevoInforme");
-        if(btnNuevoInforme) {
-            btnNuevoInforme.onclick = () => {
-                document.getElementById("infoNumero").value = "";
-                document.getElementById("infoSerial").value = "";
-                document.getElementById("infoFecha").value = new Date().toISOString().slice(0,10);
-                document.getElementById("infoTipo").value = "Calibración";
-                document.getElementById("infoDiagnostico").value = "";
-                document.getElementById("infoValores").value = "";
-                document.getElementById("infoNotaFinal").value = "";
-                document.getElementById("infoFoto").value = "";
-                const modal = document.getElementById("modalInforme");
-                if(modal) modal.style.display = "flex";
-            };
-        }
+        document.getElementById("btnNuevoInforme").onclick = () => {
+            document.getElementById("infoNumero").value = "";
+            document.getElementById("infoSerial").value = "";
+            document.getElementById("infoFecha").value = new Date().toISOString().slice(0,10);
+            document.getElementById("infoTipo").value = "Calibración";
+            document.getElementById("infoDiagnostico").value = "";
+            document.getElementById("infoValores").value = "";
+            document.getElementById("infoNotaFinal").value = "";
+            document.getElementById("infoFoto").value = "";
+            document.getElementById("modalInforme").style.display = "flex";
+        };
 
-        const btnGuardarInforme = document.getElementById("btnGuardarInforme");
-        if(btnGuardarInforme) {
-            btnGuardarInforme.onclick = async () => {
-                const numero = document.getElementById("infoNumero").value.trim();
-                const serial = document.getElementById("infoSerial").value.trim();
-                if(!numero || !serial) { mostrarMensaje("⚠️ N° Informe y Serial son obligatorios"); return; }
-                
-                const equipo = equipos.find(e => e.serial === serial);
-                
-                let fotoBase64 = "";
-                const fotoFile = document.getElementById("infoFoto").files[0];
-                if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
-                
-                const nuevoInforme = {
-                    numero: numero,
-                    serial: serial,
-                    fecha: document.getElementById("infoFecha").value,
-                    tipo: document.getElementById("infoTipo").value,
-                    diagnostico: document.getElementById("infoDiagnostico").value,
-                    valores: document.getElementById("infoValores").value,
-                    notaFinal: document.getElementById("infoNotaFinal").value,
-                    foto: fotoBase64,
-                    cliente: equipo ? equipo.cliente : "No especificado",
-                    marca: equipo ? equipo.marca : "",
-                    modelo: equipo ? equipo.modelo : "",
-                    estadoAprobacion: "Pendiente",
-                    fechaEnvioCliente: "",
-                    obsCliente: ""
-                };
-                
-                informes.push(nuevoInforme);
-                guardarDatos();
-                renderAll();
-                cerrarModalInforme();
-                mostrarMensaje(`✅ Informe ${numero} guardado`);
+        document.getElementById("btnGuardarInforme").onclick = async () => {
+            const numero = document.getElementById("infoNumero").value.trim();
+            const serial = document.getElementById("infoSerial").value.trim();
+            if(!numero || !serial) { mostrarMensaje("⚠️ N° Informe y Serial son obligatorios"); return; }
+            
+            const equipo = equipos.find(e => e.serial === serial);
+            
+            let fotoBase64 = "";
+            const fotoFile = document.getElementById("infoFoto").files[0];
+            if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
+            
+            const nuevoInforme = {
+                numero: numero,
+                serial: serial,
+                fecha: document.getElementById("infoFecha").value,
+                tipo: document.getElementById("infoTipo").value,
+                diagnostico: document.getElementById("infoDiagnostico").value,
+                valores: document.getElementById("infoValores").value,
+                notaFinal: document.getElementById("infoNotaFinal").value,
+                foto: fotoBase64,
+                cliente: equipo ? equipo.cliente : "No especificado",
+                marca: equipo ? equipo.marca : "",
+                modelo: equipo ? equipo.modelo : "",
+                estadoAprobacion: "Pendiente",
+                fechaEnvioCliente: "",
+                obsCliente: ""
             };
-        }
+            
+            informes.push(nuevoInforme);
+            guardarDatos();
+            renderAll();
+            cerrarModalInforme();
+            mostrarMensaje(`✅ Informe ${numero} guardado`);
+        };
 
         // Registrar aprobación
-        const btnRegistrarAprobacion = document.getElementById("btnRegistrarAprobacion");
-        if(btnRegistrarAprobacion) {
-            btnRegistrarAprobacion.onclick = async () => {
-                const informeNumero = document.getElementById("selectInformeAprobacion").value;
-                if(!informeNumero) { mostrarMensaje("⚠️ Seleccione un informe"); return; }
+        document.getElementById("btnRegistrarAprobacion").onclick = async () => {
+            const informeNumero = document.getElementById("selectInformeAprobacion").value;
+            if(!informeNumero) { mostrarMensaje("⚠️ Seleccione un informe"); return; }
+            
+            const informe = informes.find(i => i.numero === informeNumero);
+            if(informe) {
+                informe.fechaEnvioCliente = document.getElementById("fechaEnvioCliente").value;
+                informe.estadoAprobacion = document.getElementById("estadoAprobacionCliente").value;
+                informe.obsCliente = document.getElementById("obsClienteAprobacion").value;
                 
-                const informe = informes.find(i => i.numero === informeNumero);
-                if(informe) {
-                    informe.fechaEnvioCliente = document.getElementById("fechaEnvioCliente").value;
-                    informe.estadoAprobacion = document.getElementById("estadoAprobacionCliente").value;
-                    informe.obsCliente = document.getElementById("obsClienteAprobacion").value;
-                    
-                    guardarDatos();
-                    renderAll();
-                    
-                    document.getElementById("fechaEnvioCliente").value = "";
-                    document.getElementById("estadoAprobacionCliente").value = "Pendiente";
-                    document.getElementById("obsClienteAprobacion").value = "";
-                    
-                    mostrarMensaje(`✅ Aprobación registrada para informe ${informeNumero}`);
-                    await generarPDFAprobacion(informe, informe.fechaEnvioCliente, informe.estadoAprobacion, informe.obsCliente);
-                }
-            };
-        }
+                guardarDatos();
+                renderAll();
+                
+                document.getElementById("fechaEnvioCliente").value = "";
+                document.getElementById("estadoAprobacionCliente").value = "Pendiente";
+                document.getElementById("obsClienteAprobacion").value = "";
+                
+                mostrarMensaje(`✅ Aprobación registrada para informe ${informeNumero}`);
+                await generarPDFAprobacion(informe, informe.fechaEnvioCliente, informe.estadoAprobacion, informe.obsCliente);
+            }
+        };
 
         // Búsqueda trazabilidad
-        const btnBuscarTraza = document.getElementById("btnBuscarTraza");
-        if(btnBuscarTraza) btnBuscarTraza.onclick = buscarTrazabilidad;
+        document.getElementById("btnBuscarTraza").onclick = buscarTrazabilidad;
 
         // Pestañas
         document.querySelectorAll(".tab-btn").forEach(btn => {
@@ -644,8 +621,7 @@
                 document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
                 document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active-pane"));
                 btn.classList.add("active");
-                const pane = document.getElementById(btn.dataset.tab);
-                if(pane) pane.classList.add("active-pane");
+                document.getElementById(btn.dataset.tab).classList.add("active-pane");
             };
         });
 
@@ -656,97 +632,78 @@
                 let tabId = "equipos";
                 if(accion === "informes") tabId = "informes";
                 if(accion === "pendientes" || accion === "aprobados") tabId = "aprobacion";
-                const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-                if(tabBtn) tabBtn.click();
+                document.querySelector(`.tab-btn[data-tab="${tabId}"]`).click();
             };
         });
 
         // Configuración
-        const btnGuardarLogo = document.getElementById("btnGuardarLogo");
-        if(btnGuardarLogo) {
-            btnGuardarLogo.onclick = () => {
-                const f = document.getElementById("logoEmpresa").files[0]; 
-                if(f) {
-                    const reader = new FileReader(); 
-                    reader.readAsDataURL(f); 
-                    reader.onload = () => {
-                        logoEmpresaBase64 = reader.result; 
-                        guardarDatos(); 
-                        actualizarVistaLogo(); 
-                        mostrarMensaje("Logo guardado");
-                    };
-                }
-            };
-        }
-        
-        const btnEliminarTodos = document.getElementById("btnEliminarTodos");
-        if(btnEliminarTodos) {
-            btnEliminarTodos.onclick = () => {
-                if(confirm("¿Eliminar TODOS los datos?")) {
-                    equipos = []; 
-                    informes = []; 
-                    nextId = 100; 
+        document.getElementById("btnGuardarLogo").onclick = () => {
+            const f = document.getElementById("logoEmpresa").files[0]; 
+            if(f) {
+                const reader = new FileReader(); 
+                reader.readAsDataURL(f); 
+                reader.onload = () => {
+                    logoEmpresaBase64 = reader.result; 
                     guardarDatos(); 
-                    renderAll(); 
-                    mostrarMensaje("Datos eliminados");
-                }
-            };
-        }
+                    actualizarVistaLogo(); 
+                    mostrarMensaje("Logo guardado");
+                };
+            }
+        };
+        
+        document.getElementById("btnEliminarTodos").onclick = () => {
+            if(confirm("¿Eliminar TODOS los datos?")) {
+                equipos = []; 
+                informes = []; 
+                nextId = 100; 
+                guardarDatos(); 
+                renderAll(); 
+                mostrarMensaje("✅ Todos los datos eliminados");
+            }
+        };
 
-        const btnCargarEjemplo = document.getElementById("btnCargarEjemplo");
-        if(btnCargarEjemplo) {
-            btnCargarEjemplo.onclick = () => {
-                equipos = [
-                    {id:1, consecutivo:"ENT-001", serial:"AA123456", equipo:"OTDR", marca:"EXFO", modelo:"MAX-715", cliente:"INMEL INGENIERIA", accesorios:"Maletín, cargador", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"},
-                    {id:2, consecutivo:"ENT-002", serial:"BB789012", equipo:"Power Meter", marca:"JDSU", modelo:"OLP-85", cliente:"TELECOM SAS", accesorios:"Conectores, batería", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"}
-                ];
-                informes = [
-                    {numero:"INF-001", serial:"AA123456", fecha:"2025-01-15", tipo:"Calibración", diagnostico:"Equipo dentro de especificaciones", valores:"Potencia: OK", notaFinal:"Aprobado", cliente:"INMEL INGENIERIA", marca:"EXFO", modelo:"MAX-715", estadoAprobacion:"Aprobado", fechaEnvioCliente:"2025-01-20", obsCliente:"Conforme", foto:""},
-                    {numero:"INF-002", serial:"BB789012", fecha:"2025-01-20", tipo:"Reparación", diagnostico:"Sensor dañado reemplazado", valores:"OK", notaFinal:"Reparado", cliente:"TELECOM SAS", marca:"JDSU", modelo:"OLP-85", estadoAprobacion:"Pendiente", fechaEnvioCliente:"", obsCliente:"", foto:""}
-                ];
-                nextId = 103;
-                guardarDatos();
-                renderAll();
-                mostrarMensaje("Datos de ejemplo cargados");
-            };
-        }
+        document.getElementById("btnCargarEjemplo").onclick = () => {
+            equipos = [
+                {id:1, consecutivo:"ENT-001", serial:"AA123456", equipo:"OTDR", marca:"EXFO", modelo:"MAX-715", cliente:"INMEL INGENIERIA", accesorios:"Maletín, cargador", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"},
+                {id:2, consecutivo:"ENT-002", serial:"BB789012", equipo:"Power Meter", marca:"JDSU", modelo:"OLP-85", cliente:"TELECOM SAS", accesorios:"Conectores, batería", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"}
+            ];
+            informes = [
+                {numero:"INF-001", serial:"AA123456", fecha:"2025-01-15", tipo:"Calibración", diagnostico:"Equipo dentro de especificaciones", valores:"Potencia: OK", notaFinal:"Aprobado", cliente:"INMEL INGENIERIA", marca:"EXFO", modelo:"MAX-715", estadoAprobacion:"Aprobado", fechaEnvioCliente:"2025-01-20", obsCliente:"Conforme", foto:""},
+                {numero:"INF-002", serial:"BB789012", fecha:"2025-01-20", tipo:"Reparación", diagnostico:"Sensor dañado reemplazado", valores:"OK", notaFinal:"Reparado", cliente:"TELECOM SAS", marca:"JDSU", modelo:"OLP-85", estadoAprobacion:"Pendiente", fechaEnvioCliente:"", obsCliente:"", foto:""}
+            ];
+            nextId = 103;
+            guardarDatos();
+            renderAll();
+            mostrarMensaje("✅ Datos de ejemplo cargados");
+        };
 
         // Exportaciones
-        const btnExportarEquipos = document.getElementById("btnExportarEquipos");
-        if(btnExportarEquipos) {
-            btnExportarEquipos.onclick = () => {
-                const data = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Marca:e.marca, Modelo:e.modelo, Cliente:e.cliente, Accesorios:e.accesorios, RegistradoPor:e.registradoPor}));
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Equipos");
-                XLSX.writeFile(wb, `equipos_${new Date().toISOString().slice(0,10)}.xlsx`);
-            };
-        }
+        document.getElementById("btnExportarEquipos").onclick = () => {
+            const data = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Marca:e.marca, Modelo:e.modelo, Cliente:e.cliente, Accesorios:e.accesorios, RegistradoPor:e.registradoPor}));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Equipos");
+            XLSX.writeFile(wb, `equipos_${new Date().toISOString().slice(0,10)}.xlsx`);
+        };
 
-        const btnExportarInformes = document.getElementById("btnExportarInformes");
-        if(btnExportarInformes) {
-            btnExportarInformes.onclick = () => {
-                const data = informes.map(i => ({Numero:i.numero, Serial:i.serial, Fecha:i.fecha, Servicio:i.tipo, Diagnostico:i.diagnostico, Valores:i.valores, NotaFinal:i.notaFinal, EstadoAprobacion:i.estadoAprobacion}));
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Informes");
-                XLSX.writeFile(wb, `informes_${new Date().toISOString().slice(0,10)}.xlsx`);
-            };
-        }
+        document.getElementById("btnExportarInformes").onclick = () => {
+            const data = informes.map(i => ({Numero:i.numero, Serial:i.serial, Fecha:i.fecha, Servicio:i.tipo, Diagnostico:i.diagnostico, Valores:i.valores, NotaFinal:i.notaFinal, EstadoAprobacion:i.estadoAprobacion}));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Informes");
+            XLSX.writeFile(wb, `informes_${new Date().toISOString().slice(0,10)}.xlsx`);
+        };
 
-        const btnExportarCompleto = document.getElementById("btnExportarCompleto");
-        if(btnExportarCompleto) {
-            btnExportarCompleto.onclick = () => {
-                const dataEquipos = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Cliente:e.cliente}));
-                const dataInformes = informes.map(i => ({Numero:i.numero, Serial:i.serial, Servicio:i.tipo, Estado:i.estadoAprobacion}));
-                const wsEquipos = XLSX.utils.json_to_sheet(dataEquipos);
-                const wsInformes = XLSX.utils.json_to_sheet(dataInformes);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, wsEquipos, "Equipos");
-                XLSX.utils.book_append_sheet(wb, wsInformes, "Informes");
-                XLSX.writeFile(wb, `rentelcom_completo_${new Date().toISOString().slice(0,10)}.xlsx`);
-            };
-        }
+        document.getElementById("btnExportarCompleto").onclick = () => {
+            const dataEquipos = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Cliente:e.cliente}));
+            const dataInformes = informes.map(i => ({Numero:i.numero, Serial:i.serial, Servicio:i.tipo, Estado:i.estadoAprobacion}));
+            const wsEquipos = XLSX.utils.json_to_sheet(dataEquipos);
+            const wsInformes = XLSX.utils.json_to_sheet(dataInformes);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, wsEquipos, "Equipos");
+            XLSX.utils.book_append_sheet(wb, wsInformes, "Informes");
+            XLSX.writeFile(wb, `rentelcom_completo_${new Date().toISOString().slice(0,10)}.xlsx`);
+        };
 
         // Importar equipos
         const setupImport = (areaId, fileInputId, isEquipos) => {
@@ -823,8 +780,7 @@
     cargarDatos();
     inicializarEventos();
     renderAll();
-    
-    console.log("🚀 Aplicación iniciada correctamente");
+    console.log("🚀 Aplicación iniciada - Los datos se guardan automáticamente");
 </script>
 </body>
 </html>
