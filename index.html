@@ -57,7 +57,6 @@
         .btn-outline:hover { background: var(--primary); color: white; }
         .btn-danger { background: var(--danger); }
         .btn-success { background: var(--success); }
-        .btn-warning { background: var(--warning); }
         
         table { width: 100%; border-collapse: collapse; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
@@ -73,7 +72,7 @@
         .delete-btn { background: #6b7280; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
         .edit-btn:hover { background: #d97706; }
         .delete-btn:hover { background: #4b5563; }
-        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; cursor: pointer; }
+        .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; }
         .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .import-area { border: 2px dashed var(--gray-border); padding: 20px; text-align: center; border-radius: 16px; cursor: pointer; margin: 10px 0; }
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
@@ -122,7 +121,7 @@
             <h3>Gestión de equipos</h3>
             <button id="btnAgregarEquipo" class="btn-outline" style="margin-bottom:15px;">+ Nueva entrada</button>
             <div class="table-responsive">
-                <tr>
+                <table>
                     <thead>
                         <tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Cliente</th><th>Registrado por</th><th>Estado</th><th>Acciones</th></tr>
                     </thead>
@@ -262,7 +261,7 @@
 
 <script>
     let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "";
-    let informeEditandoIndex = null; // Índice del informe que se está editando
+    let informeEditandoIndex = null;
 
     function guardarDatos() {
         localStorage.setItem("equipos", JSON.stringify(equipos));
@@ -458,7 +457,7 @@
         // ========== INFORMES ORDENADOS (MÁS ANTIGUO PRIMERO, ÚLTIMO AL FINAL) ==========
         const tbodyInformes = document.getElementById("informesBody");
         if(informes.length === 0) {
-            tbodyInformes.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
+            tbodyInformes.innerHTML = '<td><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
         } else {
             const informesOrdenados = [...informes].sort((a, b) => {
                 if(!a.fecha) return 1;
@@ -493,6 +492,15 @@
     }
 
     // ========== EVENTOS ==========
+    function cerrarModalInforme() {
+        document.getElementById("modalInforme").style.display = "none";
+        informeEditandoIndex = null;
+        document.getElementById("modalInformeTitulo").innerText = "📝 Informe de laboratorio";
+        document.getElementById("btnGuardarInforme").style.display = "block";
+        document.getElementById("btnActualizarInforme").style.display = "none";
+    }
+    window.cerrarModalInforme = cerrarModalInforme;
+
     document.getElementById("btnGuardarEntrada").onclick = async () => {
         const serial = document.getElementById("entradaSerial").value.trim();
         if(!serial) { mostrarMensaje("⚠️ El serial es obligatorio"); return; }
@@ -536,22 +544,6 @@
         document.querySelector('.tab-btn[data-tab="nuevoEquipo"]').click();
     };
 
-    // Modal Informe - Nuevo
-    function cerrarModalInforme() {
-        document.getElementById("modalInforme").style.display = "none";
-        informeEditandoIndex = null;
-        document.getElementById("modalInformeTitulo").innerText = "📝 Informe de laboratorio";
-        document.getElementById("btnGuardarInforme").style.display = "block";
-        document.getElementById("btnActualizarInforme").style.display = "none";
-        document.getElementById("infoNumero").value = "";
-        document.getElementById("infoSerial").value = "";
-        document.getElementById("infoDiagnostico").value = "";
-        document.getElementById("infoValores").value = "";
-        document.getElementById("infoNotaFinal").value = "";
-        document.getElementById("infoFoto").value = "";
-    }
-    window.cerrarModalInforme = cerrarModalInforme;
-
     document.getElementById("btnNuevoInforme").onclick = () => {
         informeEditandoIndex = null;
         document.getElementById("modalInformeTitulo").innerText = "📝 Informe de laboratorio";
@@ -568,7 +560,6 @@
         document.getElementById("modalInforme").style.display = "flex";
     };
 
-    // Guardar nuevo informe
     document.getElementById("btnGuardarInforme").onclick = async () => {
         const numero = document.getElementById("infoNumero").value.trim();
         const serial = document.getElementById("infoSerial").value.trim();
@@ -604,7 +595,6 @@
         mostrarMensaje(`✅ Informe ${numero} guardado`);
     };
 
-    // Actualizar informe existente
     document.getElementById("btnActualizarInforme").onclick = async () => {
         if(informeEditandoIndex === null) {
             mostrarMensaje("⚠️ No hay informe seleccionado para editar");
