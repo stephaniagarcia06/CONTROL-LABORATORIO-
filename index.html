@@ -71,25 +71,20 @@
         .delete-btn { background: #b91c1c; padding: 5px 12px; font-size: 0.7rem; border-radius: 20px; margin: 2px; border: none; color: white; cursor: pointer; }
         .delete-btn:hover { background: #7f1a1a; }
         .foto-miniatura { max-width: 45px; max-height: 45px; border-radius: 8px; object-fit: cover; }
-        .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; }
+        .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; }
         .import-area { border: 2px dashed var(--gray-border); padding: 20px; text-align: center; border-radius: 16px; cursor: pointer; margin: 10px 0; }
         .import-area:hover { border-color: var(--primary); background: var(--secondary); }
         .app-footer { text-align: center; padding: 20px; color: var(--text-gray); font-size: 0.7rem; border-top: 1px solid var(--gray-border); margin-top: 20px; }
         .serial-link { color: var(--primary); font-weight: bold; cursor: pointer; text-decoration: underline; }
         .timeline-item { background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .indicadores { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .indicador { background: linear-gradient(135deg, white, var(--secondary)); padding: 15px; border-radius: 16px; text-align: center; }
-        .indicador .numero { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
-        
+        .table-responsive { overflow-x: auto; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-content { background: white; border-radius: 20px; padding: 24px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .close-modal { font-size: 24px; cursor: pointer; }
-        
         .import-separado { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
         .import-box { border: 1px solid var(--gray-border); border-radius: 16px; padding: 20px; background: var(--secondary); }
         .export-buttons { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
-        .table-responsive { overflow-x: auto; }
         @media (max-width: 768px) { .import-separado { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -226,14 +221,12 @@
                     <p style="font-size:12px;">Columnas: consecutivo, serial, equipo, marca, modelo, cliente, accesorios, registradoPor</p>
                     <div class="import-area" id="importEquiposArea"><div>📂</div><p>Arrastra Excel de EQUIPOS</p></div>
                     <input type="file" id="fileEquiposInput" accept=".xlsx" style="display:none;">
-                    <div id="importEquiposPreview"></div>
                 </div>
                 <div class="import-box">
                     <h4>📄 IMPORTAR INFORMES</h4>
                     <p style="font-size:12px;">Columnas: numero, fecha, serial, tipo, diagnostico, valores, notaFinal</p>
                     <div class="import-area" id="importInformesArea"><div>📂</div><p>Arrastra Excel de INFORMES</p></div>
                     <input type="file" id="fileInformesInput" accept=".xlsx" style="display:none;">
-                    <div id="importInformesPreview"></div>
                 </div>
             </div>
         </div>
@@ -262,24 +255,45 @@
 </div>
 
 <script>
-    let equipos = [], informes = [], nextId = 100, logoEmpresaBase64 = "";
+    // ==================== VARIABLES GLOBALES ====================
+    let equipos = [];
+    let informes = [];
+    let nextId = 100;
+    let logoEmpresaBase64 = "";
 
+    // ==================== FUNCIONES DE PERSISTENCIA ====================
     function guardarDatos() {
-        localStorage.setItem("equipos", JSON.stringify(equipos));
-        localStorage.setItem("informes", JSON.stringify(informes));
-        localStorage.setItem("nextId", nextId);
-        localStorage.setItem("logo", logoEmpresaBase64);
+        try {
+            localStorage.setItem("rentelcom_equipos", JSON.stringify(equipos));
+            localStorage.setItem("rentelcom_informes", JSON.stringify(informes));
+            localStorage.setItem("rentelcom_nextId", nextId.toString());
+            localStorage.setItem("rentelcom_logo", logoEmpresaBase64);
+            console.log("✅ Datos guardados:", { equipos: equipos.length, informes: informes.length });
+        } catch(e) {
+            console.error("Error guardando:", e);
+        }
     }
 
     function cargarDatos() {
-        const savedEquipos = localStorage.getItem("equipos");
-        const savedInformes = localStorage.getItem("informes");
-        equipos = savedEquipos ? JSON.parse(savedEquipos) : [];
-        informes = savedInformes ? JSON.parse(savedInformes) : [];
-        nextId = parseInt(localStorage.getItem("nextId") || "100");
-        logoEmpresaBase64 = localStorage.getItem("logo") || "";
+        try {
+            const equiposGuardados = localStorage.getItem("rentelcom_equipos");
+            const informesGuardados = localStorage.getItem("rentelcom_informes");
+            const nextIdGuardado = localStorage.getItem("rentelcom_nextId");
+            const logoGuardado = localStorage.getItem("rentelcom_logo");
+            
+            equipos = equiposGuardados ? JSON.parse(equiposGuardados) : [];
+            informes = informesGuardados ? JSON.parse(informesGuardados) : [];
+            nextId = nextIdGuardado ? parseInt(nextIdGuardado) : 100;
+            logoEmpresaBase64 = logoGuardado || "";
+            
+            console.log("📀 Datos cargados:", { equipos: equipos.length, informes: informes.length, nextId: nextId });
+        } catch(e) {
+            console.error("Error cargando:", e);
+            equipos = [];
+            informes = [];
+            nextId = 100;
+        }
         actualizarVistaLogo();
-        renderAll();
     }
 
     function mostrarMensaje(msg) { 
@@ -300,7 +314,9 @@
     
     function actualizarVistaLogo() { 
         const div = document.getElementById("logoPreview"); 
-        div.innerHTML = logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : "<small>No hay logo</small>"; 
+        if(div) {
+            div.innerHTML = logoEmpresaBase64 ? `<img src="${logoEmpresaBase64}" style="max-height:60px;">` : "<small>No hay logo</small>";
+        }
     }
     
     function getLogoHtml() {
@@ -332,8 +348,10 @@
         document.getElementById("buscarSerialTraza").value = serial;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active-pane'));
-        document.querySelector('.tab-btn[data-tab="trazabilidad"]').classList.add('active');
-        document.getElementById("trazabilidad").classList.add('active-pane');
+        const tabBtn = document.querySelector('.tab-btn[data-tab="trazabilidad"]');
+        if(tabBtn) tabBtn.classList.add('active');
+        const trazabilidadPane = document.getElementById("trazabilidad");
+        if(trazabilidadPane) trazabilidadPane.classList.add('active-pane');
         setTimeout(() => buscarTrazabilidad(), 100);
     };
 
@@ -408,316 +426,405 @@
     }
 
     function renderAll() {
+        console.log("🎨 Renderizando...", { equipos: equipos.length, informes: informes.length });
+        
         // Dashboard
-        document.getElementById("totalEquipos").innerText = equipos.length;
-        document.getElementById("totalInformes").innerText = informes.length;
-        document.getElementById("pendientes").innerText = informes.filter(i => i.estadoAprobacion === "Pendiente").length;
-        document.getElementById("aprobados").innerText = informes.filter(i => i.estadoAprobacion === "Aprobado").length;
+        const totalEquiposEl = document.getElementById("totalEquipos");
+        const totalInformesEl = document.getElementById("totalInformes");
+        const pendientesEl = document.getElementById("pendientes");
+        const aprobadosEl = document.getElementById("aprobados");
+        
+        if(totalEquiposEl) totalEquiposEl.innerText = equipos.length;
+        if(totalInformesEl) totalInformesEl.innerText = informes.length;
+        if(pendientesEl) pendientesEl.innerText = informes.filter(i => i.estadoAprobacion === "Pendiente").length;
+        if(aprobadosEl) aprobadosEl.innerText = informes.filter(i => i.estadoAprobacion === "Aprobado").length;
         
         // Tabla EQUIPOS
         const tbodyEquipos = document.getElementById("equiposBody");
-        if(equipos.length === 0) {
-            tbodyEquipos.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay equipos registrados</td></tr>';
-        } else {
-            tbodyEquipos.innerHTML = equipos.map((e, idx) => `
-                <tr>
-                    <td>${e.consecutivo || ("ENT-" + (idx+1))}</td>
-                    <td class="serial-link" onclick="buscarPorSerial('${e.serial}')">${e.serial}</td>
-                    <td>${e.equipo || "-"}</td>
-                    <td>${e.cliente || "-"}</td>
-                    <td>${e.registradoPor || "No especificado"}</td>
-                    <td><span class="status-badge badge-pendiente">${e.estado || "Activo"}</span></td>
-                    <td>
-                        <button class="pdf-btn" onclick="generarPDFEntrada(equipos[${idx}], '${e.consecutivo || ("ENT-" + (idx+1))}')">PDF</button>
-                        <button class="delete-btn" onclick="eliminarEquipo(${idx})">🗑️</button>
-                    </td>
-                </tr>
-            `).join('');
+        if(tbodyEquipos) {
+            if(equipos.length === 0) {
+                tbodyEquipos.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay equipos registrados</td></tr>';
+            } else {
+                tbodyEquipos.innerHTML = equipos.map((e, idx) => `
+                    <tr>
+                        <td>${e.consecutivo || ("ENT-" + (idx+1))}</td>
+                        <td class="serial-link" onclick="buscarPorSerial('${e.serial.replace(/'/g, "\\'")}')">${e.serial}</td>
+                        <td>${e.equipo || "-"}</td>
+                        <td>${e.cliente || "-"}</td>
+                        <td>${e.registradoPor || "No especificado"}</td>
+                        <td><span class="status-badge badge-pendiente">${e.estado || "Activo"}</span></td>
+                        <td>
+                            <button class="pdf-btn" onclick="generarPDFEntrada(equipos[${idx}], '${e.consecutivo || ("ENT-" + (idx+1))}')">PDF</button>
+                            <button class="delete-btn" onclick="eliminarEquipo(${idx})">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
         }
         
         // Tabla INFORMES
         const tbodyInformes = document.getElementById("informesBody");
-        if(informes.length === 0) {
-            tbodyInformes.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
-        } else {
-            tbodyInformes.innerHTML = informes.map((inf, idx) => {
-                let estadoClass = "badge-pendiente";
-                if(inf.estadoAprobacion === "Aprobado") estadoClass = "badge-aprobado";
-                if(inf.estadoAprobacion === "Rechazado") estadoClass = "badge-rechazado";
-                return `
-                    <tr>
-                        <td><strong>${inf.numero}</strong></td>
-                        <td>${inf.fecha || "-"}</td>
-                        <td class="serial-link" onclick="buscarPorSerial('${inf.serial}')">${inf.serial}</td>
-                        <td>${inf.cliente || "-"}</td>
-                        <td>${inf.tipo || "-"}</td>
-                        <td><span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span></td>
-                        <td>
-                            <button class="pdf-btn" onclick="generarPDFInforme(informes[${idx}])">PDF</button>
-                            <button class="delete-btn" onclick="eliminarInforme(${idx})">🗑️</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+        if(tbodyInformes) {
+            if(informes.length === 0) {
+                tbodyInformes.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
+            } else {
+                tbodyInformes.innerHTML = informes.map((inf, idx) => {
+                    let estadoClass = "badge-pendiente";
+                    if(inf.estadoAprobacion === "Aprobado") estadoClass = "badge-aprobado";
+                    if(inf.estadoAprobacion === "Rechazado") estadoClass = "badge-rechazado";
+                    return `
+                        <tr>
+                            <td><strong>${inf.numero}</strong></td>
+                            <td>${inf.fecha || "-"}</td>
+                            <td class="serial-link" onclick="buscarPorSerial('${inf.serial.replace(/'/g, "\\'")}')">${inf.serial}</td>
+                            <td>${inf.cliente || "-"}</td>
+                            <td>${inf.tipo || "-"}</td>
+                            <td><span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span></td>
+                            <td>
+                                <button class="pdf-btn" onclick="generarPDFInforme(informes[${idx}])">PDF</button>
+                                <button class="delete-btn" onclick="eliminarInforme(${idx})">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
         }
         
         cargarSelectAprobacion();
     }
 
-    // ========== EVENTOS ==========
-    document.getElementById("btnGuardarEntrada").onclick = async () => {
-        const serial = document.getElementById("entradaSerial").value.trim();
-        if(!serial) { mostrarMensaje("⚠️ El serial es obligatorio"); return; }
-        
-        let fotoBase64 = "";
-        const fotoFile = document.getElementById("entradaFoto").files[0];
-        if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
-        
-        const nuevoEquipo = {
-            id: nextId++,
-            consecutivo: document.getElementById("entradaConsecutivo").value,
-            serial: serial,
-            equipo: document.getElementById("entradaEquipo").value,
-            marca: document.getElementById("entradaMarca").value,
-            modelo: document.getElementById("entradaModelo").value,
-            cliente: document.getElementById("entradaCliente").value,
-            accesorios: document.getElementById("entradaAccesorios").value,
-            registradoPor: document.getElementById("entradaRegistradoPor").value,
-            fotoEntrada: fotoBase64,
-            estado: "Activo"
-        };
-        
-        equipos.push(nuevoEquipo);
-        guardarDatos();
-        renderAll();
-        
-        // Limpiar formulario
-        document.getElementById("entradaConsecutivo").value = "";
-        document.getElementById("entradaSerial").value = "";
-        document.getElementById("entradaEquipo").value = "";
-        document.getElementById("entradaMarca").value = "";
-        document.getElementById("entradaModelo").value = "";
-        document.getElementById("entradaCliente").value = "";
-        document.getElementById("entradaAccesorios").value = "";
-        document.getElementById("entradaFoto").value = "";
-        
-        mostrarMensaje(`✅ Equipo ${serial} registrado correctamente`);
-        await generarPDFEntrada(nuevoEquipo, nuevoEquipo.consecutivo || ("ENT-" + (equipos.length)));
-    };
-
-    document.getElementById("btnAgregarEquipo").onclick = () => {
-        document.querySelector('.tab-btn[data-tab="nuevoEquipo"]').click();
-    };
-
-    // Modal Informe
-    function cerrarModalInforme() {
-        document.getElementById("modalInforme").style.display = "none";
-    }
-    window.cerrarModalInforme = cerrarModalInforme;
-
-    document.getElementById("btnNuevoInforme").onclick = () => {
-        document.getElementById("infoNumero").value = "";
-        document.getElementById("infoSerial").value = "";
-        document.getElementById("infoFecha").value = new Date().toISOString().slice(0,10);
-        document.getElementById("infoTipo").value = "Calibración";
-        document.getElementById("infoDiagnostico").value = "";
-        document.getElementById("infoValores").value = "";
-        document.getElementById("infoNotaFinal").value = "";
-        document.getElementById("infoFoto").value = "";
-        document.getElementById("modalInforme").style.display = "flex";
-    };
-
-    document.getElementById("btnGuardarInforme").onclick = async () => {
-        const numero = document.getElementById("infoNumero").value.trim();
-        const serial = document.getElementById("infoSerial").value.trim();
-        if(!numero || !serial) { mostrarMensaje("⚠️ N° Informe y Serial son obligatorios"); return; }
-        
-        const equipo = equipos.find(e => e.serial === serial);
-        
-        let fotoBase64 = "";
-        const fotoFile = document.getElementById("infoFoto").files[0];
-        if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
-        
-        const nuevoInforme = {
-            numero: numero,
-            serial: serial,
-            fecha: document.getElementById("infoFecha").value,
-            tipo: document.getElementById("infoTipo").value,
-            diagnostico: document.getElementById("infoDiagnostico").value,
-            valores: document.getElementById("infoValores").value,
-            notaFinal: document.getElementById("infoNotaFinal").value,
-            foto: fotoBase64,
-            cliente: equipo ? equipo.cliente : "No especificado",
-            marca: equipo ? equipo.marca : "",
-            modelo: equipo ? equipo.modelo : "",
-            estadoAprobacion: "Pendiente",
-            fechaEnvioCliente: "",
-            obsCliente: ""
-        };
-        
-        informes.push(nuevoInforme);
-        guardarDatos();
-        renderAll();
-        cerrarModalInforme();
-        mostrarMensaje(`✅ Informe ${numero} guardado`);
-    };
-
-    document.getElementById("btnRegistrarAprobacion").onclick = async () => {
-        const informeNumero = document.getElementById("selectInformeAprobacion").value;
-        if(!informeNumero) { mostrarMensaje("⚠️ Seleccione un informe"); return; }
-        
-        const informe = informes.find(i => i.numero === informeNumero);
-        if(informe) {
-            informe.fechaEnvioCliente = document.getElementById("fechaEnvioCliente").value;
-            informe.estadoAprobacion = document.getElementById("estadoAprobacionCliente").value;
-            informe.obsCliente = document.getElementById("obsClienteAprobacion").value;
-            
-            guardarDatos();
-            renderAll();
-            
-            document.getElementById("fechaEnvioCliente").value = "";
-            document.getElementById("estadoAprobacionCliente").value = "Pendiente";
-            document.getElementById("obsClienteAprobacion").value = "";
-            
-            mostrarMensaje(`✅ Aprobación registrada para informe ${informeNumero}`);
-            await generarPDFAprobacion(informe, informe.fechaEnvioCliente, informe.estadoAprobacion, informe.obsCliente);
-        }
-    };
-
-    document.getElementById("btnBuscarTraza").onclick = buscarTrazabilidad;
-
-    // Pestañas
-    document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.onclick = () => {
-            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-            document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active-pane"));
-            btn.classList.add("active");
-            document.getElementById(btn.dataset.tab).classList.add("active-pane");
-        };
-    });
-
-    // Dashboard cards
-    document.querySelectorAll(".card").forEach(card => {
-        card.onclick = () => {
-            const accion = card.dataset.accion;
-            let tabId = "equipos";
-            if(accion === "informes") tabId = "informes";
-            if(accion === "pendientes" || accion === "aprobados") tabId = "aprobacion";
-            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).click();
-        };
-    });
-
-    // Configuración
-    document.getElementById("btnGuardarLogo").onclick = () => {
-        const f = document.getElementById("logoEmpresa").files[0]; 
-        if(f) {
-            const reader = new FileReader(); 
-            reader.readAsDataURL(f); 
-            reader.onload = () => {
-                logoEmpresaBase64 = reader.result; 
-                guardarDatos(); 
-                actualizarVistaLogo(); 
-                mostrarMensaje("Logo guardado");
-            };
-        }
-    };
-    
-    document.getElementById("btnEliminarTodos").onclick = () => {
-        if(confirm("¿Eliminar TODOS los datos?")) {
-            equipos = []; 
-            informes = []; 
-            nextId = 100; 
-            guardarDatos(); 
-            renderAll(); 
-            mostrarMensaje("Datos eliminados");
-        }
-    };
-
-    document.getElementById("btnCargarEjemplo").onclick = () => {
-        equipos = [
-            {id:1, consecutivo:"ENT-001", serial:"AA123456", equipo:"OTDR", marca:"EXFO", modelo:"MAX-715", cliente:"INMEL INGENIERIA", accesorios:"Maletín, cargador", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"},
-            {id:2, consecutivo:"ENT-002", serial:"BB789012", equipo:"Power Meter", marca:"JDSU", modelo:"OLP-85", cliente:"TELECOM SAS", accesorios:"Conectores, batería", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"}
-        ];
-        informes = [
-            {numero:"INF-001", serial:"AA123456", fecha:"2025-01-15", tipo:"Calibración", diagnostico:"Equipo dentro de especificaciones", valores:"Potencia: OK", notaFinal:"Aprobado", cliente:"INMEL INGENIERIA", marca:"EXFO", modelo:"MAX-715", estadoAprobacion:"Aprobado", fechaEnvioCliente:"2025-01-20", obsCliente:"Conforme"},
-            {numero:"INF-002", serial:"BB789012", fecha:"2025-01-20", tipo:"Reparación", diagnostico:"Sensor dañado reemplazado", valores:"OK", notaFinal:"Reparado", cliente:"TELECOM SAS", marca:"JDSU", modelo:"OLP-85", estadoAprobacion:"Pendiente", fechaEnvioCliente:"", obsCliente:""}
-        ];
-        nextId = 103;
-        guardarDatos();
-        renderAll();
-        mostrarMensaje("Datos de ejemplo cargados");
-    };
-
-    // Exportaciones básicas
-    document.getElementById("btnExportarEquipos").onclick = () => {
-        const data = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Marca:e.marca, Modelo:e.modelo, Cliente:e.cliente, Accesorios:e.accesorios, RegistradoPor:e.registradoPor}));
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Equipos");
-        XLSX.writeFile(wb, `equipos_${new Date().toISOString().slice(0,10)}.xlsx`);
-    };
-
-    document.getElementById("btnExportarInformes").onclick = () => {
-        const data = informes.map(i => ({Numero:i.numero, Serial:i.serial, Fecha:i.fecha, Servicio:i.tipo, Diagnostico:i.diagnostico, Valores:i.valores, NotaFinal:i.notaFinal, EstadoAprobacion:i.estadoAprobacion}));
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Informes");
-        XLSX.writeFile(wb, `informes_${new Date().toISOString().slice(0,10)}.xlsx`);
-    };
-
-    document.getElementById("btnExportarCompleto").onclick = () => {
-        const dataEquipos = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Cliente:e.cliente}));
-        const dataInformes = informes.map(i => ({Numero:i.numero, Serial:i.serial, Servicio:i.tipo, Estado:i.estadoAprobacion}));
-        const wsEquipos = XLSX.utils.json_to_sheet(dataEquipos);
-        const wsInformes = XLSX.utils.json_to_sheet(dataInformes);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, wsEquipos, "Equipos");
-        XLSX.utils.book_append_sheet(wb, wsInformes, "Informes");
-        XLSX.writeFile(wb, `rentelcom_completo_${new Date().toISOString().slice(0,10)}.xlsx`);
-    };
-
-    // Importar equipos
-    const setupImport = (areaId, fileInputId, previewId, isEquipos) => {
-        const area = document.getElementById(areaId);
-        const fileInput = document.getElementById(fileInputId);
-        area.onclick = () => fileInput.click();
-        area.ondragover = (e) => { e.preventDefault(); area.style.borderColor = "var(--primary)"; };
-        area.ondragleave = () => area.style.borderColor = "var(--gray-border)";
-        area.ondrop = (e) => { e.preventDefault(); fileInput.files = e.dataTransfer.files; procesarArchivo(fileInput.files[0], isEquipos); };
-        fileInput.onchange = () => { if(fileInput.files[0]) procesarArchivo(fileInput.files[0], isEquipos); };
-        const procesarArchivo = (file, isEquipos) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rows = XLSX.utils.sheet_to_json(sheet);
-                if(isEquipos) {
-                    rows.forEach(row => {
-                        equipos.push({
-                            id: nextId++, consecutivo: row.consecutivo || row.Consecutivo || "", serial: row.serial || row.Serial || "", equipo: row.equipo || row.Equipo || "", marca: row.marca || row.Marca || "", modelo: row.modelo || row.Modelo || "", cliente: row.cliente || row.Cliente || "", accesorios: row.accesorios || row.Accesorios || "", registradoPor: row.registradoPor || row.RegistradoPor || "Importado", fotoEntrada: "", estado: "Activo"
-                        });
-                    });
-                } else {
-                    rows.forEach(row => {
-                        informes.push({
-                            numero: row.numero || row.Numero || "", serial: row.serial || row.Serial || "", fecha: row.fecha || row.Fecha || "", tipo: row.tipo || row.Tipo || "", diagnostico: row.diagnostico || row.Diagnostico || "", valores: row.valores || row.Valores || "", notaFinal: row.notaFinal || row.NotaFinal || "", foto: "", cliente: "Importado", marca: "", modelo: "", estadoAprobacion: "Pendiente"
-                        });
-                    });
-                }
+    // ==================== EVENTOS ====================
+    function inicializarEventos() {
+        // Guardar entrada
+        const btnGuardarEntrada = document.getElementById("btnGuardarEntrada");
+        if(btnGuardarEntrada) {
+            btnGuardarEntrada.onclick = async () => {
+                const serial = document.getElementById("entradaSerial").value.trim();
+                if(!serial) { mostrarMensaje("⚠️ El serial es obligatorio"); return; }
+                
+                let fotoBase64 = "";
+                const fotoFile = document.getElementById("entradaFoto").files[0];
+                if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
+                
+                const nuevoEquipo = {
+                    id: nextId++,
+                    consecutivo: document.getElementById("entradaConsecutivo").value,
+                    serial: serial,
+                    equipo: document.getElementById("entradaEquipo").value,
+                    marca: document.getElementById("entradaMarca").value,
+                    modelo: document.getElementById("entradaModelo").value,
+                    cliente: document.getElementById("entradaCliente").value,
+                    accesorios: document.getElementById("entradaAccesorios").value,
+                    registradoPor: document.getElementById("entradaRegistradoPor").value,
+                    fotoEntrada: fotoBase64,
+                    estado: "Activo"
+                };
+                
+                equipos.push(nuevoEquipo);
                 guardarDatos();
                 renderAll();
-                mostrarMensaje(`✅ Importados ${rows.length} registros`);
+                
+                // Limpiar formulario
+                document.getElementById("entradaConsecutivo").value = "";
+                document.getElementById("entradaSerial").value = "";
+                document.getElementById("entradaEquipo").value = "";
+                document.getElementById("entradaMarca").value = "";
+                document.getElementById("entradaModelo").value = "";
+                document.getElementById("entradaCliente").value = "";
+                document.getElementById("entradaAccesorios").value = "";
+                document.getElementById("entradaFoto").value = "";
+                
+                mostrarMensaje(`✅ Equipo ${serial} registrado correctamente`);
+                await generarPDFEntrada(nuevoEquipo, nuevoEquipo.consecutivo || ("ENT-" + equipos.length));
             };
-            reader.readAsArrayBuffer(file);
-        };
-    };
-    
-    setupImport("importEquiposArea", "fileEquiposInput", "importEquiposPreview", true);
-    setupImport("importInformesArea", "fileInformesInput", "importInformesPreview", false);
+        }
 
-    // Inicializar
+        // Botón agregar equipo
+        const btnAgregarEquipo = document.getElementById("btnAgregarEquipo");
+        if(btnAgregarEquipo) {
+            btnAgregarEquipo.onclick = () => {
+                const tabBtn = document.querySelector('.tab-btn[data-tab="nuevoEquipo"]');
+                if(tabBtn) tabBtn.click();
+            };
+        }
+
+        // Modal Informe
+        window.cerrarModalInforme = function() {
+            const modal = document.getElementById("modalInforme");
+            if(modal) modal.style.display = "none";
+        };
+
+        const btnNuevoInforme = document.getElementById("btnNuevoInforme");
+        if(btnNuevoInforme) {
+            btnNuevoInforme.onclick = () => {
+                document.getElementById("infoNumero").value = "";
+                document.getElementById("infoSerial").value = "";
+                document.getElementById("infoFecha").value = new Date().toISOString().slice(0,10);
+                document.getElementById("infoTipo").value = "Calibración";
+                document.getElementById("infoDiagnostico").value = "";
+                document.getElementById("infoValores").value = "";
+                document.getElementById("infoNotaFinal").value = "";
+                document.getElementById("infoFoto").value = "";
+                const modal = document.getElementById("modalInforme");
+                if(modal) modal.style.display = "flex";
+            };
+        }
+
+        const btnGuardarInforme = document.getElementById("btnGuardarInforme");
+        if(btnGuardarInforme) {
+            btnGuardarInforme.onclick = async () => {
+                const numero = document.getElementById("infoNumero").value.trim();
+                const serial = document.getElementById("infoSerial").value.trim();
+                if(!numero || !serial) { mostrarMensaje("⚠️ N° Informe y Serial son obligatorios"); return; }
+                
+                const equipo = equipos.find(e => e.serial === serial);
+                
+                let fotoBase64 = "";
+                const fotoFile = document.getElementById("infoFoto").files[0];
+                if(fotoFile) fotoBase64 = await fileToBase64(fotoFile);
+                
+                const nuevoInforme = {
+                    numero: numero,
+                    serial: serial,
+                    fecha: document.getElementById("infoFecha").value,
+                    tipo: document.getElementById("infoTipo").value,
+                    diagnostico: document.getElementById("infoDiagnostico").value,
+                    valores: document.getElementById("infoValores").value,
+                    notaFinal: document.getElementById("infoNotaFinal").value,
+                    foto: fotoBase64,
+                    cliente: equipo ? equipo.cliente : "No especificado",
+                    marca: equipo ? equipo.marca : "",
+                    modelo: equipo ? equipo.modelo : "",
+                    estadoAprobacion: "Pendiente",
+                    fechaEnvioCliente: "",
+                    obsCliente: ""
+                };
+                
+                informes.push(nuevoInforme);
+                guardarDatos();
+                renderAll();
+                cerrarModalInforme();
+                mostrarMensaje(`✅ Informe ${numero} guardado`);
+            };
+        }
+
+        // Registrar aprobación
+        const btnRegistrarAprobacion = document.getElementById("btnRegistrarAprobacion");
+        if(btnRegistrarAprobacion) {
+            btnRegistrarAprobacion.onclick = async () => {
+                const informeNumero = document.getElementById("selectInformeAprobacion").value;
+                if(!informeNumero) { mostrarMensaje("⚠️ Seleccione un informe"); return; }
+                
+                const informe = informes.find(i => i.numero === informeNumero);
+                if(informe) {
+                    informe.fechaEnvioCliente = document.getElementById("fechaEnvioCliente").value;
+                    informe.estadoAprobacion = document.getElementById("estadoAprobacionCliente").value;
+                    informe.obsCliente = document.getElementById("obsClienteAprobacion").value;
+                    
+                    guardarDatos();
+                    renderAll();
+                    
+                    document.getElementById("fechaEnvioCliente").value = "";
+                    document.getElementById("estadoAprobacionCliente").value = "Pendiente";
+                    document.getElementById("obsClienteAprobacion").value = "";
+                    
+                    mostrarMensaje(`✅ Aprobación registrada para informe ${informeNumero}`);
+                    await generarPDFAprobacion(informe, informe.fechaEnvioCliente, informe.estadoAprobacion, informe.obsCliente);
+                }
+            };
+        }
+
+        // Búsqueda trazabilidad
+        const btnBuscarTraza = document.getElementById("btnBuscarTraza");
+        if(btnBuscarTraza) btnBuscarTraza.onclick = buscarTrazabilidad;
+
+        // Pestañas
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active-pane"));
+                btn.classList.add("active");
+                const pane = document.getElementById(btn.dataset.tab);
+                if(pane) pane.classList.add("active-pane");
+            };
+        });
+
+        // Dashboard cards
+        document.querySelectorAll(".card").forEach(card => {
+            card.onclick = () => {
+                const accion = card.dataset.accion;
+                let tabId = "equipos";
+                if(accion === "informes") tabId = "informes";
+                if(accion === "pendientes" || accion === "aprobados") tabId = "aprobacion";
+                const tabBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+                if(tabBtn) tabBtn.click();
+            };
+        });
+
+        // Configuración
+        const btnGuardarLogo = document.getElementById("btnGuardarLogo");
+        if(btnGuardarLogo) {
+            btnGuardarLogo.onclick = () => {
+                const f = document.getElementById("logoEmpresa").files[0]; 
+                if(f) {
+                    const reader = new FileReader(); 
+                    reader.readAsDataURL(f); 
+                    reader.onload = () => {
+                        logoEmpresaBase64 = reader.result; 
+                        guardarDatos(); 
+                        actualizarVistaLogo(); 
+                        mostrarMensaje("Logo guardado");
+                    };
+                }
+            };
+        }
+        
+        const btnEliminarTodos = document.getElementById("btnEliminarTodos");
+        if(btnEliminarTodos) {
+            btnEliminarTodos.onclick = () => {
+                if(confirm("¿Eliminar TODOS los datos?")) {
+                    equipos = []; 
+                    informes = []; 
+                    nextId = 100; 
+                    guardarDatos(); 
+                    renderAll(); 
+                    mostrarMensaje("Datos eliminados");
+                }
+            };
+        }
+
+        const btnCargarEjemplo = document.getElementById("btnCargarEjemplo");
+        if(btnCargarEjemplo) {
+            btnCargarEjemplo.onclick = () => {
+                equipos = [
+                    {id:1, consecutivo:"ENT-001", serial:"AA123456", equipo:"OTDR", marca:"EXFO", modelo:"MAX-715", cliente:"INMEL INGENIERIA", accesorios:"Maletín, cargador", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"},
+                    {id:2, consecutivo:"ENT-002", serial:"BB789012", equipo:"Power Meter", marca:"JDSU", modelo:"OLP-85", cliente:"TELECOM SAS", accesorios:"Conectores, batería", registradoPor:"Stephania Garcia", fotoEntrada:"", estado:"Activo"}
+                ];
+                informes = [
+                    {numero:"INF-001", serial:"AA123456", fecha:"2025-01-15", tipo:"Calibración", diagnostico:"Equipo dentro de especificaciones", valores:"Potencia: OK", notaFinal:"Aprobado", cliente:"INMEL INGENIERIA", marca:"EXFO", modelo:"MAX-715", estadoAprobacion:"Aprobado", fechaEnvioCliente:"2025-01-20", obsCliente:"Conforme", foto:""},
+                    {numero:"INF-002", serial:"BB789012", fecha:"2025-01-20", tipo:"Reparación", diagnostico:"Sensor dañado reemplazado", valores:"OK", notaFinal:"Reparado", cliente:"TELECOM SAS", marca:"JDSU", modelo:"OLP-85", estadoAprobacion:"Pendiente", fechaEnvioCliente:"", obsCliente:"", foto:""}
+                ];
+                nextId = 103;
+                guardarDatos();
+                renderAll();
+                mostrarMensaje("Datos de ejemplo cargados");
+            };
+        }
+
+        // Exportaciones
+        const btnExportarEquipos = document.getElementById("btnExportarEquipos");
+        if(btnExportarEquipos) {
+            btnExportarEquipos.onclick = () => {
+                const data = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Marca:e.marca, Modelo:e.modelo, Cliente:e.cliente, Accesorios:e.accesorios, RegistradoPor:e.registradoPor}));
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Equipos");
+                XLSX.writeFile(wb, `equipos_${new Date().toISOString().slice(0,10)}.xlsx`);
+            };
+        }
+
+        const btnExportarInformes = document.getElementById("btnExportarInformes");
+        if(btnExportarInformes) {
+            btnExportarInformes.onclick = () => {
+                const data = informes.map(i => ({Numero:i.numero, Serial:i.serial, Fecha:i.fecha, Servicio:i.tipo, Diagnostico:i.diagnostico, Valores:i.valores, NotaFinal:i.notaFinal, EstadoAprobacion:i.estadoAprobacion}));
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Informes");
+                XLSX.writeFile(wb, `informes_${new Date().toISOString().slice(0,10)}.xlsx`);
+            };
+        }
+
+        const btnExportarCompleto = document.getElementById("btnExportarCompleto");
+        if(btnExportarCompleto) {
+            btnExportarCompleto.onclick = () => {
+                const dataEquipos = equipos.map(e => ({Consecutivo:e.consecutivo, Serial:e.serial, Equipo:e.equipo, Cliente:e.cliente}));
+                const dataInformes = informes.map(i => ({Numero:i.numero, Serial:i.serial, Servicio:i.tipo, Estado:i.estadoAprobacion}));
+                const wsEquipos = XLSX.utils.json_to_sheet(dataEquipos);
+                const wsInformes = XLSX.utils.json_to_sheet(dataInformes);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, wsEquipos, "Equipos");
+                XLSX.utils.book_append_sheet(wb, wsInformes, "Informes");
+                XLSX.writeFile(wb, `rentelcom_completo_${new Date().toISOString().slice(0,10)}.xlsx`);
+            };
+        }
+
+        // Importar equipos
+        const setupImport = (areaId, fileInputId, isEquipos) => {
+            const area = document.getElementById(areaId);
+            const fileInput = document.getElementById(fileInputId);
+            if(!area || !fileInput) return;
+            
+            area.onclick = () => fileInput.click();
+            area.ondragover = (e) => { e.preventDefault(); area.style.borderColor = "var(--primary)"; };
+            area.ondragleave = () => area.style.borderColor = "var(--gray-border)";
+            area.ondrop = (e) => { 
+                e.preventDefault(); 
+                fileInput.files = e.dataTransfer.files; 
+                procesarArchivo(fileInput.files[0], isEquipos); 
+            };
+            fileInput.onchange = () => { if(fileInput.files[0]) procesarArchivo(fileInput.files[0], isEquipos); };
+            
+            const procesarArchivo = (file, isEquipos) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+                    if(isEquipos) {
+                        rows.forEach(row => {
+                            equipos.push({
+                                id: nextId++, 
+                                consecutivo: row.consecutivo || row.Consecutivo || "", 
+                                serial: row.serial || row.Serial || "", 
+                                equipo: row.equipo || row.Equipo || "", 
+                                marca: row.marca || row.Marca || "", 
+                                modelo: row.modelo || row.Modelo || "", 
+                                cliente: row.cliente || row.Cliente || "", 
+                                accesorios: row.accesorios || row.Accesorios || "", 
+                                registradoPor: row.registradoPor || row.RegistradoPor || "Importado", 
+                                fotoEntrada: "", 
+                                estado: "Activo"
+                            });
+                        });
+                    } else {
+                        rows.forEach(row => {
+                            informes.push({
+                                numero: row.numero || row.Numero || "", 
+                                serial: row.serial || row.Serial || "", 
+                                fecha: row.fecha || row.Fecha || "", 
+                                tipo: row.tipo || row.Tipo || "", 
+                                diagnostico: row.diagnostico || row.Diagnostico || "", 
+                                valores: row.valores || row.Valores || "", 
+                                notaFinal: row.notaFinal || row.NotaFinal || "", 
+                                foto: "", 
+                                cliente: "Importado", 
+                                marca: "", 
+                                modelo: "", 
+                                estadoAprobacion: "Pendiente",
+                                fechaEnvioCliente: "",
+                                obsCliente: ""
+                            });
+                        });
+                    }
+                    guardarDatos();
+                    renderAll();
+                    mostrarMensaje(`✅ Importados ${rows.length} registros`);
+                };
+                reader.readAsArrayBuffer(file);
+            };
+        };
+        
+        setupImport("importEquiposArea", "fileEquiposInput", true);
+        setupImport("importInformesArea", "fileInformesInput", false);
+    }
+
+    // ==================== INICIALIZACIÓN ====================
     cargarDatos();
+    inicializarEventos();
+    renderAll();
+    
+    console.log("🚀 Aplicación iniciada correctamente");
 </script>
 </body>
 </html>
