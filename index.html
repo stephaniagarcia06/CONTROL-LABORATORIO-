@@ -421,7 +421,7 @@
         } else {
             tbodyEquipos.innerHTML = equipos.map((e, idx) => `
                 <tr>
-                    <td>${e.consecutivo || ("ENT-" + (idx+1))}</td>
+                    <td style="font-weight:bold;">${e.consecutivo || ("ENT-" + (idx+1))}</td>
                     <td class="serial-link" onclick="buscarPorSerial('${e.serial}')">${e.serial}</td>
                     <td>${e.equipo || "-"}</td>
                     <td>${e.cliente || "-"}</td>
@@ -435,28 +435,36 @@
             `).join('');
         }
         
-        // Tabla INFORMES
+        // ========== INFORMES ORDENADOS (MÁS ANTIGUO PRIMERO, ÚLTIMO AL FINAL) ==========
         const tbodyInformes = document.getElementById("informesBody");
         if(informes.length === 0) {
             tbodyInformes.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay informes registrados</td></tr>';
         } else {
-            tbodyInformes.innerHTML = informes.map((inf, idx) => {
+            // Crear copia y ordenar por fecha (del más antiguo al más nuevo)
+            const informesOrdenados = [...informes].sort((a, b) => {
+                if(!a.fecha) return 1;
+                if(!b.fecha) return -1;
+                return new Date(a.fecha) - new Date(b.fecha);
+            });
+            
+            tbodyInformes.innerHTML = informesOrdenados.map((inf) => {
+                const originalIdx = informes.findIndex(i => i.numero === inf.numero);
                 let estadoClass = "badge-pendiente";
                 if(inf.estadoAprobacion === "Aprobado") estadoClass = "badge-aprobado";
                 if(inf.estadoAprobacion === "Rechazado") estadoClass = "badge-rechazado";
                 return `
                     <tr>
-                        <td><strong>${inf.numero}</strong></td>
+                        <td style="font-weight:bold;">${inf.numero}</td>
                         <td>${inf.fecha || "-"}</td>
                         <td class="serial-link" onclick="buscarPorSerial('${inf.serial}')">${inf.serial}</td>
                         <td>${inf.cliente || "-"}</td>
                         <td>${inf.tipo || "-"}</td>
                         <td><span class="status-badge ${estadoClass}">${inf.estadoAprobacion || "Pendiente"}</span></td>
                         <td>
-                            <button class="pdf-btn" onclick="generarPDFInforme(informes[${idx}])">PDF</button>
-                            <button class="delete-btn" onclick="eliminarInforme(${idx})">🗑️</button>
+                            <button class="pdf-btn" onclick="generarPDFInforme(informes[${originalIdx}])">PDF</button>
+                            <button class="delete-btn" onclick="eliminarInforme(${originalIdx})">🗑️</button>
                         </td>
-                    </tr>
+                    </table>
                 `;
             }).join('');
         }
