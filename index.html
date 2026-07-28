@@ -431,6 +431,27 @@
             color: #1d4ed8;
         }
 
+        .badge-en-uso {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .badge-reparacion {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-baja {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .badge-posicion {
+            background: #e8f0fe;
+            color: #0a2b4e;
+            font-weight: 700;
+        }
+
         .acciones-btns {
             display: flex;
             gap: 4px;
@@ -599,6 +620,16 @@
             max-height: 45px;
             border-radius: 8px;
             object-fit: cover;
+        }
+
+        .posicion-badge {
+            background: #0a2b4e;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-block;
         }
 
         /* ===== RESPONSIVE ===== */
@@ -992,7 +1023,7 @@
         </div>
 
         <!-- ================================================================ -->
-        <!-- ===== MÓDULO INVENTARIO / BODEGA ===== -->
+        <!-- ===== MÓDULO INVENTARIO / BODEGA (CON POSICIÓN) ===== -->
         <!-- ================================================================ -->
         <div class="module-container" id="moduloInventario">
             <div class="module-header">
@@ -1018,17 +1049,26 @@
                 <button class="tab-btn" data-tab="invConfiguracion">⚙️ Configuración</button>
             </div>
 
-            <!-- INV: CONSUMIBLES -->
+            <!-- INV: CONSUMIBLES (CON POSICIÓN) -->
             <div id="invConsumibles" class="tab-pane active-pane">
                 <div class="table-card">
-                    <h3>📋 Gestión de Consumibles</h3>
+                    <h3>📋 Gestión de Inventario / Consumibles</h3>
                     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
                         <button id="invBtnAgregarConsumible" class="btn-outline btn-sm">+ Nuevo Consumible</button>
                         <button id="invBtnCargarStock" class="btn-info btn-sm">📥 Cargar Stock</button>
                     </div>
                     <div class="table-responsive">
                         <table>
-                            <thead><tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Proveedor</th><th>Stock</th><th>Estado</th><th>Acciones</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Posición</th>
+                                    <th>Nombre</th>
+                                    <th>Marca</th>
+                                    <th>Referencia</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
                             <tbody id="invConsumiblesBody"></tbody>
                         </table>
                     </div>
@@ -1038,26 +1078,38 @@
             <!-- INV: EQUIPOS -->
             <div id="invEquipos" class="tab-pane">
                 <div class="table-card">
-                    <h3>🖥️ Gestión de Equipos</h3>
+                    <h3>🖥️ Gestión de Equipos Disponibles</h3>
                     <button id="invBtnAgregarEquipo" class="btn-outline btn-sm" style="margin-bottom:15px;">+ Nuevo Equipo</button>
                     <div class="table-responsive">
                         <table>
-                            <thead><tr><th>Código</th><th>Nombre</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
+                            <thead>
+                                <tr>
+                                    <th>Estado</th>
+                                    <th>Fecha de Certificación</th>
+                                    <th>N° Certificación</th>
+                                    <th>Equipo</th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th>Serial</th>
+                                    <th>Observaciones</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
                             <tbody id="invEquiposBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- INV: NUEVO CONSUMIBLE -->
+            <!-- INV: NUEVO CONSUMIBLE (CON POSICIÓN) -->
             <div id="invNuevoConsumible" class="tab-pane">
                 <div class="form-card">
                     <h3>➕ Registrar Nuevo Consumible</h3>
                     <div class="form-grid">
-                        <div class="input-group"><label>Código *</label><input id="invConsCategoria" placeholder="Ej: CON-001"></div>
+                        <div class="input-group"><label>Posición en Rack *</label><input id="invConsPosicion" placeholder="Ej: RACK-A1, EST-3, B-02"></div>
                         <div class="input-group"><label>Nombre *</label><input id="invConsNombre" placeholder="Nombre del producto"></div>
-                        <div class="input-group"><label>Descripción</label><input id="invConsDescripcion" placeholder="Descripción detallada"></div>
-                        <div class="input-group"><label>Proveedor</label><input id="invConsProveedor" placeholder="Nombre del proveedor"></div>
+                        <div class="input-group"><label>Marca</label><input id="invConsMarca" placeholder="Marca del producto"></div>
+                        <div class="input-group"><label>Referencia</label><input id="invConsReferencia" placeholder="Referencia o código"></div>
                         <div class="input-group"><label>Stock Inicial</label><input id="invConsStock" type="number" value="0" min="0"></div>
                     </div>
                     <button id="invBtnGuardarConsumible">💾 Guardar Consumible</button>
@@ -1069,15 +1121,21 @@
                 <div class="form-card">
                     <h3>➕ Registrar Nuevo Equipo</h3>
                     <div class="form-grid">
-                        <div class="input-group"><label>Código *</label><input id="invEqCategoria" placeholder="Ej: EQ-001"></div>
-                        <div class="input-group"><label>Nombre *</label><input id="invEqNombre" placeholder="Nombre del equipo"></div>
-                        <div class="input-group"><label>Descripción</label><input id="invEqDescripcion" placeholder="Descripción detallada"></div>
-                        <div class="input-group"><label>Estado Inicial</label>
+                        <div class="input-group"><label>Equipo *</label><input id="invEqEquipo" placeholder="Nombre del equipo"></div>
+                        <div class="input-group"><label>Marca</label><input id="invEqMarca" placeholder="Marca del equipo"></div>
+                        <div class="input-group"><label>Modelo</label><input id="invEqModelo" placeholder="Modelo del equipo"></div>
+                        <div class="input-group"><label>Serial *</label><input id="invEqSerial" placeholder="Número de serie"></div>
+                        <div class="input-group"><label>Estado</label>
                             <select id="invEqEstado">
                                 <option value="Disponible">✅ Disponible</option>
-                                <option value="No Disponible">❌ No Disponible</option>
+                                <option value="En uso">🔧 En uso</option>
+                                <option value="En reparación">🛠️ En reparación</option>
+                                <option value="Dado de baja">❌ Dado de baja</option>
                             </select>
                         </div>
+                        <div class="input-group"><label>Fecha de Certificación</label><input id="invEqFechaCert" type="date"></div>
+                        <div class="input-group"><label>N° Certificación</label><input id="invEqNumCert" placeholder="Número de certificado"></div>
+                        <div class="input-group" style="grid-column: 1 / -1;"><label>Observaciones</label><textarea id="invEqObservaciones" rows="2"></textarea></div>
                     </div>
                     <button id="invBtnGuardarEquipo">💾 Guardar Equipo</button>
                 </div>
@@ -1090,13 +1148,13 @@
                     <div class="import-separado">
                         <div class="import-box">
                             <h4>📋 IMPORTAR CONSUMIBLES</h4>
-                            <p style="font-size:12px;">Columnas: codigo, nombre, descripcion, proveedor, stock</p>
+                            <p style="font-size:12px;">Columnas: posicion, nombre, marca, referencia, stock</p>
                             <div class="import-area" id="invImportConsumiblesArea"><div>📂</div><p>Arrastra Excel de CONSUMIBLES</p></div>
                             <input type="file" id="invFileConsumiblesInput" accept=".xlsx" style="display:none;">
                         </div>
                         <div class="import-box">
                             <h4>🖥️ IMPORTAR EQUIPOS</h4>
-                            <p style="font-size:12px;">Columnas: codigo, nombre, descripcion, estado</p>
+                            <p style="font-size:12px;">Columnas: estado, fechaCert, numCert, equipo, marca, modelo, serial, observaciones</p>
                             <div class="import-area" id="invImportEquiposArea"><div>📂</div><p>Arrastra Excel de EQUIPOS</p></div>
                             <input type="file" id="invFileEquiposInput" accept=".xlsx" style="display:none;">
                         </div>
@@ -1139,19 +1197,12 @@
         document.querySelectorAll('.sidebar-nav a').forEach(link => {
             link.onclick = function(e) {
                 e.preventDefault();
-                // Quitar activo de todos
                 document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
                 this.classList.add('active');
-
-                // Ocultar todos los módulos
                 document.querySelectorAll('.module-container').forEach(m => m.classList.remove('active'));
-
-                // Mostrar el módulo seleccionado
                 const modulo = this.dataset.modulo;
                 const targetId = 'modulo' + modulo.charAt(0).toUpperCase() + modulo.slice(1);
                 document.getElementById(targetId).classList.add('active');
-
-                // Cerrar sidebar en móvil
                 if (window.innerWidth <= 768) {
                     toggleSidebar();
                 }
@@ -1185,6 +1236,10 @@
             .badge-bajo-stock{background:#fef3c7;color:#d97706;}
             .badge-aprobado{background:#d1fae5;color:#059669;}
             .badge-rechazado{background:#fee2e2;color:#dc2626;}
+            .badge-en-uso{background:#dbeafe;color:#1d4ed8;}
+            .badge-reparacion{background:#fef3c7;color:#d97706;}
+            .badge-baja{background:#f3f4f6;color:#6b7280;}
+            .posicion-badge{background:#0a2b4e;color:white;padding:2px 12px;border-radius:20px;font-weight:bold;display:inline-block;}
             </style></head><body>
             <div style="text-align:center;margin-bottom:15px;"><h2>CI RENTELCOM SAS</h2></div>
             ${htmlContent}
@@ -1207,11 +1262,7 @@
         }
 
         // ========================================================================
-        // INCLUIMOS LOS TRES MÓDULOS COMPLETOS
-        // ========================================================================
-
-        // ========================================================================
-        // 1. MÓDULO LABORATORIO (CalibPro)
+        // 1. MÓDULO LABORATORIO (CalibPro) - Código simplificado
         // ========================================================================
         (function() {
             let labEquipos = [],
@@ -1254,7 +1305,6 @@
                 document.getElementById("labAprobados").innerText = labInformes.filter(i => i.estadoAprobacion === "Aprobado")
                     .length;
 
-                // Tabla Equipos
                 const tbody = document.getElementById("labEquiposBody");
                 if (labEquipos.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">No hay equipos registrados</td></tr>';
@@ -1277,7 +1327,6 @@
                     ).join('');
                 }
 
-                // Tabla Informes
                 const tbodyInf = document.getElementById("labInformesBody");
                 if (labInformes.length === 0) {
                     tbodyInf.innerHTML = '<tr><td colspan="10" style="text-align:center;">No hay informes registrados</td></tr>';
@@ -1322,7 +1371,6 @@
                 });
             }
 
-            // --- LAB: CRUD Equipos ---
             window.labEliminarEquipo = function(idx) {
                 if (confirm(`¿Eliminar el equipo ${labEquipos[idx].serial}?`)) {
                     const serial = labEquipos[idx].serial;
@@ -1334,7 +1382,6 @@
                 }
             };
 
-            // --- LAB: CRUD Informes ---
             window.labEliminarInforme = function(idx) {
                 if (confirm(`¿Eliminar el informe ${labInformes[idx].numero}?`)) {
                     labInformes.splice(idx, 1);
@@ -1371,7 +1418,6 @@
 
             window.labBuscarPorSerial = function(serial) {
                 document.getElementById("labBuscarSerialTraza").value = serial;
-                // Cambiar a pestaña de trazabilidad
                 document.querySelectorAll('#moduloLaboratorio .tab-btn').forEach(b => b.classList.remove('active'));
                 document.querySelectorAll('#moduloLaboratorio .tab-pane').forEach(p => p.classList.remove('active-pane'));
                 document.querySelector('#moduloLaboratorio .tab-btn[data-tab="labTrazabilidad"]').classList.add('active');
@@ -1379,7 +1425,6 @@
                 setTimeout(() => labBuscarTrazabilidad(), 100);
             };
 
-            // --- LAB: PDFs ---
             window.labGenerarPDFEntrada = function(idx) {
                 const e = labEquipos[idx];
                 const fecha = new Date().toLocaleDateString('es-CO');
@@ -1421,7 +1466,6 @@
                 generarPDF(html, `Informe_${inf.numero}`);
             };
 
-            // --- LAB: Trazabilidad ---
             function labBuscarTrazabilidad() {
                 const serial = document.getElementById("labBuscarSerialTraza").value.trim();
                 const resultadosDiv = document.getElementById("labTrazabilidadResultados");
@@ -1455,7 +1499,6 @@
                 resultadosDiv.innerHTML = html;
             }
 
-            // --- LAB: Eventos ---
             document.getElementById("labBtnGuardarEntrada").onclick = function() {
                 const serial = document.getElementById("labEntradaSerial").value.trim();
                 if (!serial) { mostrarMensaje("⚠️ El serial es obligatorio"); return; }
@@ -1568,7 +1611,6 @@
                     labGuardarDatos();
                     labRenderAll();
                     mostrarMensaje(`✅ Aprobación registrada para informe ${informeNumero}`);
-                    // PDF de aprobación
                     const html = `${labGetLogoHtml()}
                         <h2 style="text-align:center;color:#0a2b4e;margin-bottom:30px;">APROBACIÓN COMERCIAL</h2>
                         <div><strong>Informe N°:</strong> ${informe.numero}</div>
@@ -1585,7 +1627,6 @@
 
             document.getElementById("labBtnBuscarTraza").onclick = labBuscarTrazabilidad;
 
-            // LAB: Importar
             function labSetupImport(areaId, fileInputId, isEquipos) {
                 const area = document.getElementById(areaId);
                 const fileInput = document.getElementById(fileInputId);
@@ -1653,7 +1694,6 @@
             labSetupImport("labImportEquiposArea", "labFileEquiposInput", true);
             labSetupImport("labImportInformesArea", "labFileInformesInput", false);
 
-            // LAB: Exportar
             document.getElementById("labBtnExportarEquipos").onclick = function() {
                 exportarToExcel(labEquipos, "Lab_Equipos");
             };
@@ -1668,7 +1708,6 @@
                 mostrarMensaje("✅ Exportación completa generada");
             };
 
-            // LAB: Configuración
             document.getElementById("labBtnGuardarLogo").onclick = function() {
                 const f = document.getElementById("labLogoEmpresa").files[0];
                 if (f) {
@@ -1718,7 +1757,6 @@
                 mostrarMensaje("Datos de ejemplo cargados");
             };
 
-            // LAB: Pestañas
             document.querySelectorAll('#moduloLaboratorio .tab-btn').forEach(btn => {
                 btn.onclick = function() {
                     document.querySelectorAll('#moduloLaboratorio .tab-btn').forEach(b => b.classList.remove('active'));
@@ -1729,7 +1767,6 @@
                 };
             });
 
-            // LAB: Dashboard cards
             document.querySelectorAll('#moduloLaboratorio .card').forEach(card => {
                 card.onclick = function() {
                     const accion = this.dataset.accion;
@@ -1740,7 +1777,6 @@
                 };
             });
 
-            // Inicializar Laboratorio
             labCargarDatos();
         })();
 
@@ -1771,7 +1807,6 @@
                 document.getElementById("logCompletados").innerText = logSolicitudes.filter(s => s.estado === "Despachado")
                     .length;
 
-                // Solicitudes
                 const tbodySol = document.getElementById("logSolicitudesBody");
                 if (logSolicitudes.length === 0) {
                     tbodySol.innerHTML =
@@ -1803,7 +1838,6 @@
                     }).join('');
                 }
 
-                // Despachos
                 const tbodyDesp = document.getElementById("logDespachosBody");
                 if (logDespachos.length === 0) {
                     tbodyDesp.innerHTML =
@@ -1830,7 +1864,6 @@
                 }
             }
 
-            // --- LOG: CRUD Solicitudes ---
             window.logEliminarSolicitud = function(idx) {
                 if (confirm(`¿Eliminar la solicitud ${logSolicitudes[idx].numero}?`)) {
                     logSolicitudes.splice(idx, 1);
@@ -1905,7 +1938,6 @@
                 document.querySelector('#moduloLogistica .tab-btn[data-tab="logNuevaSolicitud"]').click();
             };
 
-            // --- LOG: Despachar ---
             window.logAbrirModalDespachar = function(idx) {
                 logDespacharIdx = idx;
                 const s = logSolicitudes[idx];
@@ -1988,7 +2020,6 @@
                 }
             };
 
-            // --- LOG: PDFs ---
             window.logGenerarPDFSolicitud = function(idx) {
                 const s = logSolicitudes[idx];
                 const estadoClass = s.estado === "Pendiente" ? "badge-pendiente" : (s.estado === "Despachado" ?
@@ -2020,7 +2051,6 @@
                 generarPDF(html, `Despacho_${d.numero}`);
             };
 
-            // --- LOG: Importar ---
             function logSetupImport(areaId, fileInputId, isSolicitudes) {
                 const area = document.getElementById(areaId);
                 const fileInput = document.getElementById(fileInputId);
@@ -2077,7 +2107,6 @@
             logSetupImport("logImportSolicitudesArea", "logFileSolicitudesInput", true);
             logSetupImport("logImportDespachosArea", "logFileDespachosInput", false);
 
-            // --- LOG: Exportar ---
             document.getElementById("logBtnExportarSolicitudes").onclick = function() {
                 exportarToExcel(logSolicitudes, "Log_Solicitudes");
             };
@@ -2092,7 +2121,6 @@
                 mostrarMensaje("✅ Exportación completa generada");
             };
 
-            // --- LOG: Configuración ---
             document.getElementById("logBtnEliminarTodos").onclick = function() {
                 if (confirm("¿Eliminar TODOS los datos de logística?")) {
                     logSolicitudes = [];
@@ -2117,7 +2145,6 @@
                 mostrarMensaje("Datos de ejemplo cargados");
             };
 
-            // --- LOG: Pestañas ---
             document.querySelectorAll('#moduloLogistica .tab-btn').forEach(btn => {
                 btn.onclick = function() {
                     document.querySelectorAll('#moduloLogistica .tab-btn').forEach(b => b.classList.remove('active'));
@@ -2128,7 +2155,6 @@
                 };
             });
 
-            // --- LOG: Dashboard cards ---
             document.querySelectorAll('#moduloLogistica .card').forEach(card => {
                 card.onclick = function() {
                     const accion = this.dataset.accion;
@@ -2143,7 +2169,7 @@
         })();
 
         // ========================================================================
-        // 3. MÓDULO INVENTARIO / BODEGA
+        // 3. MÓDULO INVENTARIO / BODEGA (CON POSICIÓN)
         // ========================================================================
         (function() {
             let invConsumibles = [],
@@ -2167,23 +2193,22 @@
                     .length;
                 document.getElementById("invSinStock").innerText = invConsumibles.filter(c => c.stock <= 0).length;
 
-                // Consumibles
+                // Consumibles (con posición)
                 const tbodyCons = document.getElementById("invConsumiblesBody");
                 if (invConsumibles.length === 0) {
                     tbodyCons.innerHTML =
-                        '<tr><td colspan="7" style="text-align:center;">No hay consumibles registrados</td></tr>';
+                        '<tr><td colspan="6" style="text-align:center;">No hay consumibles registrados</td></tr>';
                 } else {
                     tbodyCons.innerHTML = invConsumibles.map((c, idx) => {
                         let stockClass = "badge-disponible";
                         if (c.stock <= 0) stockClass = "badge-sin-stock";
                         else if (c.stock < 5) stockClass = "badge-bajo-stock";
                         return `<tr>
-                            <td><strong>${c.codigo}</strong></td>
+                            <td><span class="posicion-badge">${c.posicion || "N/A"}</span></td>
                             <td>${c.nombre}</td>
-                            <td>${c.descripcion || "-"}</td>
-                            <td>${c.proveedor || "-"}</td>
+                            <td>${c.marca || "-"}</td>
+                            <td>${c.referencia || "-"}</td>
                             <td><span class="status-badge ${stockClass}">${c.stock}</span></td>
-                            <td><span class="status-badge ${c.stock > 0 ? 'badge-disponible' : 'badge-sin-stock'}">${c.stock > 0 ? 'Disponible' : 'Sin Stock'}</span></td>
                             <td>
                                 <div class="acciones-btns">
                                     <button class="edit-btn" onclick="invEditarConsumible(${idx})">✏️</button>
@@ -2199,15 +2224,23 @@
                 const tbodyEq = document.getElementById("invEquiposBody");
                 if (invEquipos.length === 0) {
                     tbodyEq.innerHTML =
-                        '<tr><td colspan="5" style="text-align:center;">No hay equipos registrados</td></tr>';
+                        '<tr><td colspan="9" style="text-align:center;">No hay equipos registrados</td></tr>';
                 } else {
                     tbodyEq.innerHTML = invEquipos.map((e, idx) => {
-                        const estadoClass = e.estado === "Disponible" ? "badge-disponible" : "badge-no-disponible";
+                        let estadoClass = "badge-disponible";
+                        if (e.estado === "Disponible") estadoClass = "badge-disponible";
+                        else if (e.estado === "En uso") estadoClass = "badge-en-uso";
+                        else if (e.estado === "En reparación") estadoClass = "badge-reparacion";
+                        else if (e.estado === "Dado de baja") estadoClass = "badge-baja";
                         return `<tr>
-                            <td><strong>${e.codigo}</strong></td>
-                            <td>${e.nombre}</td>
-                            <td>${e.descripcion || "-"}</td>
                             <td><span class="status-badge ${estadoClass}">${e.estado}</span></td>
+                            <td>${e.fechaCert || "-"}</td>
+                            <td>${e.numCert || "-"}</td>
+                            <td>${e.equipo}</td>
+                            <td>${e.marca || "-"}</td>
+                            <td>${e.modelo || "-"}</td>
+                            <td><strong>${e.serial}</strong></td>
+                            <td>${e.observaciones || "-"}</td>
                             <td>
                                 <div class="acciones-btns">
                                     <button class="edit-btn" onclick="invEditarEquipo(${idx})">✏️</button>
@@ -2222,7 +2255,7 @@
 
             // --- INV: CRUD Consumibles ---
             window.invEliminarConsumible = function(idx) {
-                if (confirm(`¿Eliminar el consumible ${invConsumibles[idx].codigo}?`)) {
+                if (confirm(`¿Eliminar el consumible "${invConsumibles[idx].nombre}"?`)) {
                     invConsumibles.splice(idx, 1);
                     invGuardarDatos();
                     invRenderAll();
@@ -2232,53 +2265,56 @@
 
             window.invEditarConsumible = function(idx) {
                 const c = invConsumibles[idx];
-                document.getElementById("invConsCategoria").value = c.codigo;
+                document.getElementById("invConsPosicion").value = c.posicion || "";
                 document.getElementById("invConsNombre").value = c.nombre;
-                document.getElementById("invConsDescripcion").value = c.descripcion || "";
-                document.getElementById("invConsProveedor").value = c.proveedor || "";
+                document.getElementById("invConsMarca").value = c.marca || "";
+                document.getElementById("invConsReferencia").value = c.referencia || "";
                 document.getElementById("invConsStock").value = c.stock;
                 document.querySelector('#moduloInventario .tab-btn[data-tab="invNuevoConsumible"]').click();
                 const btn = document.getElementById("invBtnGuardarConsumible");
                 btn.textContent = "✏️ Actualizar Consumible";
                 btn.onclick = function() {
-                    c.codigo = document.getElementById("invConsCategoria").value.trim();
+                    c.posicion = document.getElementById("invConsPosicion").value.trim();
                     c.nombre = document.getElementById("invConsNombre").value.trim();
-                    c.descripcion = document.getElementById("invConsDescripcion").value.trim();
-                    c.proveedor = document.getElementById("invConsProveedor").value.trim();
+                    c.marca = document.getElementById("invConsMarca").value.trim();
+                    c.referencia = document.getElementById("invConsReferencia").value.trim();
                     c.stock = parseInt(document.getElementById("invConsStock").value) || 0;
                     invGuardarDatos();
                     invRenderAll();
-                    mostrarMensaje(`✅ Consumible ${c.codigo} actualizado`);
+                    mostrarMensaje(`✅ Consumible "${c.nombre}" actualizado`);
                     btn.textContent = "💾 Guardar Consumible";
                     btn.onclick = invGuardarConsumible;
-                    document.getElementById("invConsCategoria").value = "";
+                    document.getElementById("invConsPosicion").value = "";
                     document.getElementById("invConsNombre").value = "";
+                    document.getElementById("invConsMarca").value = "";
+                    document.getElementById("invConsReferencia").value = "";
+                    document.getElementById("invConsStock").value = "0";
                     document.querySelector('#moduloInventario .tab-btn[data-tab="invConsumibles"]').click();
                 };
-                mostrarMensaje(`✏️ Editando consumible ${c.codigo}`);
+                mostrarMensaje(`✏️ Editando consumible "${c.nombre}"`);
             };
 
             function invGuardarConsumible() {
-                const codigo = document.getElementById("invConsCategoria").value.trim();
+                const posicion = document.getElementById("invConsPosicion").value.trim();
                 const nombre = document.getElementById("invConsNombre").value.trim();
-                if (!codigo || !nombre) {
-                    mostrarMensaje("⚠️ Código y Nombre son obligatorios");
+                if (!nombre) {
+                    mostrarMensaje("⚠️ El nombre es obligatorio");
                     return;
                 }
                 invConsumibles.push({
-                    codigo: codigo,
+                    posicion: posicion,
                     nombre: nombre,
-                    descripcion: document.getElementById("invConsDescripcion").value.trim(),
-                    proveedor: document.getElementById("invConsProveedor").value.trim(),
+                    marca: document.getElementById("invConsMarca").value.trim(),
+                    referencia: document.getElementById("invConsReferencia").value.trim(),
                     stock: parseInt(document.getElementById("invConsStock").value) || 0
                 });
                 invGuardarDatos();
                 invRenderAll();
-                mostrarMensaje(`✅ Consumible ${codigo} registrado`);
-                document.getElementById("invConsCategoria").value = "";
+                mostrarMensaje(`✅ Consumible "${nombre}" registrado en posición ${posicion || "N/A"}`);
+                document.getElementById("invConsPosicion").value = "";
                 document.getElementById("invConsNombre").value = "";
-                document.getElementById("invConsDescripcion").value = "";
-                document.getElementById("invConsProveedor").value = "";
+                document.getElementById("invConsMarca").value = "";
+                document.getElementById("invConsReferencia").value = "";
                 document.getElementById("invConsStock").value = "0";
                 document.querySelector('#moduloInventario .tab-btn[data-tab="invConsumibles"]').click();
             }
@@ -2289,11 +2325,11 @@
 
             // Cargar Stock
             document.getElementById("invBtnCargarStock").onclick = function() {
-                const codigo = prompt("Ingrese el código del consumible para cargar stock:");
-                if (!codigo) return;
-                const cons = invConsumibles.find(c => c.codigo.toLowerCase() === codigo.toLowerCase());
+                const nombre = prompt("Ingrese el nombre del consumible para cargar stock:");
+                if (!nombre) return;
+                const cons = invConsumibles.find(c => c.nombre.toLowerCase() === nombre.toLowerCase());
                 if (!cons) {
-                    mostrarMensaje(`⚠️ No se encontró el consumible con código: ${codigo}`);
+                    mostrarMensaje(`⚠️ No se encontró el consumible: ${nombre}`);
                     return;
                 }
                 const cantidad = prompt(`Stock actual: ${cons.stock}\nIngrese la cantidad a agregar:`);
@@ -2304,12 +2340,12 @@
                 cons.stock += parseInt(cantidad);
                 invGuardarDatos();
                 invRenderAll();
-                mostrarMensaje(`✅ Stock de ${cons.nombre} actualizado a ${cons.stock}`);
+                mostrarMensaje(`✅ Stock de "${cons.nombre}" actualizado a ${cons.stock}`);
             };
 
             // --- INV: CRUD Equipos ---
             window.invEliminarEquipo = function(idx) {
-                if (confirm(`¿Eliminar el equipo ${invEquipos[idx].codigo}?`)) {
+                if (confirm(`¿Eliminar el equipo "${invEquipos[idx].equipo}"?`)) {
                     invEquipos.splice(idx, 1);
                     invGuardarDatos();
                     invRenderAll();
@@ -2319,49 +2355,70 @@
 
             window.invEditarEquipo = function(idx) {
                 const e = invEquipos[idx];
-                document.getElementById("invEqCategoria").value = e.codigo;
-                document.getElementById("invEqNombre").value = e.nombre;
-                document.getElementById("invEqDescripcion").value = e.descripcion || "";
+                document.getElementById("invEqEquipo").value = e.equipo;
+                document.getElementById("invEqMarca").value = e.marca || "";
+                document.getElementById("invEqModelo").value = e.modelo || "";
+                document.getElementById("invEqSerial").value = e.serial;
                 document.getElementById("invEqEstado").value = e.estado;
+                document.getElementById("invEqFechaCert").value = e.fechaCert || "";
+                document.getElementById("invEqNumCert").value = e.numCert || "";
+                document.getElementById("invEqObservaciones").value = e.observaciones || "";
                 document.querySelector('#moduloInventario .tab-btn[data-tab="invNuevoEquipo"]').click();
                 const btn = document.getElementById("invBtnGuardarEquipo");
                 btn.textContent = "✏️ Actualizar Equipo";
                 btn.onclick = function() {
-                    e.codigo = document.getElementById("invEqCategoria").value.trim();
-                    e.nombre = document.getElementById("invEqNombre").value.trim();
-                    e.descripcion = document.getElementById("invEqDescripcion").value.trim();
+                    e.equipo = document.getElementById("invEqEquipo").value.trim();
+                    e.marca = document.getElementById("invEqMarca").value.trim();
+                    e.modelo = document.getElementById("invEqModelo").value.trim();
+                    e.serial = document.getElementById("invEqSerial").value.trim();
                     e.estado = document.getElementById("invEqEstado").value;
+                    e.fechaCert = document.getElementById("invEqFechaCert").value || "";
+                    e.numCert = document.getElementById("invEqNumCert").value.trim();
+                    e.observaciones = document.getElementById("invEqObservaciones").value.trim();
                     invGuardarDatos();
                     invRenderAll();
-                    mostrarMensaje(`✅ Equipo ${e.codigo} actualizado`);
+                    mostrarMensaje(`✅ Equipo "${e.equipo}" actualizado`);
                     btn.textContent = "💾 Guardar Equipo";
                     btn.onclick = invGuardarEquipo;
-                    document.getElementById("invEqCategoria").value = "";
-                    document.getElementById("invEqNombre").value = "";
+                    document.getElementById("invEqEquipo").value = "";
+                    document.getElementById("invEqMarca").value = "";
+                    document.getElementById("invEqModelo").value = "";
+                    document.getElementById("invEqSerial").value = "";
+                    document.getElementById("invEqFechaCert").value = "";
+                    document.getElementById("invEqNumCert").value = "";
+                    document.getElementById("invEqObservaciones").value = "";
                     document.querySelector('#moduloInventario .tab-btn[data-tab="invEquipos"]').click();
                 };
-                mostrarMensaje(`✏️ Editando equipo ${e.codigo}`);
+                mostrarMensaje(`✏️ Editando equipo "${e.equipo}"`);
             };
 
             function invGuardarEquipo() {
-                const codigo = document.getElementById("invEqCategoria").value.trim();
-                const nombre = document.getElementById("invEqNombre").value.trim();
-                if (!codigo || !nombre) {
-                    mostrarMensaje("⚠️ Código y Nombre son obligatorios");
+                const equipo = document.getElementById("invEqEquipo").value.trim();
+                const serial = document.getElementById("invEqSerial").value.trim();
+                if (!equipo || !serial) {
+                    mostrarMensaje("⚠️ Equipo y Serial son obligatorios");
                     return;
                 }
                 invEquipos.push({
-                    codigo: codigo,
-                    nombre: nombre,
-                    descripcion: document.getElementById("invEqDescripcion").value.trim(),
-                    estado: document.getElementById("invEqEstado").value
+                    equipo: equipo,
+                    marca: document.getElementById("invEqMarca").value.trim(),
+                    modelo: document.getElementById("invEqModelo").value.trim(),
+                    serial: serial,
+                    estado: document.getElementById("invEqEstado").value,
+                    fechaCert: document.getElementById("invEqFechaCert").value || "",
+                    numCert: document.getElementById("invEqNumCert").value.trim(),
+                    observaciones: document.getElementById("invEqObservaciones").value.trim()
                 });
                 invGuardarDatos();
                 invRenderAll();
-                mostrarMensaje(`✅ Equipo ${codigo} registrado`);
-                document.getElementById("invEqCategoria").value = "";
-                document.getElementById("invEqNombre").value = "";
-                document.getElementById("invEqDescripcion").value = "";
+                mostrarMensaje(`✅ Equipo "${equipo}" registrado`);
+                document.getElementById("invEqEquipo").value = "";
+                document.getElementById("invEqMarca").value = "";
+                document.getElementById("invEqModelo").value = "";
+                document.getElementById("invEqSerial").value = "";
+                document.getElementById("invEqFechaCert").value = "";
+                document.getElementById("invEqNumCert").value = "";
+                document.getElementById("invEqObservaciones").value = "";
                 document.querySelector('#moduloInventario .tab-btn[data-tab="invEquipos"]').click();
             }
             document.getElementById("invBtnGuardarEquipo").onclick = invGuardarEquipo;
@@ -2374,25 +2431,29 @@
                 const c = invConsumibles[idx];
                 const html = `
                     <h3>📋 Ficha de Consumible</h3>
-                    <div class="info-line"><strong>Código:</strong> ${c.codigo}</div>
+                    <div class="info-line"><strong>Posición:</strong> <span class="posicion-badge">${c.posicion || "N/A"}</span></div>
                     <div class="info-line"><strong>Nombre:</strong> ${c.nombre}</div>
-                    <div class="info-line"><strong>Descripción:</strong> ${c.descripcion || "N/A"}</div>
-                    <div class="info-line"><strong>Proveedor:</strong> ${c.proveedor || "N/A"}</div>
+                    <div class="info-line"><strong>Marca:</strong> ${c.marca || "N/A"}</div>
+                    <div class="info-line"><strong>Referencia:</strong> ${c.referencia || "N/A"}</div>
                     <div class="info-line"><strong>Stock:</strong> <span class="status-badge ${c.stock > 0 ? 'badge-disponible' : 'badge-sin-stock'}">${c.stock}</span></div>
                 `;
-                generarPDF(html, `Consumible_${c.codigo}`);
+                generarPDF(html, `Consumible_${c.nombre}`);
             };
 
             window.invGenerarPDFEquipo = function(idx) {
                 const e = invEquipos[idx];
                 const html = `
                     <h3>🖥️ Ficha de Equipo</h3>
-                    <div class="info-line"><strong>Código:</strong> ${e.codigo}</div>
-                    <div class="info-line"><strong>Nombre:</strong> ${e.nombre}</div>
-                    <div class="info-line"><strong>Descripción:</strong> ${e.descripcion || "N/A"}</div>
-                    <div class="info-line"><strong>Estado:</strong> <span class="status-badge ${e.estado === 'Disponible' ? 'badge-disponible' : 'badge-no-disponible'}">${e.estado}</span></div>
+                    <div class="info-line"><strong>Equipo:</strong> ${e.equipo}</div>
+                    <div class="info-line"><strong>Marca:</strong> ${e.marca || "N/A"}</div>
+                    <div class="info-line"><strong>Modelo:</strong> ${e.modelo || "N/A"}</div>
+                    <div class="info-line"><strong>Serial:</strong> ${e.serial}</div>
+                    <div class="info-line"><strong>Estado:</strong> <span class="status-badge ${e.estado === 'Disponible' ? 'badge-disponible' : 'badge-pendiente'}">${e.estado}</span></div>
+                    <div class="info-line"><strong>Fecha de Certificación:</strong> ${e.fechaCert || "N/A"}</div>
+                    <div class="info-line"><strong>N° Certificación:</strong> ${e.numCert || "N/A"}</div>
+                    <div class="info-line"><strong>Observaciones:</strong> ${e.observaciones || "Ninguna"}</div>
                 `;
-                generarPDF(html, `Equipo_${e.codigo}`);
+                generarPDF(html, `Equipo_${e.serial}`);
             };
 
             // --- INV: Importar ---
@@ -2419,20 +2480,24 @@
                         if (isConsumibles) {
                             rows.forEach(row => {
                                 invConsumibles.push({
-                                    codigo: row.codigo || row.Codigo || "",
+                                    posicion: row.posicion || row.Posicion || row.POSICION || "",
                                     nombre: row.nombre || row.Nombre || "",
-                                    descripcion: row.descripcion || row.Descripcion || "",
-                                    proveedor: row.proveedor || row.Proveedor || "",
+                                    marca: row.marca || row.Marca || "",
+                                    referencia: row.referencia || row.Referencia || "",
                                     stock: parseInt(row.stock || row.Stock || "0") || 0
                                 });
                             });
                         } else {
                             rows.forEach(row => {
                                 invEquipos.push({
-                                    codigo: row.codigo || row.Codigo || "",
-                                    nombre: row.nombre || row.Nombre || "",
-                                    descripcion: row.descripcion || row.Descripcion || "",
-                                    estado: row.estado || row.Estado || "Disponible"
+                                    estado: row.estado || row.Estado || "Disponible",
+                                    fechaCert: row.fechaCert || row.FechaCert || "",
+                                    numCert: row.numCert || row.NumCert || "",
+                                    equipo: row.equipo || row.Equipo || "",
+                                    marca: row.marca || row.Marca || "",
+                                    modelo: row.modelo || row.Modelo || "",
+                                    serial: row.serial || row.Serial || "",
+                                    observaciones: row.observaciones || row.Observaciones || ""
                                 });
                             });
                         }
@@ -2473,24 +2538,27 @@
             };
             document.getElementById("invBtnCargarEjemplo").onclick = function() {
                 invConsumibles = [
-                    { codigo: "CON-001", nombre: "Cable UTP Cat6", descripcion: "Cable de red categoría 6",
-                        proveedor: "Proveedor A", stock: 50 },
-                    { codigo: "CON-002", nombre: "Conector RJ45", descripcion: "Conector para cable UTP",
-                        proveedor: "Proveedor B", stock: 120 },
-                    { codigo: "CON-003", nombre: "Fibra Óptica SC/APC", descripcion: "Pig tail fibra óptica",
-                        proveedor: "Proveedor C", stock: 15 }
+                    { posicion: "RACK-A1", nombre: "Cable UTP Cat6", marca: "AMP", referencia: "C6-UTP-305",
+                    stock: 50 },
+                    { posicion: "RACK-B3", nombre: "Conector RJ45", marca: "AMP", referencia: "RJ45-CAT6",
+                    stock: 120 },
+                    { posicion: "RACK-C2", nombre: "Fibra Óptica SC/APC", marca: "Corning", referencia: "SC-APC-3M",
+                        stock: 15 }
                 ];
                 invEquipos = [
-                    { codigo: "EQ-001", nombre: "Medidor de Potencia", descripcion: "Medidor óptico de potencia",
-                        estado: "Disponible" },
-                    { codigo: "EQ-002", nombre: "OTDR", descripcion: "Reflectómetro óptico",
-                        estado: "No Disponible" },
-                    { codigo: "EQ-003", nombre: "Fuente de Luz", descripcion: "Fuente láser para fibra",
-                        estado: "Disponible" }
+                    { equipo: "Medidor de Potencia", marca: "EXFO", modelo: "OLP-85", serial: "EXF-001",
+                        estado: "Disponible", fechaCert: "2025-01-15", numCert: "CERT-001",
+                        observaciones: "Calibración vigente" },
+                    { equipo: "OTDR", marca: "EXFO", modelo: "MAX-715", serial: "EXF-002",
+                        estado: "En reparación", fechaCert: "2024-12-10", numCert: "CERT-002",
+                        observaciones: "Enviado a taller" },
+                    { equipo: "Fuente de Luz", marca: "JDSU", modelo: "OLS-85", serial: "JDS-003",
+                        estado: "Disponible", fechaCert: "2025-02-01", numCert: "CERT-003",
+                        observaciones: "Nuevo equipo" }
                 ];
                 invGuardarDatos();
                 invRenderAll();
-                mostrarMensaje("Datos de ejemplo cargados");
+                mostrarMensaje("📋 Datos de ejemplo cargados correctamente");
             };
 
             // --- INV: Pestañas ---
