@@ -7,689 +7,135 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         /* ===== ESTILOS GENERALES ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f0f2f5;
-            display: flex;
-            min-height: 100vh;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; min-height: 100vh; }
 
         /* ===== MENÚ LATERAL ===== */
-        .sidebar {
-            width: 260px;
-            background: #0a2b4e;
-            color: white;
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1000;
-            transition: transform 0.3s ease;
-        }
-
-        .sidebar-brand {
-            padding: 0 24px 20px 24px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 20px;
-        }
-
-        .sidebar-brand h1 {
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-
-        .sidebar-brand small {
-            font-size: 0.75rem;
-            opacity: 0.7;
-            display: block;
-            margin-top: 4px;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 0 12px;
-        }
-
-        .sidebar-nav .nav-label {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            padding: 12px 12px 6px 12px;
-        }
-
-        .sidebar-nav a {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: rgba(255,255,255,0.7);
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            margin-bottom: 2px;
-        }
-
-        .sidebar-nav a:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        .sidebar-nav a.active {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            box-shadow: 0 0 20px rgba(255,255,255,0.05);
-        }
-
-        .sidebar-nav a .icon {
-            font-size: 1.2rem;
-            width: 28px;
-            text-align: center;
-        }
-
-        .sidebar-footer {
-            padding: 16px 24px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.7rem;
-            opacity: 0.6;
-            text-align: center;
-        }
+        .sidebar { width: 260px; background: #0a2b4e; color: white; padding: 20px 0; display: flex; flex-direction: column; position: fixed; height: 100vh; overflow-y: auto; z-index: 1000; transition: transform 0.3s ease; }
+        .sidebar-brand { padding: 0 24px 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-brand h1 { font-size: 1.2rem; font-weight: 700; }
+        .sidebar-brand small { font-size: 0.75rem; opacity: 0.7; display: block; margin-top: 4px; }
+        .sidebar-nav { flex: 1; padding: 0 12px; }
+        .sidebar-nav .nav-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5; padding: 12px 12px 6px 12px; }
+        .sidebar-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 12px; color: rgba(255,255,255,0.7); text-decoration: none; cursor: pointer; transition: all 0.2s; font-size: 0.9rem; margin-bottom: 2px; }
+        .sidebar-nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+        .sidebar-nav a.active { background: rgba(255,255,255,0.15); color: white; box-shadow: 0 0 20px rgba(255,255,255,0.05); }
+        .sidebar-nav a .icon { font-size: 1.2rem; width: 28px; text-align: center; }
+        .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; opacity: 0.6; text-align: center; }
 
         /* ===== CONTENIDO PRINCIPAL ===== */
-        .main-content {
-            margin-left: 260px;
-            flex: 1;
-            padding: 24px 28px;
-            min-height: 100vh;
-        }
+        .main-content { margin-left: 260px; flex: 1; padding: 24px 28px; min-height: 100vh; }
 
-        /* ===== HEADER DEL MÓDULO ===== */
-        .module-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 28px;
-            padding-bottom: 16px;
-            border-bottom: 3px solid #0a2b4e;
-        }
+        /* ===== HEADER ===== */
+        .module-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid #0a2b4e; }
+        .module-header h2 { color: #0a2b4e; font-size: 1.6rem; }
+        .module-header .badge-area { background: #1e4a76; color: white; padding: 8px 20px; border-radius: 40px; font-size: 0.8rem; font-weight: 600; }
 
-        .module-header h2 {
-            color: #0a2b4e;
-            font-size: 1.6rem;
-        }
-
-        .module-header .badge-area {
-            background: #1e4a76;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        /* ===== CONTENEDOR DE MÓDULOS ===== */
-        .module-container {
-            display: none;
-        }
-
-        .module-container.active {
-            display: block;
-        }
+        .module-container { display: none; }
+        .module-container.active { display: block; }
 
         /* ===== ALERTA ===== */
-        .alert-success {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 12px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: none;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            font-weight: 500;
-        }
-
-        /* ===== REUTILIZACIÓN DE ESTILOS ===== */
-        .dashboard {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 16px;
-            padding: 18px 20px;
-            cursor: pointer;
-            border: 1px solid #e2e8f0;
-            transition: all 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-3px);
-            background: #e8f0fe;
-        }
-
-        .card h3 {
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #64748b;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .card .number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0a2b4e;
-        }
-
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            border-bottom: 2px solid #e2e8f0;
-            margin-bottom: 24px;
-        }
-
-        .tab-btn {
-            background: none;
-            border: none;
-            padding: 10px 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 30px;
-            color: #64748b;
-            transition: all 0.2s;
-        }
-
-        .tab-btn:hover {
-            background: #e8f0fe;
-            color: #0a2b4e;
-        }
-
-        .tab-btn.active {
-            background: #0a2b4e;
-            color: white;
-        }
-
-        .tab-pane {
-            display: none;
-        }
-
-        .tab-pane.active-pane {
-            display: block;
-        }
-
-        .form-card,
-        .table-card {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 28px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .form-card h3,
-        .table-card h3 {
-            margin-bottom: 20px;
-            color: #0a2b4e;
-            border-left: 4px solid #0a2b4e;
-            padding-left: 12px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-bottom: 12px;
-        }
-
-        .input-group label {
-            font-weight: 600;
-            font-size: 0.75rem;
-            color: #64748b;
-            text-transform: uppercase;
-        }
-
-        .input-group input,
-        .input-group select,
-        .input-group textarea {
-            padding: 10px 14px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        .input-group textarea {
-            resize: vertical;
-            min-height: 60px;
-        }
-
-        button {
-            background: #0a2b4e;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 30px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.85rem;
-        }
-
-        button:hover {
-            background: #051a30;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #0a2b4e;
-            color: #0a2b4e;
-        }
-
-        .btn-outline:hover {
-            background: #0a2b4e;
-            color: white;
-        }
-
-        .btn-danger {
-            background: #dc2626;
-        }
-
-        .btn-danger:hover {
-            background: #b91c1c;
-        }
-
-        .btn-success {
-            background: #10b981;
-        }
-
-        .btn-success:hover {
-            background: #059669;
-        }
-
-        .btn-info {
-            background: #3b82f6;
-        }
-
-        .btn-info:hover {
-            background: #2563eb;
-        }
-
-        .btn-sm {
-            padding: 6px 14px;
-            font-size: 0.75rem;
-        }
-
-        .btn-warning {
-            background: #f59e0b;
-        }
-
-        .btn-warning:hover {
-            background: #d97706;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 10px 8px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.8rem;
-            vertical-align: middle;
-        }
-
-        th {
-            background: #e8f0fe;
-            font-weight: 600;
-            color: #0a2b4e;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .status-badge {
-            padding: 3px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-
-        .badge-pendiente {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .badge-aprobado {
-            background: #d1fae5;
-            color: #059669;
-        }
-
-        .badge-rechazado {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .badge-despachado {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .badge-disponible {
-            background: #d1fae5;
-            color: #059669;
-        }
-
-        .badge-no-disponible {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-
-        .badge-bajo-stock {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .badge-sin-stock {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .badge-activo {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .badge-en-uso {
-            background: #dbeafe;
-            color: #1d4ed8;
-        }
-
-        .badge-reparacion {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .badge-baja {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-
-        .badge-posicion {
-            background: #e8f0fe;
-            color: #0a2b4e;
-            font-weight: 700;
-        }
-
-        .acciones-btns {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-
-        .pdf-btn {
-            background: #dc2626;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            border-radius: 20px;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        .pdf-btn:hover {
-            background: #b91c1c;
-        }
-
-        .edit-btn {
-            background: #f59e0b;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            border-radius: 20px;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        .edit-btn:hover {
-            background: #d97706;
-        }
-
-        .delete-btn {
-            background: #6b7280;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            border-radius: 20px;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        .delete-btn:hover {
-            background: #4b5563;
-        }
-
-        .despachar-btn {
-            background: #10b981;
-            padding: 4px 10px;
-            font-size: 0.7rem;
-            border-radius: 20px;
-            border: none;
-            color: white;
-            cursor: pointer;
-        }
-
-        .despachar-btn:hover {
-            background: #059669;
-        }
-
-        .serial-link {
-            color: #0a2b4e;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        .timeline-item {
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border-left: 4px solid #0a2b4e;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 24px;
-            max-width: 700px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .close-modal {
-            font-size: 28px;
-            cursor: pointer;
-            color: #64748b;
-        }
-
-        .close-modal:hover {
-            color: #dc2626;
-        }
-
-        .import-area {
-            border: 2px dashed #e2e8f0;
-            padding: 30px 20px;
-            text-align: center;
-            border-radius: 16px;
-            cursor: pointer;
-            margin: 10px 0;
-        }
-
-        .import-area:hover {
-            border-color: #0a2b4e;
-            background: #e8f0fe;
-        }
-
-        .import-box {
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
-            background: #e8f0fe;
-            margin-bottom: 20px;
-        }
-
-        .import-separado {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 15px;
-        }
-
-        .export-buttons {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .app-footer {
-            text-align: center;
-            padding: 20px;
-            color: #64748b;
-            font-size: 0.7rem;
-            border-top: 1px solid #e2e8f0;
-            margin-top: 20px;
-        }
-
-        .foto-miniatura {
-            max-width: 45px;
-            max-height: 45px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-
-        .posicion-badge {
-            background: #0a2b4e;
-            color: white;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: inline-block;
-        }
+        .alert-success { background: #d1fae5; color: #065f46; padding: 12px 20px; border-radius: 12px; margin-bottom: 20px; display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 28px; }
+        .card { background: white; border-radius: 16px; padding: 18px 20px; cursor: pointer; border: 1px solid #e2e8f0; transition: all 0.2s; }
+        .card:hover { transform: translateY(-3px); background: #e8f0fe; }
+        .card h3 { font-size: 0.75rem; font-weight: 500; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
+        .card .number { font-size: 2rem; font-weight: 700; color: #0a2b4e; }
+
+        /* ===== TABS ===== */
+        .tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; }
+        .tab-btn { background: none; border: none; padding: 10px 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border-radius: 30px; color: #64748b; transition: all 0.2s; }
+        .tab-btn:hover { background: #e8f0fe; color: #0a2b4e; }
+        .tab-btn.active { background: #0a2b4e; color: white; }
+        .tab-pane { display: none; }
+        .tab-pane.active-pane { display: block; }
+
+        /* ===== FORMULARIOS Y TABLAS ===== */
+        .form-card, .table-card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 28px; border: 1px solid #e2e8f0; }
+        .form-card h3, .table-card h3 { margin-bottom: 20px; color: #0a2b4e; border-left: 4px solid #0a2b4e; padding-left: 12px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+        .input-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+        .input-group label { font-weight: 600; font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+        .input-group input, .input-group select, .input-group textarea { padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; font-size: 0.9rem; }
+        .input-group textarea { resize: vertical; min-height: 60px; }
+
+        /* ===== BOTONES ===== */
+        button { background: #0a2b4e; color: white; border: none; padding: 10px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
+        button:hover { background: #051a30; }
+        .btn-outline { background: transparent; border: 2px solid #0a2b4e; color: #0a2b4e; }
+        .btn-outline:hover { background: #0a2b4e; color: white; }
+        .btn-danger { background: #dc2626; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-success { background: #10b981; }
+        .btn-success:hover { background: #059669; }
+        .btn-info { background: #3b82f6; }
+        .btn-info:hover { background: #2563eb; }
+        .btn-sm { padding: 6px 14px; font-size: 0.75rem; }
+
+        /* ===== TABLAS ===== */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #e2e8f0; font-size: 0.8rem; vertical-align: middle; }
+        th { background: #e8f0fe; font-weight: 600; color: #0a2b4e; }
+        .table-responsive { overflow-x: auto; }
+
+        /* ===== BADGES ===== */
+        .status-badge { padding: 3px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .badge-pendiente { background: #fef3c7; color: #d97706; }
+        .badge-aprobado { background: #d1fae5; color: #059669; }
+        .badge-rechazado { background: #fee2e2; color: #dc2626; }
+        .badge-despachado { background: #dbeafe; color: #1d4ed8; }
+        .badge-disponible { background: #d1fae5; color: #059669; }
+        .badge-no-disponible { background: #f3f4f6; color: #6b7280; }
+        .badge-bajo-stock { background: #fef3c7; color: #d97706; }
+        .badge-sin-stock { background: #fee2e2; color: #dc2626; }
+        .badge-activo { background: #dbeafe; color: #1d4ed8; }
+        .badge-en-uso { background: #dbeafe; color: #1d4ed8; }
+        .badge-reparacion { background: #fef3c7; color: #d97706; }
+        .badge-baja { background: #f3f4f6; color: #6b7280; }
+
+        .posicion-badge { background: #0a2b4e; color: white; padding: 2px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; display: inline-block; }
+
+        /* ===== BOTONES DE ACCIÓN ===== */
+        .acciones-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+        .pdf-btn { background: #dc2626; padding: 4px 10px; font-size: 0.7rem; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .pdf-btn:hover { background: #b91c1c; }
+        .edit-btn { background: #f59e0b; padding: 4px 10px; font-size: 0.7rem; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .edit-btn:hover { background: #d97706; }
+        .delete-btn { background: #6b7280; padding: 4px 10px; font-size: 0.7rem; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .delete-btn:hover { background: #4b5563; }
+        .despachar-btn { background: #10b981; padding: 4px 10px; font-size: 0.7rem; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .despachar-btn:hover { background: #059669; }
+        .serial-link { color: #0a2b4e; font-weight: bold; cursor: pointer; text-decoration: underline; }
+
+        /* ===== MODALES ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: white; border-radius: 20px; padding: 24px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-modal { font-size: 28px; cursor: pointer; color: #64748b; }
+        .close-modal:hover { color: #dc2626; }
+
+        /* ===== IMPORTACIÓN ===== */
+        .import-area { border: 2px dashed #e2e8f0; padding: 30px 20px; text-align: center; border-radius: 16px; cursor: pointer; margin: 10px 0; }
+        .import-area:hover { border-color: #0a2b4e; background: #e8f0fe; }
+        .import-box { border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; background: #e8f0fe; margin-bottom: 20px; }
+        .import-separado { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
+        .export-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .app-footer { text-align: center; padding: 20px; color: #64748b; font-size: 0.7rem; border-top: 1px solid #e2e8f0; margin-top: 20px; }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 16px;
-            }
-
-            .import-separado {
-                grid-template-columns: 1fr;
-            }
-
-            .menu-toggle {
-                display: block !important;
-                position: fixed;
-                top: 16px;
-                left: 16px;
-                z-index: 1001;
-                background: #0a2b4e;
-                color: white;
-                border: none;
-                padding: 12px 16px;
-                border-radius: 12px;
-                font-size: 1.5rem;
-                cursor: pointer;
-            }
-
-            .module-header h2 {
-                font-size: 1.2rem;
-            }
+            .sidebar { transform: translateX(-100%); width: 280px; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 16px; }
+            .import-separado { grid-template-columns: 1fr; }
+            .menu-toggle { display: block !important; position: fixed; top: 16px; left: 16px; z-index: 1001; background: #0a2b4e; color: white; border: none; padding: 12px 16px; border-radius: 12px; font-size: 1.5rem; cursor: pointer; }
+            .module-header h2 { font-size: 1.2rem; }
         }
-
-        .menu-toggle {
-            display: none;
-        }
-
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.show {
-            display: block;
-        }
+        .menu-toggle { display: none; }
+        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 999; }
+        .sidebar-overlay.show { display: block; }
     </style>
 </head>
 <body>
@@ -705,46 +151,31 @@
         </div>
         <div class="sidebar-nav">
             <div class="nav-label">Módulos</div>
-            <a href="#" class="active" data-modulo="laboratorio">
-                <span class="icon">🔬</span> Laboratorio
-            </a>
-            <a href="#" data-modulo="logistica">
-                <span class="icon">📦</span> Logística
-            </a>
-            <a href="#" data-modulo="inventario">
-                <span class="icon">📋</span> Inventario / Bodega
-            </a>
+            <a href="#" class="active" data-modulo="laboratorio"><span class="icon">🔬</span> Laboratorio</a>
+            <a href="#" data-modulo="logistica"><span class="icon">📦</span> Logística</a>
+            <a href="#" data-modulo="inventario"><span class="icon">📋</span> Inventario / Bodega</a>
         </div>
-        <div class="sidebar-footer">
-            CI RENTELCOM SAS<br>
-            Carrera 19A No. 150-50 Bogotá D.C.
-        </div>
+        <div class="sidebar-footer">CI RENTELCOM SAS<br>Carrera 19A No. 150-50 Bogotá D.C.</div>
     </nav>
 
     <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <div class="main-content" id="mainContent">
-
-        <!-- ===== ALERTA ===== -->
         <div id="mensajeExito" class="alert-success"></div>
 
         <!-- ================================================================ -->
-        <!-- ===== MÓDULO LABORATORIO ===== -->
+        <!-- MÓDULO LABORATORIO -->
         <!-- ================================================================ -->
         <div class="module-container active" id="moduloLaboratorio">
             <div class="module-header">
                 <h2>🔬 Laboratorio - CalibPro</h2>
                 <span class="badge-area">Gestión de Aprobaciones</span>
             </div>
-
-            <!-- Dashboard Laboratorio -->
             <div class="dashboard">
                 <div class="card" data-accion="equipos"><h3>Equipos</h3><div class="number" id="labTotalEquipos">0</div></div>
                 <div class="card" data-accion="informes"><h3>Informes</h3><div class="number" id="labTotalInformes">0</div></div>
                 <div class="card" data-accion="pendientes"><h3>Pendientes</h3><div class="number" id="labPendientes">0</div></div>
                 <div class="card" data-accion="aprobados"><h3>Aprobados</h3><div class="number" id="labAprobados">0</div></div>
             </div>
-
-            <!-- Tabs Laboratorio -->
             <div class="tabs">
                 <button class="tab-btn active" data-tab="labEquipos">📋 Equipos</button>
                 <button class="tab-btn" data-tab="labNuevoEquipo">📥 Nueva Entrada</button>
@@ -754,22 +185,16 @@
                 <button class="tab-btn" data-tab="labImportar">📂 Importar</button>
                 <button class="tab-btn" data-tab="labConfiguracion">⚙️ Configuración</button>
             </div>
-
-            <!-- LAB: EQUIPOS -->
             <div id="labEquipos" class="tab-pane active-pane">
                 <div class="table-card">
                     <h3>Gestión de equipos</h3>
                     <button id="labBtnAgregarEquipo" class="btn-outline btn-sm" style="margin-bottom:15px;">+ Nueva entrada</button>
                     <div class="table-responsive">
-                        <table>
-                            <thead><tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Registrado por</th><th>Estado</th><th>Acciones</th></tr></thead>
-                            <tbody id="labEquiposBody"></tbody>
-                        </table>
+                        <table><thead><tr><th>Consecutivo</th><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Registrado por</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="labEquiposBody"></tbody></table>
                     </div>
                 </div>
             </div>
-
-            <!-- LAB: NUEVA ENTRADA -->
             <div id="labNuevoEquipo" class="tab-pane">
                 <div class="form-card">
                     <h3>📥 REGISTRO DE ENTRADA DE EQUIPO</h3>
@@ -787,17 +212,13 @@
                     <button id="labBtnGuardarEntrada">💾 Guardar entrada</button>
                 </div>
             </div>
-
-            <!-- LAB: INFORMES -->
             <div id="labInformes" class="tab-pane">
                 <div class="table-card">
                     <h3>Informes técnicos de laboratorio</h3>
                     <button id="labBtnNuevoInforme" class="btn-outline btn-sm" style="margin-bottom:15px;">+ Nuevo informe</button>
                     <div class="table-responsive">
-                        <table>
-                            <thead><tr><th>N° Informe</th><th>Fecha</th><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead>
-                            <tbody id="labInformesBody"></tbody>
-                        </table>
+                        <table><thead><tr><th>N° Informe</th><th>Fecha</th><th>Serial</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Cliente</th><th>Servicio</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="labInformesBody"></tbody></table>
                     </div>
                 </div>
                 <div id="labModalInforme" class="modal">
@@ -818,8 +239,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- LAB: APROBACIÓN -->
             <div id="labAprobacion" class="tab-pane">
                 <div class="form-card">
                     <h3>✅ GESTIÓN DE APROBACIÓN COMERCIAL</h3>
@@ -839,8 +258,6 @@
                     <button id="labBtnRegistrarAprobacion">💾 Registrar aprobación</button>
                 </div>
             </div>
-
-            <!-- LAB: TRAZABILIDAD -->
             <div id="labTrazabilidad" class="tab-pane">
                 <div class="form-card">
                     <h3>🔍 Trazabilidad por serial</h3>
@@ -851,8 +268,6 @@
                     <div id="labTrazabilidadResultados"></div>
                 </div>
             </div>
-
-            <!-- LAB: IMPORTAR -->
             <div id="labImportar" class="tab-pane">
                 <div class="form-card">
                     <h3>Importar datos por separado</h3>
@@ -872,8 +287,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- LAB: CONFIGURACIÓN -->
             <div id="labConfiguracion" class="tab-pane">
                 <div class="form-card">
                     <h3>Configuración</h3>
@@ -895,23 +308,19 @@
         </div>
 
         <!-- ================================================================ -->
-        <!-- ===== MÓDULO LOGÍSTICA ===== -->
+        <!-- MÓDULO LOGÍSTICA -->
         <!-- ================================================================ -->
         <div class="module-container" id="moduloLogistica">
             <div class="module-header">
                 <h2>📦 Logística - Solicitudes y Despachos</h2>
                 <span class="badge-area">Gestión de Órdenes</span>
             </div>
-
-            <!-- Dashboard Logística -->
             <div class="dashboard">
                 <div class="card" data-accion="solicitudes"><h3>Solicitudes</h3><div class="number" id="logTotalSolicitudes">0</div></div>
                 <div class="card" data-accion="despachos"><h3>Despachos</h3><div class="number" id="logTotalDespachos">0</div></div>
                 <div class="card" data-accion="pendientes"><h3>Pendientes</h3><div class="number" id="logPendientes">0</div></div>
                 <div class="card" data-accion="completados"><h3>Completados</h3><div class="number" id="logCompletados">0</div></div>
             </div>
-
-            <!-- Tabs Logística -->
             <div class="tabs">
                 <button class="tab-btn active" data-tab="logSolicitudes">📝 Solicitudes</button>
                 <button class="tab-btn" data-tab="logDespachos">🚚 Despachos</button>
@@ -919,35 +328,25 @@
                 <button class="tab-btn" data-tab="logImportar">📂 Importar</button>
                 <button class="tab-btn" data-tab="logConfiguracion">⚙️ Configuración</button>
             </div>
-
-            <!-- LOG: SOLICITUDES -->
             <div id="logSolicitudes" class="tab-pane active-pane">
                 <div class="table-card">
                     <h3>📝 Solicitudes de Compra/Alquiler</h3>
                     <button id="logBtnNuevaSolicitud" class="btn-outline btn-sm" style="margin-bottom:15px;">+ Nueva Solicitud</button>
                     <div class="table-responsive">
-                        <table>
-                            <thead><tr><th>N° Solicitud</th><th>Fecha</th><th>Tipo</th><th>Producto/Equipo</th><th>Cantidad</th><th>Solicitante</th><th>Estado</th><th>Acciones</th></tr></thead>
-                            <tbody id="logSolicitudesBody"></tbody>
-                        </table>
+                        <table><thead><tr><th>N° Solicitud</th><th>Fecha</th><th>Tipo</th><th>Producto/Equipo</th><th>Cantidad</th><th>Solicitante</th><th>Estado</th><th>Acciones</th></tr></thead>
+                        <tbody id="logSolicitudesBody"></tbody></table>
                     </div>
                 </div>
             </div>
-
-            <!-- LOG: DESPACHOS -->
             <div id="logDespachos" class="tab-pane">
                 <div class="table-card">
                     <h3>🚚 Registro de Despachos</h3>
                     <div class="table-responsive">
-                        <table>
-                            <thead><tr><th>N° Despacho</th><th>Fecha</th><th>N° Solicitud</th><th>Producto/Equipo</th><th>Cantidad</th><th>Responsable</th><th>Acciones</th></tr></thead>
-                            <tbody id="logDespachosBody"></tbody>
-                        </table>
+                        <table><thead><tr><th>N° Despacho</th><th>Fecha</th><th>N° Solicitud</th><th>Producto/Equipo</th><th>Cantidad</th><th>Responsable</th><th>Acciones</th></tr></thead>
+                        <tbody id="logDespachosBody"></tbody></table>
                     </div>
                 </div>
             </div>
-
-            <!-- LOG: NUEVA SOLICITUD -->
             <div id="logNuevaSolicitud" class="tab-pane">
                 <div class="form-card">
                     <h3>📝 Nueva Solicitud</h3>
@@ -968,8 +367,6 @@
                     <button id="logBtnGuardarSolicitud">💾 Guardar Solicitud</button>
                 </div>
             </div>
-
-            <!-- LOG: IMPORTAR -->
             <div id="logImportar" class="tab-pane">
                 <div class="form-card">
                     <h3>📂 Importar Datos</h3>
@@ -989,8 +386,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- LOG: CONFIGURACIÓN -->
             <div id="logConfiguracion" class="tab-pane">
                 <div class="form-card">
                     <h3>⚙️ Configuración</h3>
@@ -1004,14 +399,9 @@
                     <button id="logBtnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar ejemplo</button>
                 </div>
             </div>
-
-            <!-- MODAL DESPACHAR -->
             <div id="logModalDespachar" class="modal">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>🚚 Despachar Solicitud</h3>
-                        <span class="close-modal" onclick="logCerrarModalDespachar()">&times;</span>
-                    </div>
+                    <div class="modal-header"><h3>🚚 Despachar Solicitud</h3><span class="close-modal" onclick="logCerrarModalDespachar()">&times;</span></div>
                     <div id="logDespacharInfo"></div>
                     <div class="form-grid">
                         <div class="input-group"><label>Cantidad a Despachar *</label><input id="logDespCantidad" type="number" min="1" value="1"></div>
@@ -1023,23 +413,19 @@
         </div>
 
         <!-- ================================================================ -->
-        <!-- ===== MÓDULO INVENTARIO / BODEGA (CON POSICIÓN) ===== -->
+        <!-- MÓDULO INVENTARIO / BODEGA -->
         <!-- ================================================================ -->
         <div class="module-container" id="moduloInventario">
             <div class="module-header">
                 <h2>📋 Inventario / Bodega</h2>
                 <span class="badge-area">Control de Stock</span>
             </div>
-
-            <!-- Dashboard Inventario -->
             <div class="dashboard">
                 <div class="card" data-accion="consumibles"><h3>Consumibles</h3><div class="number" id="invTotalConsumibles">0</div></div>
                 <div class="card" data-accion="equipos"><h3>Equipos</h3><div class="number" id="invTotalEquipos">0</div></div>
                 <div class="card" data-accion="bajoStock"><h3>Bajo Stock</h3><div class="number" id="invBajoStock">0</div></div>
                 <div class="card" data-accion="sinStock"><h3>Sin Stock</h3><div class="number" id="invSinStock">0</div></div>
             </div>
-
-            <!-- Tabs Inventario -->
             <div class="tabs">
                 <button class="tab-btn active" data-tab="invConsumibles">📋 Consumibles</button>
                 <button class="tab-btn" data-tab="invEquipos">🖥️ Equipos</button>
@@ -1048,8 +434,6 @@
                 <button class="tab-btn" data-tab="invImportar">📂 Importar</button>
                 <button class="tab-btn" data-tab="invConfiguracion">⚙️ Configuración</button>
             </div>
-
-            <!-- INV: CONSUMIBLES (CON POSICIÓN) -->
             <div id="invConsumibles" class="tab-pane active-pane">
                 <div class="table-card">
                     <h3>📋 Gestión de Inventario / Consumibles</h3>
@@ -1059,49 +443,24 @@
                     </div>
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Posición</th>
-                                    <th>Nombre</th>
-                                    <th>Marca</th>
-                                    <th>Referencia</th>
-                                    <th>Stock</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Posición</th><th>Nombre</th><th>Marca</th><th>Referencia</th><th>Stock</th><th>Acciones</th></tr></thead>
                             <tbody id="invConsumiblesBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <!-- INV: EQUIPOS -->
             <div id="invEquipos" class="tab-pane">
                 <div class="table-card">
                     <h3>🖥️ Gestión de Equipos Disponibles</h3>
                     <button id="invBtnAgregarEquipo" class="btn-outline btn-sm" style="margin-bottom:15px;">+ Nuevo Equipo</button>
                     <div class="table-responsive">
                         <table>
-                            <thead>
-                                <tr>
-                                    <th>Estado</th>
-                                    <th>Fecha de Certificación</th>
-                                    <th>N° Certificación</th>
-                                    <th>Equipo</th>
-                                    <th>Marca</th>
-                                    <th>Modelo</th>
-                                    <th>Serial</th>
-                                    <th>Observaciones</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Estado</th><th>Fecha de Certificación</th><th>N° Certificación</th><th>Equipo</th><th>Marca</th><th>Modelo</th><th>Serial</th><th>Observaciones</th><th>Acciones</th></tr></thead>
                             <tbody id="invEquiposBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <!-- INV: NUEVO CONSUMIBLE (CON POSICIÓN) -->
             <div id="invNuevoConsumible" class="tab-pane">
                 <div class="form-card">
                     <h3>➕ Registrar Nuevo Consumible</h3>
@@ -1115,8 +474,6 @@
                     <button id="invBtnGuardarConsumible">💾 Guardar Consumible</button>
                 </div>
             </div>
-
-            <!-- INV: NUEVO EQUIPO -->
             <div id="invNuevoEquipo" class="tab-pane">
                 <div class="form-card">
                     <h3>➕ Registrar Nuevo Equipo</h3>
@@ -1140,8 +497,6 @@
                     <button id="invBtnGuardarEquipo">💾 Guardar Equipo</button>
                 </div>
             </div>
-
-            <!-- INV: IMPORTAR -->
             <div id="invImportar" class="tab-pane">
                 <div class="form-card">
                     <h3>📂 Importar Datos</h3>
@@ -1161,8 +516,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- INV: CONFIGURACIÓN -->
             <div id="invConfiguracion" class="tab-pane">
                 <div class="form-card">
                     <h3>⚙️ Configuración</h3>
@@ -1178,16 +531,15 @@
             </div>
         </div>
 
-        <!-- ===== FOOTER ===== -->
         <div class="app-footer">CI RENTELCOM SAS - Sistema Integrado de Gestión v2.0</div>
     </div>
 
     <!-- ================================================================ -->
-    <!-- ===== JAVASCRIPT UNIFICADO ===== -->
+    <!-- ===== JAVASCRIPT ===== -->
     <!-- ================================================================ -->
     <script>
         // ========================================================================
-        // 0. NAVEGACIÓN ENTRE MÓDULOS
+        // NAVEGACIÓN ENTRE MÓDULOS
         // ========================================================================
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('open');
@@ -1203,9 +555,7 @@
                 const modulo = this.dataset.modulo;
                 const targetId = 'modulo' + modulo.charAt(0).toUpperCase() + modulo.slice(1);
                 document.getElementById(targetId).classList.add('active');
-                if (window.innerWidth <= 768) {
-                    toggleSidebar();
-                }
+                if (window.innerWidth <= 768) toggleSidebar();
             };
         });
 
@@ -1254,15 +604,20 @@
                 mostrarMensaje(`⚠️ No hay datos para exportar en ${nombre}`);
                 return;
             }
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, nombre);
-            XLSX.writeFile(wb, `${nombre}_${new Date().toISOString().slice(0, 10)}.xlsx`);
-            mostrarMensaje(`✅ ${nombre} exportado correctamente`);
+            try {
+                const ws = XLSX.utils.json_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, nombre);
+                XLSX.writeFile(wb, `${nombre}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+                mostrarMensaje(`✅ ${nombre} exportado correctamente (${data.length} registros)`);
+            } catch (error) {
+                mostrarMensaje(`❌ Error al exportar: ${error.message}`);
+                console.error(error);
+            }
         }
 
         // ========================================================================
-        // 1. MÓDULO LABORATORIO (CalibPro) - Código simplificado
+        // MÓDULO LABORATORIO (resumido)
         // ========================================================================
         (function() {
             let labEquipos = [],
@@ -1300,10 +655,8 @@
             function labRenderAll() {
                 document.getElementById("labTotalEquipos").innerText = labEquipos.length;
                 document.getElementById("labTotalInformes").innerText = labInformes.length;
-                document.getElementById("labPendientes").innerText = labInformes.filter(i => i.estadoAprobacion === "Pendiente")
-                    .length;
-                document.getElementById("labAprobados").innerText = labInformes.filter(i => i.estadoAprobacion === "Aprobado")
-                    .length;
+                document.getElementById("labPendientes").innerText = labInformes.filter(i => i.estadoAprobacion === "Pendiente").length;
+                document.getElementById("labAprobados").innerText = labInformes.filter(i => i.estadoAprobacion === "Aprobado").length;
 
                 const tbody = document.getElementById("labEquiposBody");
                 if (labEquipos.length === 0) {
@@ -1355,7 +708,6 @@
                         </tr>`;
                     }).join('');
                 }
-
                 labCargarSelectAprobacion();
             }
 
@@ -1476,8 +828,7 @@
                 const equiposEncontrados = labEquipos.filter(e => e.serial === serial);
                 const informesEncontrados = labInformes.filter(i => i.serial === serial);
                 if (equiposEncontrados.length === 0 && informesEncontrados.length === 0) {
-                    resultadosDiv.innerHTML =
-                        `<div class="timeline-item">❌ No se encontraron registros para el serial: ${serial}</div>`;
+                    resultadosDiv.innerHTML = `<div class="timeline-item">❌ No se encontraron registros para el serial: ${serial}</div>`;
                     return;
                 }
                 let html = `<h4>📋 Trazabilidad para serial: ${serial}</h4>`;
@@ -1499,6 +850,7 @@
                 resultadosDiv.innerHTML = html;
             }
 
+            // Eventos Laboratorio
             document.getElementById("labBtnGuardarEntrada").onclick = function() {
                 const serial = document.getElementById("labEntradaSerial").value.trim();
                 if (!serial) { mostrarMensaje("⚠️ El serial es obligatorio"); return; }
@@ -1627,6 +979,7 @@
 
             document.getElementById("labBtnBuscarTraza").onclick = labBuscarTrazabilidad;
 
+            // LAB - Importar
             function labSetupImport(areaId, fileInputId, isEquipos) {
                 const area = document.getElementById(areaId);
                 const fileInput = document.getElementById(fileInputId);
@@ -1694,20 +1047,89 @@
             labSetupImport("labImportEquiposArea", "labFileEquiposInput", true);
             labSetupImport("labImportInformesArea", "labFileInformesInput", false);
 
+            // LAB - Exportar (CORREGIDO)
             document.getElementById("labBtnExportarEquipos").onclick = function() {
-                exportarToExcel(labEquipos, "Lab_Equipos");
-            };
-            document.getElementById("labBtnExportarInformes").onclick = function() {
-                exportarToExcel(labInformes, "Lab_Informes");
-            };
-            document.getElementById("labBtnExportarCompleto").onclick = function() {
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(labEquipos), "Equipos");
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(labInformes), "Informes");
-                XLSX.writeFile(wb, `Lab_Completo_${new Date().toISOString().slice(0,10)}.xlsx`);
-                mostrarMensaje("✅ Exportación completa generada");
+                if (labEquipos.length === 0) {
+                    mostrarMensaje("⚠️ No hay equipos para exportar");
+                    return;
+                }
+                const data = labEquipos.map(e => ({
+                    Consecutivo: e.consecutivo || "",
+                    Serial: e.serial || "",
+                    Equipo: e.equipo || "",
+                    Marca: e.marca || "",
+                    Modelo: e.modelo || "",
+                    Cliente: e.cliente || "",
+                    "Registrado por": e.registradoPor || "",
+                    Estado: e.estado || "Activo"
+                }));
+                exportarToExcel(data, "Lab_Equipos");
             };
 
+            document.getElementById("labBtnExportarInformes").onclick = function() {
+                if (labInformes.length === 0) {
+                    mostrarMensaje("⚠️ No hay informes para exportar");
+                    return;
+                }
+                const data = labInformes.map(i => ({
+                    "N° Informe": i.numero || "",
+                    Serial: i.serial || "",
+                    Fecha: i.fecha || "",
+                    Equipo: i.equipo || "",
+                    Marca: i.marca || "",
+                    Modelo: i.modelo || "",
+                    Cliente: i.cliente || "",
+                    Servicio: i.tipo || "",
+                    Diagnóstico: i.diagnostico || "",
+                    Valores: i.valores || "",
+                    "Nota Final": i.notaFinal || "",
+                    "Estado Aprobación": i.estadoAprobacion || "Pendiente"
+                }));
+                exportarToExcel(data, "Lab_Informes");
+            };
+
+            document.getElementById("labBtnExportarCompleto").onclick = function() {
+                if (labEquipos.length === 0 && labInformes.length === 0) {
+                    mostrarMensaje("⚠️ No hay datos para exportar");
+                    return;
+                }
+                try {
+                    const wb = XLSX.utils.book_new();
+                    if (labEquipos.length > 0) {
+                        const dataEq = labEquipos.map(e => ({
+                            Consecutivo: e.consecutivo || "",
+                            Serial: e.serial || "",
+                            Equipo: e.equipo || "",
+                            Marca: e.marca || "",
+                            Modelo: e.modelo || "",
+                            Cliente: e.cliente || "",
+                            "Registrado por": e.registradoPor || "",
+                            Estado: e.estado || "Activo"
+                        }));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataEq), "Equipos");
+                    }
+                    if (labInformes.length > 0) {
+                        const dataInf = labInformes.map(i => ({
+                            "N° Informe": i.numero || "",
+                            Serial: i.serial || "",
+                            Fecha: i.fecha || "",
+                            Equipo: i.equipo || "",
+                            Marca: i.marca || "",
+                            Modelo: i.modelo || "",
+                            Cliente: i.cliente || "",
+                            Servicio: i.tipo || "",
+                            "Estado Aprobación": i.estadoAprobacion || "Pendiente"
+                        }));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataInf), "Informes");
+                    }
+                    XLSX.writeFile(wb, `Lab_Completo_${new Date().toISOString().slice(0,10)}.xlsx`);
+                    mostrarMensaje(`✅ Exportación completa generada`);
+                } catch (error) {
+                    mostrarMensaje(`❌ Error al exportar: ${error.message}`);
+                }
+            };
+
+            // LAB - Configuración
             document.getElementById("labBtnGuardarLogo").onclick = function() {
                 const f = document.getElementById("labLogoEmpresa").files[0];
                 if (f) {
@@ -1721,6 +1143,7 @@
                     };
                 }
             };
+
             document.getElementById("labBtnEliminarTodos").onclick = function() {
                 if (confirm("¿Eliminar TODOS los datos del laboratorio?")) {
                     labEquipos = [];
@@ -1731,6 +1154,7 @@
                     mostrarMensaje("Datos eliminados");
                 }
             };
+
             document.getElementById("labBtnCargarEjemplo").onclick = function() {
                 labEquipos = [
                     { id: 1, consecutivo: "ENT-001", serial: "AA123456", equipo: "OTDR", marca: "EXFO", modelo: "MAX-715",
@@ -1760,8 +1184,7 @@
             document.querySelectorAll('#moduloLaboratorio .tab-btn').forEach(btn => {
                 btn.onclick = function() {
                     document.querySelectorAll('#moduloLaboratorio .tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('#moduloLaboratorio .tab-pane').forEach(p => p.classList.remove(
-                    'active-pane'));
+                    document.querySelectorAll('#moduloLaboratorio .tab-pane').forEach(p => p.classList.remove('active-pane'));
                     this.classList.add('active');
                     document.getElementById(this.dataset.tab).classList.add('active-pane');
                 };
@@ -1781,7 +1204,7 @@
         })();
 
         // ========================================================================
-        // 2. MÓDULO LOGÍSTICA
+        // MÓDULO LOGÍSTICA
         // ========================================================================
         (function() {
             let logSolicitudes = [],
@@ -1802,15 +1225,12 @@
             function logRenderAll() {
                 document.getElementById("logTotalSolicitudes").innerText = logSolicitudes.length;
                 document.getElementById("logTotalDespachos").innerText = logDespachos.length;
-                document.getElementById("logPendientes").innerText = logSolicitudes.filter(s => s.estado === "Pendiente")
-                .length;
-                document.getElementById("logCompletados").innerText = logSolicitudes.filter(s => s.estado === "Despachado")
-                    .length;
+                document.getElementById("logPendientes").innerText = logSolicitudes.filter(s => s.estado === "Pendiente").length;
+                document.getElementById("logCompletados").innerText = logSolicitudes.filter(s => s.estado === "Despachado").length;
 
                 const tbodySol = document.getElementById("logSolicitudesBody");
                 if (logSolicitudes.length === 0) {
-                    tbodySol.innerHTML =
-                        '<tr><td colspan="8" style="text-align:center;">No hay solicitudes registradas</td></tr>';
+                    tbodySol.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay solicitudes registradas</td></tr>';
                 } else {
                     const sorted = [...logSolicitudes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
                     tbodySol.innerHTML = sorted.map((s, idx) => {
@@ -1840,8 +1260,7 @@
 
                 const tbodyDesp = document.getElementById("logDespachosBody");
                 if (logDespachos.length === 0) {
-                    tbodyDesp.innerHTML =
-                        '<tr><td colspan="7" style="text-align:center;">No hay despachos registrados</td></tr>';
+                    tbodyDesp.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay despachos registrados</td></tr>';
                 } else {
                     const sorted = [...logDespachos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
                     tbodyDesp.innerHTML = sorted.map((d, idx) => {
@@ -2022,8 +1441,7 @@
 
             window.logGenerarPDFSolicitud = function(idx) {
                 const s = logSolicitudes[idx];
-                const estadoClass = s.estado === "Pendiente" ? "badge-pendiente" : (s.estado === "Despachado" ?
-                    "badge-despachado" : "badge-rechazado");
+                const estadoClass = s.estado === "Pendiente" ? "badge-pendiente" : (s.estado === "Despachado" ? "badge-despachado" : "badge-rechazado");
                 const html = `
                     <h3>📝 Solicitud ${s.numero}</h3>
                     <div class="info-line"><strong>Fecha:</strong> ${s.fecha}</div>
@@ -2107,18 +1525,77 @@
             logSetupImport("logImportSolicitudesArea", "logFileSolicitudesInput", true);
             logSetupImport("logImportDespachosArea", "logFileDespachosInput", false);
 
+            // LOG - Exportar (CORREGIDO)
             document.getElementById("logBtnExportarSolicitudes").onclick = function() {
-                exportarToExcel(logSolicitudes, "Log_Solicitudes");
+                if (logSolicitudes.length === 0) {
+                    mostrarMensaje("⚠️ No hay solicitudes para exportar");
+                    return;
+                }
+                const data = logSolicitudes.map(s => ({
+                    "N° Solicitud": s.numero || "",
+                    Fecha: s.fecha || "",
+                    Tipo: s.tipo || "",
+                    "Producto/Equipo": s.producto || "",
+                    Cantidad: s.cantidad || "",
+                    Solicitante: s.solicitante || "",
+                    "Fecha Necesidad": s.fechaNecesidad || "",
+                    Observaciones: s.observaciones || "",
+                    Estado: s.estado || ""
+                }));
+                exportarToExcel(data, "Log_Solicitudes");
             };
+
             document.getElementById("logBtnExportarDespachos").onclick = function() {
-                exportarToExcel(logDespachos, "Log_Despachos");
+                if (logDespachos.length === 0) {
+                    mostrarMensaje("⚠️ No hay despachos para exportar");
+                    return;
+                }
+                const data = logDespachos.map(d => ({
+                    "N° Despacho": d.numero || "",
+                    Fecha: d.fecha || "",
+                    "N° Solicitud": d.solicitudNumero || "",
+                    "Producto/Equipo": d.producto || "",
+                    Cantidad: d.cantidad || "",
+                    Responsable: d.responsable || ""
+                }));
+                exportarToExcel(data, "Log_Despachos");
             };
+
             document.getElementById("logBtnExportarTodo").onclick = function() {
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(logSolicitudes), "Solicitudes");
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(logDespachos), "Despachos");
-                XLSX.writeFile(wb, `Log_Completo_${new Date().toISOString().slice(0,10)}.xlsx`);
-                mostrarMensaje("✅ Exportación completa generada");
+                if (logSolicitudes.length === 0 && logDespachos.length === 0) {
+                    mostrarMensaje("⚠️ No hay datos para exportar");
+                    return;
+                }
+                try {
+                    const wb = XLSX.utils.book_new();
+                    if (logSolicitudes.length > 0) {
+                        const dataSol = logSolicitudes.map(s => ({
+                            "N° Solicitud": s.numero || "",
+                            Fecha: s.fecha || "",
+                            Tipo: s.tipo || "",
+                            "Producto/Equipo": s.producto || "",
+                            Cantidad: s.cantidad || "",
+                            Solicitante: s.solicitante || "",
+                            Estado: s.estado || ""
+                        }));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataSol), "Solicitudes");
+                    }
+                    if (logDespachos.length > 0) {
+                        const dataDesp = logDespachos.map(d => ({
+                            "N° Despacho": d.numero || "",
+                            Fecha: d.fecha || "",
+                            "N° Solicitud": d.solicitudNumero || "",
+                            "Producto/Equipo": d.producto || "",
+                            Cantidad: d.cantidad || "",
+                            Responsable: d.responsable || ""
+                        }));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataDesp), "Despachos");
+                    }
+                    XLSX.writeFile(wb, `Log_Completo_${new Date().toISOString().slice(0,10)}.xlsx`);
+                    mostrarMensaje(`✅ Exportación completa generada`);
+                } catch (error) {
+                    mostrarMensaje(`❌ Error al exportar: ${error.message}`);
+                }
             };
 
             document.getElementById("logBtnEliminarTodos").onclick = function() {
@@ -2130,6 +1607,7 @@
                     mostrarMensaje("Datos eliminados");
                 }
             };
+
             document.getElementById("logBtnCargarEjemplo").onclick = function() {
                 logSolicitudes = [
                     { numero: "SOL-001", fecha: new Date().toISOString().slice(0, 10), tipo: "Compra",
@@ -2148,8 +1626,7 @@
             document.querySelectorAll('#moduloLogistica .tab-btn').forEach(btn => {
                 btn.onclick = function() {
                     document.querySelectorAll('#moduloLogistica .tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('#moduloLogistica .tab-pane').forEach(p => p.classList.remove(
-                    'active-pane'));
+                    document.querySelectorAll('#moduloLogistica .tab-pane').forEach(p => p.classList.remove('active-pane'));
                     this.classList.add('active');
                     document.getElementById(this.dataset.tab).classList.add('active-pane');
                 };
@@ -2169,7 +1646,7 @@
         })();
 
         // ========================================================================
-        // 3. MÓDULO INVENTARIO / BODEGA (CON POSICIÓN)
+        // MÓDULO INVENTARIO / BODEGA
         // ========================================================================
         (function() {
             let invConsumibles = [],
@@ -2189,15 +1666,12 @@
             function invRenderAll() {
                 document.getElementById("invTotalConsumibles").innerText = invConsumibles.length;
                 document.getElementById("invTotalEquipos").innerText = invEquipos.length;
-                document.getElementById("invBajoStock").innerText = invConsumibles.filter(c => c.stock > 0 && c.stock < 5)
-                    .length;
+                document.getElementById("invBajoStock").innerText = invConsumibles.filter(c => c.stock > 0 && c.stock < 5).length;
                 document.getElementById("invSinStock").innerText = invConsumibles.filter(c => c.stock <= 0).length;
 
-                // Consumibles (con posición)
                 const tbodyCons = document.getElementById("invConsumiblesBody");
                 if (invConsumibles.length === 0) {
-                    tbodyCons.innerHTML =
-                        '<tr><td colspan="6" style="text-align:center;">No hay consumibles registrados</td></tr>';
+                    tbodyCons.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay consumibles registrados</td></tr>';
                 } else {
                     tbodyCons.innerHTML = invConsumibles.map((c, idx) => {
                         let stockClass = "badge-disponible";
@@ -2220,11 +1694,9 @@
                     }).join('');
                 }
 
-                // Equipos
                 const tbodyEq = document.getElementById("invEquiposBody");
                 if (invEquipos.length === 0) {
-                    tbodyEq.innerHTML =
-                        '<tr><td colspan="9" style="text-align:center;">No hay equipos registrados</td></tr>';
+                    tbodyEq.innerHTML = '<tr><td colspan="9" style="text-align:center;">No hay equipos registrados</td></tr>';
                 } else {
                     tbodyEq.innerHTML = invEquipos.map((e, idx) => {
                         let estadoClass = "badge-disponible";
@@ -2253,7 +1725,6 @@
                 }
             }
 
-            // --- INV: CRUD Consumibles ---
             window.invEliminarConsumible = function(idx) {
                 if (confirm(`¿Eliminar el consumible "${invConsumibles[idx].nombre}"?`)) {
                     invConsumibles.splice(idx, 1);
@@ -2323,7 +1794,6 @@
                 document.querySelector('#moduloInventario .tab-btn[data-tab="invNuevoConsumible"]').click();
             };
 
-            // Cargar Stock
             document.getElementById("invBtnCargarStock").onclick = function() {
                 const nombre = prompt("Ingrese el nombre del consumible para cargar stock:");
                 if (!nombre) return;
@@ -2343,7 +1813,6 @@
                 mostrarMensaje(`✅ Stock de "${cons.nombre}" actualizado a ${cons.stock}`);
             };
 
-            // --- INV: CRUD Equipos ---
             window.invEliminarEquipo = function(idx) {
                 if (confirm(`¿Eliminar el equipo "${invEquipos[idx].equipo}"?`)) {
                     invEquipos.splice(idx, 1);
@@ -2426,7 +1895,6 @@
                 document.querySelector('#moduloInventario .tab-btn[data-tab="invNuevoEquipo"]').click();
             };
 
-            // --- INV: PDFs ---
             window.invGenerarPDFConsumible = function(idx) {
                 const c = invConsumibles[idx];
                 const html = `
@@ -2456,7 +1924,6 @@
                 generarPDF(html, `Equipo_${e.serial}`);
             };
 
-            // --- INV: Importar ---
             function invSetupImport(areaId, fileInputId, isConsumibles) {
                 const area = document.getElementById(areaId);
                 const fileInput = document.getElementById(fileInputId);
@@ -2511,22 +1978,77 @@
             invSetupImport("invImportConsumiblesArea", "invFileConsumiblesInput", true);
             invSetupImport("invImportEquiposArea", "invFileEquiposInput", false);
 
-            // --- INV: Exportar ---
+            // INV - Exportar (CORREGIDO)
             document.getElementById("invBtnExportarConsumibles").onclick = function() {
-                exportarToExcel(invConsumibles, "Inv_Consumibles");
-            };
-            document.getElementById("invBtnExportarEquipos").onclick = function() {
-                exportarToExcel(invEquipos, "Inv_Equipos");
-            };
-            document.getElementById("invBtnExportarTodo").onclick = function() {
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(invConsumibles), "Consumibles");
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(invEquipos), "Equipos");
-                XLSX.writeFile(wb, `Inv_Completo_${new Date().toISOString().slice(0,10)}.xlsx`);
-                mostrarMensaje("✅ Exportación completa generada");
+                if (invConsumibles.length === 0) {
+                    mostrarMensaje("⚠️ No hay consumibles para exportar");
+                    return;
+                }
+                const data = invConsumibles.map(c => ({
+                    Posición: c.posicion || "",
+                    Nombre: c.nombre || "",
+                    Marca: c.marca || "",
+                    Referencia: c.referencia || "",
+                    Stock: c.stock || 0
+                }));
+                exportarToExcel(data, "Inv_Consumibles");
             };
 
-            // --- INV: Configuración ---
+            document.getElementById("invBtnExportarEquipos").onclick = function() {
+                if (invEquipos.length === 0) {
+                    mostrarMensaje("⚠️ No hay equipos para exportar");
+                    return;
+                }
+                const data = invEquipos.map(e => ({
+                    Estado: e.estado || "",
+                    "Fecha de Certificación": e.fechaCert || "",
+                    "N° Certificación": e.numCert || "",
+                    Equipo: e.equipo || "",
+                    Marca: e.marca || "",
+                    Modelo: e.modelo || "",
+                    Serial: e.serial || "",
+                    Observaciones: e.observaciones || ""
+                }));
+                exportarToExcel(data, "Inv_Equipos");
+            };
+
+            document.getElementById("invBtnExportarTodo").onclick = function() {
+                if (invConsumibles.length === 0 && invEquipos.length === 0) {
+                    mostrarMensaje("⚠️ No hay datos para exportar");
+                    return;
+                }
+                try {
+                    const wb = XLSX.utils.book_new();
+                    if (invConsumibles.length > 0) {
+                        const dataCons = invConsumibles.map(c => ({
+                            Posición: c.posicion || "",
+                            Nombre: c.nombre || "",
+                            Marca: c.marca || "",
+                            Referencia: c.referencia || "",
+                            Stock: c.stock || 0
+                        }));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataCons), "Consumibles");
+                    }
+                    if (invEquipos.length > 0) {
+                        const dataEq = invEquipos.map(e => ({
+                            Estado: e.estado || "",
+                            "Fecha de Certificación": e.fechaCert || "",
+                            "N° Certificación": e.numCert || "",
+                            Equipo: e.equipo || "",
+                            Marca: e.marca || "",
+                            Modelo: e.modelo || "",
+                            Serial: e.serial || "",
+                            Observaciones: e.observaciones || ""
+                        }));
+                        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataEq), "Equipos");
+                    }
+                    XLSX.writeFile(wb, `Inv_Completo_${new Date().toISOString().slice(0,10)}.xlsx`);
+                    mostrarMensaje(`✅ Exportación completa generada`);
+                } catch (error) {
+                    mostrarMensaje(`❌ Error al exportar: ${error.message}`);
+                }
+            };
+
             document.getElementById("invBtnEliminarTodos").onclick = function() {
                 if (confirm("¿Eliminar TODOS los datos de inventario?")) {
                     invConsumibles = [];
@@ -2536,43 +2058,35 @@
                     mostrarMensaje("Datos eliminados");
                 }
             };
+
             document.getElementById("invBtnCargarEjemplo").onclick = function() {
                 invConsumibles = [
-                    { posicion: "RACK-A1", nombre: "Cable UTP Cat6", marca: "AMP", referencia: "C6-UTP-305",
-                    stock: 50 },
-                    { posicion: "RACK-B3", nombre: "Conector RJ45", marca: "AMP", referencia: "RJ45-CAT6",
-                    stock: 120 },
-                    { posicion: "RACK-C2", nombre: "Fibra Óptica SC/APC", marca: "Corning", referencia: "SC-APC-3M",
-                        stock: 15 }
+                    { posicion: "RACK-A1", nombre: "Cable UTP Cat6", marca: "AMP", referencia: "C6-UTP-305", stock: 50 },
+                    { posicion: "RACK-B3", nombre: "Conector RJ45", marca: "AMP", referencia: "RJ45-CAT6", stock: 120 },
+                    { posicion: "RACK-C2", nombre: "Fibra Óptica SC/APC", marca: "Corning", referencia: "SC-APC-3M", stock: 15 }
                 ];
                 invEquipos = [
                     { equipo: "Medidor de Potencia", marca: "EXFO", modelo: "OLP-85", serial: "EXF-001",
-                        estado: "Disponible", fechaCert: "2025-01-15", numCert: "CERT-001",
-                        observaciones: "Calibración vigente" },
+                        estado: "Disponible", fechaCert: "2025-01-15", numCert: "CERT-001", observaciones: "Calibración vigente" },
                     { equipo: "OTDR", marca: "EXFO", modelo: "MAX-715", serial: "EXF-002",
-                        estado: "En reparación", fechaCert: "2024-12-10", numCert: "CERT-002",
-                        observaciones: "Enviado a taller" },
+                        estado: "En reparación", fechaCert: "2024-12-10", numCert: "CERT-002", observaciones: "Enviado a taller" },
                     { equipo: "Fuente de Luz", marca: "JDSU", modelo: "OLS-85", serial: "JDS-003",
-                        estado: "Disponible", fechaCert: "2025-02-01", numCert: "CERT-003",
-                        observaciones: "Nuevo equipo" }
+                        estado: "Disponible", fechaCert: "2025-02-01", numCert: "CERT-003", observaciones: "Nuevo equipo" }
                 ];
                 invGuardarDatos();
                 invRenderAll();
                 mostrarMensaje("📋 Datos de ejemplo cargados correctamente");
             };
 
-            // --- INV: Pestañas ---
             document.querySelectorAll('#moduloInventario .tab-btn').forEach(btn => {
                 btn.onclick = function() {
                     document.querySelectorAll('#moduloInventario .tab-btn').forEach(b => b.classList.remove('active'));
-                    document.querySelectorAll('#moduloInventario .tab-pane').forEach(p => p.classList.remove(
-                    'active-pane'));
+                    document.querySelectorAll('#moduloInventario .tab-pane').forEach(p => p.classList.remove('active-pane'));
                     this.classList.add('active');
                     document.getElementById(this.dataset.tab).classList.add('active-pane');
                 };
             });
 
-            // --- INV: Dashboard cards ---
             document.querySelectorAll('#moduloInventario .card').forEach(card => {
                 card.onclick = function() {
                     const accion = this.dataset.accion;
