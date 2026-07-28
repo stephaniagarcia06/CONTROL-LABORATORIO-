@@ -1,1 +1,1055 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario Bodega - CI RENTELCOM</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        /* ===== ESTILOS GENERALES (Adaptados del sistema de laboratorio) ===== */
+        :root {
+            --primary: #0a2b4e;
+            --primary-dark: #051a30;
+            --primary-light: #1e4a76;
+            --secondary: #e8f0fe;
+            --gray-border: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-gray: #64748b;
+            --white: #ffffff;
+            --danger: #dc2626;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --info: #3b82f6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #f5f7fa; font-family: 'Segoe UI', sans-serif; padding: 24px 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
 
+        /* ===== HEADER ===== */
+        .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; padding-bottom: 16px; border-bottom: 3px solid var(--primary); }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-placeholder { width: 50px; height: 50px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 20px; }
+        h1 { font-size: 1.6rem; color: var(--primary); }
+        .badge { background: var(--primary-light); color: white; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; }
+
+        /* ===== TARJETAS DE DASHBOARD ===== */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
+        .card { background: white; border-radius: 16px; padding: 20px; cursor: pointer; border: 1px solid var(--gray-border); transition: all 0.2s; }
+        .card:hover { transform: translateY(-3px); background: var(--secondary); }
+        .card h3 { font-size: 0.85rem; font-weight: 500; color: var(--text-gray); margin-bottom: 12px; text-transform: uppercase; }
+        .card .number { font-size: 2.2rem; font-weight: 700; color: var(--primary); }
+
+        /* ===== PESTAÑAS ===== */
+        .tabs { display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 2px solid var(--gray-border); margin-bottom: 28px; }
+        .tab-btn { background: none; border: none; padding: 10px 24px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-radius: 30px; color: var(--text-gray); }
+        .tab-btn:hover { background: var(--secondary); color: var(--primary); }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .tab-pane { display: none; }
+        .tab-pane.active-pane { display: block; }
+
+        /* ===== TARJETAS DE FORMULARIOS Y TABLAS ===== */
+        .form-card, .table-card { background: white; border-radius: 20px; padding: 24px; margin-bottom: 32px; border: 1px solid var(--gray-border); }
+        .form-card h3, .table-card h3 { margin-bottom: 20px; color: var(--primary); border-left: 4px solid var(--primary); padding-left: 12px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; }
+        label { font-weight: 600; font-size: 0.8rem; color: var(--text-gray); text-transform: uppercase; }
+        input, select, textarea { padding: 12px; border: 1px solid var(--gray-border); border-radius: 12px; font-family: inherit; font-size: 0.9rem; }
+        textarea { resize: vertical; min-height: 60px; }
+
+        /* ===== BOTONES ===== */
+        button { background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        button:hover { background: var(--primary-dark); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-success { background: var(--success); }
+        .btn-success:hover { background: #059669; }
+        .btn-info { background: var(--info); }
+        .btn-info:hover { background: #2563eb; }
+        .btn-sm { padding: 6px 14px; font-size: 0.75rem; }
+
+        /* ===== TABLAS ===== */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--gray-border); font-size: 0.8rem; vertical-align: middle; }
+        th { background: var(--secondary); font-weight: 600; color: var(--primary); }
+        .table-responsive { overflow-x: auto; }
+
+        /* ===== BADGES DE ESTADO ===== */
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; display: inline-block; }
+        .badge-pendiente { background: #fef3c7; color: #d97706; }
+        .badge-aprobado { background: #d1fae5; color: #059669; }
+        .badge-rechazado { background: #ffe6e6; color: #c62828; }
+        .badge-despachado { background: #dbeafe; color: #1d4ed8; }
+        .badge-disponible { background: #d1fae5; color: #059669; }
+        .badge-no-disponible { background: #f3f4f6; color: #6b7280; }
+        .badge-bajo-stock { background: #fef3c7; color: #d97706; }
+        .badge-sin-stock { background: #fee2e2; color: #dc2626; }
+
+        /* ===== BOTONES DE ACCIÓN ===== */
+        .pdf-btn { background: var(--danger); padding: 4px 10px; font-size: 0.7rem; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .pdf-btn:hover { background: #b91c1c; }
+        .edit-btn { background: var(--warning); padding: 4px 10px; font-size: 0.7rem; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .edit-btn:hover { background: #d97706; }
+        .delete-btn { background: #6b7280; padding: 4px 10px; font-size: 0.7rem; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .delete-btn:hover { background: #4b5563; }
+        .despachar-btn { background: var(--success); padding: 4px 10px; font-size: 0.7rem; border-radius: 20px; border: none; color: white; cursor: pointer; }
+        .despachar-btn:hover { background: #059669; }
+        .acciones-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+
+        /* ===== ALERTAS Y MODALES ===== */
+        .alert-success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 12px; margin-bottom: 20px; display: none; position: fixed; top: 20px; right: 20px; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: white; border-radius: 20px; padding: 24px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-modal { font-size: 28px; cursor: pointer; color: var(--text-gray); }
+        .close-modal:hover { color: var(--danger); }
+
+        /* ===== IMPORTACIÓN ===== */
+        .import-area { border: 2px dashed var(--gray-border); padding: 30px 20px; text-align: center; border-radius: 16px; cursor: pointer; margin: 10px 0; }
+        .import-area:hover { border-color: var(--primary); background: var(--secondary); }
+        .import-box { border: 1px solid var(--gray-border); border-radius: 16px; padding: 20px; background: var(--secondary); margin-bottom: 20px; }
+        .import-separado { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px; }
+        @media (max-width: 768px) { .import-separado { grid-template-columns: 1fr; } }
+
+        /* ===== PIE DE PÁGINA ===== */
+        .app-footer { text-align: center; padding: 20px; color: var(--text-gray); font-size: 0.7rem; border-top: 1px solid var(--gray-border); margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-placeholder">CR</div>
+            <h1>📦 Inventario Bodega | CI RENTELCOM</h1>
+        </div>
+        <div class="badge">Módulo de Logística</div>
+    </div>
+
+    <!-- ===== ALERTA DE ÉXITO ===== -->
+    <div id="mensajeExito" class="alert-success"></div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="dashboard">
+        <div class="card" data-accion="consumibles"><h3>Consumibles</h3><div class="number" id="totalConsumibles">0</div></div>
+        <div class="card" data-accion="equipos"><h3>Equipos</h3><div class="number" id="totalEquipos">0</div></div>
+        <div class="card" data-accion="solicitudes"><h3>Solicitudes</h3><div class="number" id="totalSolicitudes">0</div></div>
+        <div class="card" data-accion="despachos"><h3>Despachos</h3><div class="number" id="totalDespachos">0</div></div>
+    </div>
+
+    <!-- ===== PESTAÑAS ===== -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="consumibles">📋 Consumibles</button>
+        <button class="tab-btn" data-tab="equipos">🖥️ Equipos</button>
+        <button class="tab-btn" data-tab="solicitudes">📝 Solicitudes</button>
+        <button class="tab-btn" data-tab="despachos">🚚 Despachos</button>
+        <button class="tab-btn" data-tab="nuevoConsumible">➕ Nuevo Consumible</button>
+        <button class="tab-btn" data-tab="nuevoEquipo">🖥️ Nuevo Equipo</button>
+        <button class="tab-btn" data-tab="nuevaSolicitud">📝 Nueva Solicitud</button>
+        <button class="tab-btn" data-tab="importar">📂 Importar Datos</button>
+        <button class="tab-btn" data-tab="configuracion">⚙️ Configuración</button>
+    </div>
+
+    <!-- ===== CONSUMIBLES ===== -->
+    <div id="consumibles" class="tab-pane active-pane">
+        <div class="table-card">
+            <h3>📋 Gestión de Consumibles</h3>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:15px;">
+                <button id="btnAgregarConsumible" class="btn-outline btn-sm">+ Nuevo Consumible</button>
+                <button id="btnCargarStock" class="btn-info btn-sm">📥 Cargar Stock</button>
+            </div>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th><th>Nombre</th><th>Descripción</th><th>Proveedor</th><th>Stock</th><th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="consumiblesBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== EQUIPOS ===== -->
+    <div id="equipos" class="tab-pane">
+        <div class="table-card">
+            <h3>🖥️ Gestión de Equipos</h3>
+            <button id="btnAgregarEquipo" class="btn-outline btn-sm" style="margin-bottom:15px;">+ Nuevo Equipo</button>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código</th><th>Nombre</th><th>Descripción</th><th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="equiposBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== SOLICITUDES ===== -->
+    <div id="solicitudes" class="tab-pane">
+        <div class="table-card">
+            <h3>📝 Solicitudes de Compra/Alquiler</h3>
+            <button id="btnNuevaSolicitud" class="btn-outline btn-sm" style="margin-bottom:15px;">+ Nueva Solicitud</button>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N° Solicitud</th><th>Fecha</th><th>Tipo</th><th>Producto/Equipo</th><th>Cantidad</th>
+                            <th>Solicitante</th><th>Estado</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="solicitudesBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DESPACHOS ===== -->
+    <div id="despachos" class="tab-pane">
+        <div class="table-card">
+            <h3>🚚 Registro de Despachos</h3>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N° Despacho</th><th>Fecha</th><th>N° Solicitud</th><th>Producto/Equipo</th>
+                            <th>Cantidad</th><th>Responsable Logística</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="despachosBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NUEVO CONSUMIBLE ===== -->
+    <div id="nuevoConsumible" class="tab-pane">
+        <div class="form-card">
+            <h3>➕ Registrar Nuevo Consumible</h3>
+            <div class="form-grid">
+                <div class="input-group"><label>Código *</label><input id="consCategoria" placeholder="Ej: CON-001"></div>
+                <div class="input-group"><label>Nombre *</label><input id="consNombre" placeholder="Nombre del producto"></div>
+                <div class="input-group"><label>Descripción</label><input id="consDescripcion" placeholder="Descripción detallada"></div>
+                <div class="input-group"><label>Proveedor</label><input id="consProveedor" placeholder="Nombre del proveedor"></div>
+                <div class="input-group"><label>Stock Inicial</label><input id="consStock" type="number" value="0" min="0"></div>
+            </div>
+            <button id="btnGuardarConsumible">💾 Guardar Consumible</button>
+        </div>
+    </div>
+
+    <!-- ===== NUEVO EQUIPO ===== -->
+    <div id="nuevoEquipo" class="tab-pane">
+        <div class="form-card">
+            <h3>➕ Registrar Nuevo Equipo</h3>
+            <div class="form-grid">
+                <div class="input-group"><label>Código *</label><input id="eqCategoria" placeholder="Ej: EQ-001"></div>
+                <div class="input-group"><label>Nombre *</label><input id="eqNombre" placeholder="Nombre del equipo"></div>
+                <div class="input-group"><label>Descripción</label><input id="eqDescripcion" placeholder="Descripción detallada"></div>
+                <div class="input-group"><label>Estado Inicial</label>
+                    <select id="eqEstado">
+                        <option value="Disponible">✅ Disponible</option>
+                        <option value="No Disponible">❌ No Disponible</option>
+                    </select>
+                </div>
+            </div>
+            <button id="btnGuardarEquipo">💾 Guardar Equipo</button>
+        </div>
+    </div>
+
+    <!-- ===== NUEVA SOLICITUD ===== -->
+    <div id="nuevaSolicitud" class="tab-pane">
+        <div class="form-card">
+            <h3>📝 Nueva Solicitud de Compra/Alquiler</h3>
+            <div class="form-grid">
+                <div class="input-group"><label>N° Solicitud *</label><input id="solNumero" placeholder="Ej: SOL-001"></div>
+                <div class="input-group"><label>Tipo *</label>
+                    <select id="solTipo">
+                        <option value="Compra">🛒 Compra</option>
+                        <option value="Alquiler">📦 Alquiler</option>
+                    </select>
+                </div>
+                <div class="input-group"><label>Producto/Equipo *</label><input id="solProducto" placeholder="Nombre del producto o equipo"></div>
+                <div class="input-group"><label>Cantidad *</label><input id="solCantidad" type="number" min="1" value="1"></div>
+                <div class="input-group"><label>Solicitante *</label><input id="solSolicitante" placeholder="Nombre del solicitante (Comercial)"></div>
+                <div class="input-group"><label>Fecha de Necesidad</label><input id="solFechaNecesidad" type="date"></div>
+                <div class="input-group" style="grid-column: 1 / -1;"><label>Observaciones</label><textarea id="solObservaciones" rows="2"></textarea></div>
+            </div>
+            <button id="btnGuardarSolicitud">💾 Guardar Solicitud</button>
+        </div>
+    </div>
+
+    <!-- ===== MODAL DESPACHAR SOLICITUD ===== -->
+    <div id="modalDespachar" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🚚 Despachar Solicitud</h3>
+                <span class="close-modal" onclick="cerrarModalDespachar()">&times;</span>
+            </div>
+            <div id="despacharInfo"></div>
+            <div class="form-grid">
+                <div class="input-group"><label>Cantidad a Despachar *</label><input id="despCantidad" type="number" min="1" value="1"></div>
+                <div class="input-group"><label>Responsable Logística *</label><input id="despResponsable" placeholder="Nombre del responsable"></div>
+            </div>
+            <button id="btnConfirmarDespacho">✅ Confirmar Despacho</button>
+        </div>
+    </div>
+
+    <!-- ===== IMPORTAR DATOS ===== -->
+    <div id="importar" class="tab-pane">
+        <div class="form-card">
+            <h3>📂 Importar Datos desde Excel</h3>
+            <div class="import-separado">
+                <div class="import-box">
+                    <h4>📋 IMPORTAR CONSUMIBLES</h4>
+                    <p style="font-size:12px;">Columnas: codigo, nombre, descripcion, proveedor, stock</p>
+                    <div class="import-area" id="importConsumiblesArea"><div>📂</div><p>Arrastra Excel de CONSUMIBLES</p></div>
+                    <input type="file" id="fileConsumiblesInput" accept=".xlsx" style="display:none;">
+                </div>
+                <div class="import-box">
+                    <h4>🖥️ IMPORTAR EQUIPOS</h4>
+                    <p style="font-size:12px;">Columnas: codigo, nombre, descripcion, estado</p>
+                    <div class="import-area" id="importEquiposArea"><div>📂</div><p>Arrastra Excel de EQUIPOS</p></div>
+                    <input type="file" id="fileEquiposInput" accept=".xlsx" style="display:none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONFIGURACIÓN ===== -->
+    <div id="configuracion" class="tab-pane">
+        <div class="form-card">
+            <h3>⚙️ Configuración del Módulo</h3>
+            <div class="export-buttons" style="display:flex; gap:15px; flex-wrap:wrap; margin-bottom:20px;">
+                <button id="btnExportarTodo" class="btn-success">📊 Exportar TODO</button>
+                <button id="btnExportarConsumibles" class="btn-outline">📋 Exportar Consumibles</button>
+                <button id="btnExportarEquipos" class="btn-outline">🖥️ Exportar Equipos</button>
+                <button id="btnExportarSolicitudes" class="btn-outline">📝 Exportar Solicitudes</button>
+                <button id="btnExportarDespachos" class="btn-outline">🚚 Exportar Despachos</button>
+            </div>
+            <hr style="margin:20px 0;">
+            <button id="btnEliminarTodos" class="btn-danger">🗑️ Eliminar todos los datos</button>
+            <button id="btnCargarEjemplo" class="btn-outline" style="margin-top:15px;">📋 Cargar Datos de Ejemplo</button>
+        </div>
+    </div>
+
+    <!-- ===== PIE DE PÁGINA ===== -->
+    <div class="app-footer">CI RENTELCOM SAS - Carrera 19A No. 150-50 Bogotá D.C. | Módulo de Inventario Bodega</div>
+</div>
+
+<script>
+    // ========================================================================
+    // 1. ESTRUCTURA DE DATOS Y PERSISTENCIA
+    // ========================================================================
+    let consumibles = [];
+    let equipos = [];
+    let solicitudes = [];
+    let despachos = [];
+    let nextId = 100;
+
+    function guardarDatos() {
+        localStorage.setItem("inv_consumibles", JSON.stringify(consumibles));
+        localStorage.setItem("inv_equipos", JSON.stringify(equipos));
+        localStorage.setItem("inv_solicitudes", JSON.stringify(solicitudes));
+        localStorage.setItem("inv_despachos", JSON.stringify(despachos));
+        localStorage.setItem("inv_nextId", nextId);
+    }
+
+    function cargarDatos() {
+        consumibles = JSON.parse(localStorage.getItem("inv_consumibles") || "[]");
+        equipos = JSON.parse(localStorage.getItem("inv_equipos") || "[]");
+        solicitudes = JSON.parse(localStorage.getItem("inv_solicitudes") || "[]");
+        despachos = JSON.parse(localStorage.getItem("inv_despachos") || "[]");
+        nextId = parseInt(localStorage.getItem("inv_nextId") || "100");
+        renderAll();
+    }
+
+    function mostrarMensaje(msg) {
+        const d = document.getElementById("mensajeExito");
+        d.innerText = msg;
+        d.style.display = "block";
+        setTimeout(() => d.style.display = "none", 3500);
+    }
+
+    // ========================================================================
+    // 2. RENDERIZADO PRINCIPAL
+    // ========================================================================
+    function renderAll() {
+        // Dashboard
+        document.getElementById("totalConsumibles").innerText = consumibles.length;
+        document.getElementById("totalEquipos").innerText = equipos.length;
+        document.getElementById("totalSolicitudes").innerText = solicitudes.length;
+        document.getElementById("totalDespachos").innerText = despachos.length;
+
+        renderConsumibles();
+        renderEquipos();
+        renderSolicitudes();
+        renderDespachos();
+    }
+
+    // --- CONSUMIBLES ---
+    function renderConsumibles() {
+        const tbody = document.getElementById("consumiblesBody");
+        if (consumibles.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay consumibles registrados</td></tr>';
+            return;
+        }
+        tbody.innerHTML = consumibles.map((c, idx) => {
+            let stockClass = "badge-disponible";
+            if (c.stock <= 0) stockClass = "badge-sin-stock";
+            else if (c.stock < 5) stockClass = "badge-bajo-stock";
+
+            return `<tr>
+                <td><strong>${c.codigo}</strong></td>
+                <td>${c.nombre}</td>
+                <td>${c.descripcion || "-"}</td>
+                <td>${c.proveedor || "-"}</td>
+                <td><span class="status-badge ${stockClass}">${c.stock}</span></td>
+                <td><span class="status-badge ${c.stock > 0 ? 'badge-disponible' : 'badge-sin-stock'}">${c.stock > 0 ? 'Disponible' : 'Sin Stock'}</span></td>
+                <td>
+                    <div class="acciones-btns">
+                        <button class="edit-btn" onclick="editarConsumible(${idx})">✏️</button>
+                        <button class="delete-btn" onclick="eliminarConsumible(${idx})">🗑️</button>
+                        <button class="pdf-btn" onclick="generarPDFConsumible(${idx})">PDF</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // --- EQUIPOS ---
+    function renderEquipos() {
+        const tbody = document.getElementById("equiposBody");
+        if (equipos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay equipos registrados</td></tr>';
+            return;
+        }
+        tbody.innerHTML = equipos.map((e, idx) => {
+            const estadoClass = e.estado === "Disponible" ? "badge-disponible" : "badge-no-disponible";
+            return `<tr>
+                <td><strong>${e.codigo}</strong></td>
+                <td>${e.nombre}</td>
+                <td>${e.descripcion || "-"}</td>
+                <td><span class="status-badge ${estadoClass}">${e.estado}</span></td>
+                <td>
+                    <div class="acciones-btns">
+                        <button class="edit-btn" onclick="editarEquipo(${idx})">✏️</button>
+                        <button class="delete-btn" onclick="eliminarEquipo(${idx})">🗑️</button>
+                        <button class="pdf-btn" onclick="generarPDFEquipo(${idx})">PDF</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // --- SOLICITUDES ---
+    function renderSolicitudes() {
+        const tbody = document.getElementById("solicitudesBody");
+        if (solicitudes.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay solicitudes registradas</td></tr>';
+            return;
+        }
+        // Ordenar: más recientes primero
+        const sorted = [...solicitudes].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        tbody.innerHTML = sorted.map((s, idx) => {
+            const originalIdx = solicitudes.findIndex(item => item.numero === s.numero);
+            let estadoClass = "badge-pendiente";
+            if (s.estado === "Despachado") estadoClass = "badge-despachado";
+            else if (s.estado === "Cancelado") estadoClass = "badge-rechazado";
+
+            return `<tr>
+                <td><strong>${s.numero}</strong></td>
+                <td>${s.fecha || "-"}</td>
+                <td>${s.tipo}</td>
+                <td>${s.producto}</td>
+                <td>${s.cantidad}</td>
+                <td>${s.solicitante}</td>
+                <td><span class="status-badge ${estadoClass}">${s.estado}</span></td>
+                <td>
+                    <div class="acciones-btns">
+                        ${s.estado === "Pendiente" ? `<button class="despachar-btn" onclick="abrirModalDespachar(${originalIdx})">🚚 Despachar</button>` : ''}
+                        <button class="edit-btn" onclick="editarSolicitud(${originalIdx})">✏️</button>
+                        <button class="delete-btn" onclick="eliminarSolicitud(${originalIdx})">🗑️</button>
+                        <button class="pdf-btn" onclick="generarPDFSolicitud(${originalIdx})">PDF</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // --- DESPACHOS ---
+    function renderDespachos() {
+        const tbody = document.getElementById("despachosBody");
+        if (despachos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No hay despachos registrados</td></tr>';
+            return;
+        }
+        const sorted = [...despachos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        tbody.innerHTML = sorted.map((d, idx) => {
+            const originalIdx = despachos.findIndex(item => item.numero === d.numero);
+            return `<tr>
+                <td><strong>${d.numero}</strong></td>
+                <td>${d.fecha || "-"}</td>
+                <td>${d.solicitudNumero}</td>
+                <td>${d.producto}</td>
+                <td>${d.cantidad}</td>
+                <td>${d.responsable}</td>
+                <td>
+                    <div class="acciones-btns">
+                        <button class="delete-btn" onclick="eliminarDespacho(${originalIdx})">🗑️</button>
+                        <button class="pdf-btn" onclick="generarPDFDespacho(${originalIdx})">PDF</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // ========================================================================
+    // 3. CRUD CONSUMIBLES
+    // ========================================================================
+    window.editarConsumible = (idx) => {
+        const c = consumibles[idx];
+        document.getElementById("consCategoria").value = c.codigo;
+        document.getElementById("consNombre").value = c.nombre;
+        document.getElementById("consDescripcion").value = c.descripcion || "";
+        document.getElementById("consProveedor").value = c.proveedor || "";
+        document.getElementById("consStock").value = c.stock;
+        document.querySelector('.tab-btn[data-tab="nuevoConsumible"]').click();
+        // Cambiamos el comportamiento del botón guardar para actualizar
+        const btn = document.getElementById("btnGuardarConsumible");
+        btn.textContent = "✏️ Actualizar Consumible";
+        btn.onclick = () => {
+            c.codigo = document.getElementById("consCategoria").value.trim();
+            c.nombre = document.getElementById("consNombre").value.trim();
+            c.descripcion = document.getElementById("consDescripcion").value.trim();
+            c.proveedor = document.getElementById("consProveedor").value.trim();
+            c.stock = parseInt(document.getElementById("consStock").value) || 0;
+            guardarDatos();
+            renderAll();
+            mostrarMensaje(`✅ Consumible ${c.codigo} actualizado`);
+            btn.textContent = "💾 Guardar Consumible";
+            btn.onclick = guardarConsumible;
+            // Limpiar formulario
+            document.getElementById("consCategoria").value = "";
+            document.getElementById("consNombre").value = "";
+            document.getElementById("consDescripcion").value = "";
+            document.getElementById("consProveedor").value = "";
+            document.getElementById("consStock").value = "0";
+            document.querySelector('.tab-btn[data-tab="consumibles"]').click();
+        };
+        mostrarMensaje(`✏️ Editando consumible ${c.codigo}`);
+    };
+
+    window.eliminarConsumible = (idx) => {
+        if (confirm(`¿Eliminar el consumible ${consumibles[idx].codigo}?`)) {
+            consumibles.splice(idx, 1);
+            guardarDatos();
+            renderAll();
+            mostrarMensage(`✅ Consumible eliminado`);
+        }
+    };
+
+    function guardarConsumible() {
+        const codigo = document.getElementById("consCategoria").value.trim();
+        const nombre = document.getElementById("consNombre").value.trim();
+        if (!codigo || !nombre) {
+            mostrarMensaje("⚠️ Código y Nombre son obligatorios");
+            return;
+        }
+        consumibles.push({
+            codigo,
+            nombre,
+            descripcion: document.getElementById("consDescripcion").value.trim(),
+            proveedor: document.getElementById("consProveedor").value.trim(),
+            stock: parseInt(document.getElementById("consStock").value) || 0
+        });
+        guardarDatos();
+        renderAll();
+        mostrarMensaje(`✅ Consumible ${codigo} registrado`);
+        // Limpiar formulario
+        document.getElementById("consCategoria").value = "";
+        document.getElementById("consNombre").value = "";
+        document.getElementById("consDescripcion").value = "";
+        document.getElementById("consProveedor").value = "";
+        document.getElementById("consStock").value = "0";
+        document.querySelector('.tab-btn[data-tab="consumibles"]').click();
+    }
+
+    document.getElementById("btnGuardarConsumible").onclick = guardarConsumible;
+    document.getElementById("btnAgregarConsumible").onclick = () => document.querySelector('.tab-btn[data-tab="nuevoConsumible"]').click();
+
+    // ========================================================================
+    // 4. CRUD EQUIPOS
+    // ========================================================================
+    window.editarEquipo = (idx) => {
+        const e = equipos[idx];
+        document.getElementById("eqCategoria").value = e.codigo;
+        document.getElementById("eqNombre").value = e.nombre;
+        document.getElementById("eqDescripcion").value = e.descripcion || "";
+        document.getElementById("eqEstado").value = e.estado;
+        document.querySelector('.tab-btn[data-tab="nuevoEquipo"]').click();
+        const btn = document.getElementById("btnGuardarEquipo");
+        btn.textContent = "✏️ Actualizar Equipo";
+        btn.onclick = () => {
+            e.codigo = document.getElementById("eqCategoria").value.trim();
+            e.nombre = document.getElementById("eqNombre").value.trim();
+            e.descripcion = document.getElementById("eqDescripcion").value.trim();
+            e.estado = document.getElementById("eqEstado").value;
+            guardarDatos();
+            renderAll();
+            mostrarMensaje(`✅ Equipo ${e.codigo} actualizado`);
+            btn.textContent = "💾 Guardar Equipo";
+            btn.onclick = guardarEquipo;
+            document.getElementById("eqCategoria").value = "";
+            document.getElementById("eqNombre").value = "";
+            document.getElementById("eqDescripcion").value = "";
+            document.querySelector('.tab-btn[data-tab="equipos"]').click();
+        };
+        mostrarMensaje(`✏️ Editando equipo ${e.codigo}`);
+    };
+
+    window.eliminarEquipo = (idx) => {
+        if (confirm(`¿Eliminar el equipo ${equipos[idx].codigo}?`)) {
+            equipos.splice(idx, 1);
+            guardarDatos();
+            renderAll();
+            mostrarMensaje(`✅ Equipo eliminado`);
+        }
+    };
+
+    function guardarEquipo() {
+        const codigo = document.getElementById("eqCategoria").value.trim();
+        const nombre = document.getElementById("eqNombre").value.trim();
+        if (!codigo || !nombre) {
+            mostrarMensaje("⚠️ Código y Nombre son obligatorios");
+            return;
+        }
+        equipos.push({
+            codigo,
+            nombre,
+            descripcion: document.getElementById("eqDescripcion").value.trim(),
+            estado: document.getElementById("eqEstado").value
+        });
+        guardarDatos();
+        renderAll();
+        mostrarMensaje(`✅ Equipo ${codigo} registrado`);
+        document.getElementById("eqCategoria").value = "";
+        document.getElementById("eqNombre").value = "";
+        document.getElementById("eqDescripcion").value = "";
+        document.querySelector('.tab-btn[data-tab="equipos"]').click();
+    }
+
+    document.getElementById("btnGuardarEquipo").onclick = guardarEquipo;
+    document.getElementById("btnAgregarEquipo").onclick = () => document.querySelector('.tab-btn[data-tab="nuevoEquipo"]').click();
+
+    // ========================================================================
+    // 5. CRUD SOLICITUDES Y DESPACHOS
+    // ========================================================================
+    function guardarSolicitud() {
+        const numero = document.getElementById("solNumero").value.trim();
+        const producto = document.getElementById("solProducto").value.trim();
+        const solicitante = document.getElementById("solSolicitante").value.trim();
+        if (!numero || !producto || !solicitante) {
+            mostrarMensaje("⚠️ N° Solicitud, Producto y Solicitante son obligatorios");
+            return;
+        }
+        solicitudes.push({
+            numero,
+            fecha: new Date().toISOString().slice(0, 10),
+            tipo: document.getElementById("solTipo").value,
+            producto,
+            cantidad: parseInt(document.getElementById("solCantidad").value) || 1,
+            solicitante,
+            fechaNecesidad: document.getElementById("solFechaNecesidad").value || "",
+            observaciones: document.getElementById("solObservaciones").value.trim(),
+            estado: "Pendiente"
+        });
+        guardarDatos();
+        renderAll();
+        mostrarMensaje(`✅ Solicitud ${numero} registrada`);
+        document.getElementById("solNumero").value = "";
+        document.getElementById("solProducto").value = "";
+        document.getElementById("solSolicitante").value = "";
+        document.getElementById("solCantidad").value = "1";
+        document.getElementById("solFechaNecesidad").value = "";
+        document.getElementById("solObservaciones").value = "";
+        document.querySelector('.tab-btn[data-tab="solicitudes"]').click();
+    }
+
+    document.getElementById("btnGuardarSolicitud").onclick = guardarSolicitud;
+    document.getElementById("btnNuevaSolicitud").onclick = () => document.querySelector('.tab-btn[data-tab="nuevaSolicitud"]').click();
+
+    window.editarSolicitud = (idx) => {
+        const s = solicitudes[idx];
+        document.getElementById("solNumero").value = s.numero;
+        document.getElementById("solTipo").value = s.tipo;
+        document.getElementById("solProducto").value = s.producto;
+        document.getElementById("solCantidad").value = s.cantidad;
+        document.getElementById("solSolicitante").value = s.solicitante;
+        document.getElementById("solFechaNecesidad").value = s.fechaNecesidad || "";
+        document.getElementById("solObservaciones").value = s.observaciones || "";
+        document.querySelector('.tab-btn[data-tab="nuevaSolicitud"]').click();
+        const btn = document.getElementById("btnGuardarSolicitud");
+        btn.textContent = "✏️ Actualizar Solicitud";
+        btn.onclick = () => {
+            s.numero = document.getElementById("solNumero").value.trim();
+            s.tipo = document.getElementById("solTipo").value;
+            s.producto = document.getElementById("solProducto").value.trim();
+            s.cantidad = parseInt(document.getElementById("solCantidad").value) || 1;
+            s.solicitante = document.getElementById("solSolicitante").value.trim();
+            s.fechaNecesidad = document.getElementById("solFechaNecesidad").value || "";
+            s.observaciones = document.getElementById("solObservaciones").value.trim();
+            guardarDatos();
+            renderAll();
+            mostrarMensaje(`✅ Solicitud ${s.numero} actualizada`);
+            btn.textContent = "💾 Guardar Solicitud";
+            btn.onclick = guardarSolicitud;
+            document.getElementById("solNumero").value = "";
+            document.getElementById("solProducto").value = "";
+            document.getElementById("solSolicitante").value = "";
+            document.getElementById("solCantidad").value = "1";
+            document.getElementById("solFechaNecesidad").value = "";
+            document.getElementById("solObservaciones").value = "";
+            document.querySelector('.tab-btn[data-tab="solicitudes"]').click();
+        };
+        mostrarMensaje(`✏️ Editando solicitud ${s.numero}`);
+    };
+
+    window.eliminarSolicitud = (idx) => {
+        if (confirm(`¿Eliminar la solicitud ${solicitudes[idx].numero}?`)) {
+            solicitudes.splice(idx, 1);
+            guardarDatos();
+            renderAll();
+            mostrarMensaje(`✅ Solicitud eliminada`);
+        }
+    };
+
+    // ===== DESPACHAR SOLICITUD =====
+    let despacharIdx = null;
+
+    window.abrirModalDespachar = (idx) => {
+        despacharIdx = idx;
+        const s = solicitudes[idx];
+        if (s.estado !== "Pendiente") {
+            mostrarMensaje(`⚠️ La solicitud ya fue ${s.estado}`);
+            return;
+        }
+        document.getElementById("despacharInfo").innerHTML = `
+            <div style="background:#f5f5f5; padding:15px; border-radius:12px; margin-bottom:15px;">
+                <p><strong>Solicitud:</strong> ${s.numero}</p>
+                <p><strong>Producto:</strong> ${s.producto}</p>
+                <p><strong>Cantidad solicitada:</strong> ${s.cantidad}</p>
+                <p><strong>Solicitante:</strong> ${s.solicitante}</p>
+            </div>
+        `;
+        document.getElementById("despCantidad").value = s.cantidad;
+        document.getElementById("despCantidad").max = s.cantidad;
+        document.getElementById("despResponsable").value = "";
+        document.getElementById("modalDespachar").style.display = "flex";
+    };
+
+    window.cerrarModalDespachar = () => {
+        document.getElementById("modalDespachar").style.display = "none";
+        despacharIdx = null;
+    };
+
+    document.getElementById("btnConfirmarDespacho").onclick = () => {
+        if (despacharIdx === null) return;
+        const s = solicitudes[despacharIdx];
+        const cantidad = parseInt(document.getElementById("despCantidad").value) || 0;
+        const responsable = document.getElementById("despResponsable").value.trim();
+        if (cantidad <= 0) { mostrarMensaje("⚠️ Cantidad inválida"); return; }
+        if (!responsable) { mostrarMensaje("⚠️ Responsable es obligatorio"); return; }
+        if (cantidad > s.cantidad) { mostrarMensaje(`⚠️ La cantidad a despachar (${cantidad}) excede la solicitada (${s.cantidad})`); return; }
+
+        // Registrar despacho
+        const despacho = {
+            numero: `DESP-${String(despachos.length + 1).padStart(3, '0')}`,
+            fecha: new Date().toISOString().slice(0, 10),
+            solicitudNumero: s.numero,
+            producto: s.producto,
+            cantidad: cantidad,
+            responsable: responsable
+        };
+        despachos.push(despacho);
+
+        // Actualizar stock del consumible si es compra
+        if (s.tipo === "Compra") {
+            const cons = consumibles.find(c => c.nombre.toLowerCase() === s.producto.toLowerCase() || c.codigo.toLowerCase() === s.producto.toLowerCase());
+            if (cons) {
+                cons.stock = Math.max(0, cons.stock - cantidad);
+            } else {
+                mostrarMensaje(`⚠️ No se encontró el consumible "${s.producto}" para descontar stock`);
+            }
+        }
+
+        // Actualizar estado de la solicitud
+        if (cantidad === s.cantidad) {
+            s.estado = "Despachado";
+        } else {
+            s.estado = "Parcial";
+            // Si se despacha parcial, crear una nueva solicitud para el resto
+            const restante = s.cantidad - cantidad;
+            if (restante > 0) {
+                solicitudes.push({
+                    numero: `${s.numero}-P${String(solicitudes.filter(sol => sol.numero.startsWith(s.numero)).length + 1)}`,
+                    fecha: new Date().toISOString().slice(0, 10),
+                    tipo: s.tipo,
+                    producto: s.producto,
+                    cantidad: restante,
+                    solicitante: s.solicitante,
+                    fechaNecesidad: s.fechaNecesidad || "",
+                    observaciones: `Restante de solicitud ${s.numero} - ${s.observaciones || ''}`,
+                    estado: "Pendiente"
+                });
+            }
+        }
+
+        guardarDatos();
+        renderAll();
+        cerrarModalDespachar();
+        mostrarMensaje(`✅ Despacho ${despacho.numero} registrado correctamente`);
+    };
+
+    window.eliminarDespacho = (idx) => {
+        if (confirm(`¿Eliminar el despacho ${despachos[idx].numero}?`)) {
+            despachos.splice(idx, 1);
+            guardarDatos();
+            renderAll();
+            mostrarMensaje(`✅ Despacho eliminado`);
+        }
+    };
+
+    // ========================================================================
+    // 6. GENERACIÓN DE PDF (vista previa en HTML)
+    // ========================================================================
+    function generarPDF(htmlContent, filename) {
+        const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${filename}</title>
+            <style>body{font-family:'Segoe UI',Arial,sans-serif;padding:30px;margin:0;background:white;}
+            table{width:100%;border-collapse:collapse;margin:15px 0;}
+            th,td{border:1px solid #ccc;padding:8px 12px;text-align:left;font-size:12px;}
+            th{background:#0a2b4e;color:white;}
+            .header{text-align:center;margin-bottom:20px;color:#0a2b4e;border-bottom:2px solid #0a2b4e;padding-bottom:15px;}
+            .footer{text-align:center;margin-top:30px;font-size:10px;color:#666;border-top:1px solid #ccc;padding-top:15px;}
+            .info-line{margin:4px 0;font-size:13px;}
+            .status-badge{display:inline-block;padding:2px 12px;border-radius:20px;font-weight:bold;}
+            .badge-pendiente{background:#fef3c7;color:#d97706;}
+            .badge-despachado{background:#dbeafe;color:#1d4ed8;}
+            .badge-disponible{background:#d1fae5;color:#059669;}
+            .badge-sin-stock{background:#fee2e2;color:#dc2626;}
+            .badge-bajo-stock{background:#fef3c7;color:#d97706;}
+            </style></head><body>
+            <div style="text-align:center;margin-bottom:15px;"><h2>CI RENTELCOM SAS</h2><p>Módulo de Inventario Bodega</p></div>
+            ${htmlContent}
+            <div class="footer">Carrera 19A No. 150-50 Bogotá D.C. | Tel: 9399167</div>
+            </body></html>`;
+        const blob = new Blob([fullHtml], { type: 'text/html' });
+        window.open(URL.createObjectURL(blob), '_blank');
+    }
+
+    window.generarPDFConsumible = (idx) => {
+        const c = consumibles[idx];
+        generarPDF(`
+            <h3>📋 Ficha de Consumible</h3>
+            <div class="info-line"><strong>Código:</strong> ${c.codigo}</div>
+            <div class="info-line"><strong>Nombre:</strong> ${c.nombre}</div>
+            <div class="info-line"><strong>Descripción:</strong> ${c.descripcion || "N/A"}</div>
+            <div class="info-line"><strong>Proveedor:</strong> ${c.proveedor || "N/A"}</div>
+            <div class="info-line"><strong>Stock:</strong> <span class="status-badge ${c.stock > 0 ? 'badge-disponible' : 'badge-sin-stock'}">${c.stock}</span></div>
+        `, `Consumible_${c.codigo}`);
+    };
+
+    window.generarPDFEquipo = (idx) => {
+        const e = equipos[idx];
+        generarPDF(`
+            <h3>🖥️ Ficha de Equipo</h3>
+            <div class="info-line"><strong>Código:</strong> ${e.codigo}</div>
+            <div class="info-line"><strong>Nombre:</strong> ${e.nombre}</div>
+            <div class="info-line"><strong>Descripción:</strong> ${e.descripcion || "N/A"}</div>
+            <div class="info-line"><strong>Estado:</strong> <span class="status-badge ${e.estado === 'Disponible' ? 'badge-disponible' : 'badge-no-disponible'}">${e.estado}</span></div>
+        `, `Equipo_${e.codigo}`);
+    };
+
+    window.generarPDFSolicitud = (idx) => {
+        const s = solicitudes[idx];
+        const estadoClass = s.estado === "Pendiente" ? "badge-pendiente" : (s.estado === "Despachado" ? "badge-despachado" : "badge-rechazado");
+        generarPDF(`
+            <h3>📝 Solicitud ${s.numero}</h3>
+            <div class="info-line"><strong>Fecha:</strong> ${s.fecha}</div>
+            <div class="info-line"><strong>Tipo:</strong> ${s.tipo}</div>
+            <div class="info-line"><strong>Producto/Equipo:</strong> ${s.producto}</div>
+            <div class="info-line"><strong>Cantidad:</strong> ${s.cantidad}</div>
+            <div class="info-line"><strong>Solicitante:</strong> ${s.solicitante}</div>
+            <div class="info-line"><strong>Fecha de Necesidad:</strong> ${s.fechaNecesidad || "N/A"}</div>
+            <div class="info-line"><strong>Observaciones:</strong> ${s.observaciones || "Ninguna"}</div>
+            <div class="info-line"><strong>Estado:</strong> <span class="status-badge ${estadoClass}">${s.estado}</span></div>
+        `, `Solicitud_${s.numero}`);
+    };
+
+    window.generarPDFDespacho = (idx) => {
+        const d = despachos[idx];
+        generarPDF(`
+            <h3>🚚 Despacho ${d.numero}</h3>
+            <div class="info-line"><strong>Fecha:</strong> ${d.fecha}</div>
+            <div class="info-line"><strong>Solicitud N°:</strong> ${d.solicitudNumero}</div>
+            <div class="info-line"><strong>Producto/Equipo:</strong> ${d.producto}</div>
+            <div class="info-line"><strong>Cantidad:</strong> ${d.cantidad}</div>
+            <div class="info-line"><strong>Responsable Logística:</strong> ${d.responsable}</div>
+        `, `Despacho_${d.numero}`);
+    };
+
+    // ========================================================================
+    // 7. IMPORTAR DATOS
+    // ========================================================================
+    function setupImport(areaId, fileInputId, isConsumibles) {
+        const area = document.getElementById(areaId);
+        const fileInput = document.getElementById(fileInputId);
+        area.onclick = () => fileInput.click();
+        area.ondragover = (e) => { e.preventDefault(); area.style.borderColor = "var(--primary)"; };
+        area.ondragleave = () => area.style.borderColor = "var(--gray-border)";
+        area.ondrop = (e) => { e.preventDefault(); fileInput.files = e.dataTransfer.files; procesarArchivo(fileInput.files[0]); };
+        fileInput.onchange = () => { if (fileInput.files[0]) procesarArchivo(fileInput.files[0]); };
+
+        const procesarArchivo = (file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet);
+                if (isConsumibles) {
+                    rows.forEach(row => {
+                        consumibles.push({
+                            codigo: row.codigo || row.Codigo || row.CÓDIGO || "",
+                            nombre: row.nombre || row.Nombre || "",
+                            descripcion: row.descripcion || row.Descripcion || "",
+                            proveedor: row.proveedor || row.Proveedor || "",
+                            stock: parseInt(row.stock || row.Stock || "0") || 0
+                        });
+                    });
+                } else {
+                    rows.forEach(row => {
+                        equipos.push({
+                            codigo: row.codigo || row.Codigo || row.CÓDIGO || "",
+                            nombre: row.nombre || row.Nombre || "",
+                            descripcion: row.descripcion || row.Descripcion || "",
+                            estado: row.estado || row.Estado || "Disponible"
+                        });
+                    });
+                }
+                guardarDatos();
+                renderAll();
+                mostrarMensaje(`✅ Importados ${rows.length} registros`);
+            };
+            reader.readAsArrayBuffer(file);
+        };
+    }
+
+    setupImport("importConsumiblesArea", "fileConsumiblesInput", true);
+    setupImport("importEquiposArea", "fileEquiposInput", false);
+
+    // ========================================================================
+    // 8. EXPORTAR DATOS
+    // ========================================================================
+    function exportarToExcel(data, nombre, columnas) {
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, nombre);
+        XLSX.writeFile(wb, `${nombre}_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    }
+
+    document.getElementById("btnExportarConsumibles").onclick = () => exportarToExcel(consumibles, "Consumibles");
+    document.getElementById("btnExportarEquipos").onclick = () => exportarToExcel(equipos, "Equipos");
+    document.getElementById("btnExportarSolicitudes").onclick = () => exportarToExcel(solicitudes, "Solicitudes");
+    document.getElementById("btnExportarDespachos").onclick = () => exportarToExcel(despachos, "Despachos");
+
+    document.getElementById("btnExportarTodo").onclick = () => {
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(consumibles), "Consumibles");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(equipos), "Equipos");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(solicitudes), "Solicitudes");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(despachos), "Despachos");
+        XLSX.writeFile(wb, `Inventario_Bodega_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        mostrarMensaje("✅ Exportación completa generada");
+    };
+
+    // ========================================================================
+    // 9. CONFIGURACIÓN Y EJEMPLOS
+    // ========================================================================
+    document.getElementById("btnEliminarTodos").onclick = () => {
+        if (confirm("¿Eliminar TODOS los datos del módulo de inventario?")) {
+            consumibles = [];
+            equipos = [];
+            solicitudes = [];
+            despachos = [];
+            nextId = 100;
+            guardarDatos();
+            renderAll();
+            mostrarMensaje("🗑️ Todos los datos eliminados");
+        }
+    };
+
+    document.getElementById("btnCargarEjemplo").onclick = () => {
+        consumibles = [
+            { codigo: "CON-001", nombre: "Cable UTP Cat6", descripcion: "Cable de red categoría 6", proveedor: "Proveedor A", stock: 50 },
+            { codigo: "CON-002", nombre: "Conector RJ45", descripcion: "Conector para cable UTP", proveedor: "Proveedor B", stock: 120 },
+            { codigo: "CON-003", nombre: "Fibra Óptica SC/APC", descripcion: "Pig tail fibra óptica", proveedor: "Proveedor C", stock: 15 }
+        ];
+        equipos = [
+            { codigo: "EQ-001", nombre: "Medidor de Potencia", descripcion: "Medidor óptico de potencia", estado: "Disponible" },
+            { codigo: "EQ-002", nombre: "OTDR", descripcion: "Reflectómetro óptico", estado: "No Disponible" },
+            { codigo: "EQ-003", nombre: "Fuente de Luz", descripcion: "Fuente láser para fibra", estado: "Disponible" }
+        ];
+        solicitudes = [
+            { numero: "SOL-001", fecha: new Date().toISOString().slice(0, 10), tipo: "Compra", producto: "Cable UTP Cat6", cantidad: 20, solicitante: "Comercial 1", fechaNecesidad: "2025-02-10", observaciones: "Urgente para proyecto", estado: "Pendiente" },
+            { numero: "SOL-002", fecha: new Date().toISOString().slice(0, 10), tipo: "Alquiler", producto: "Medidor de Potencia", cantidad: 2, solicitante: "Comercial 2", fechaNecesidad: "2025-02-15", observaciones: "Para sitio de cliente", estado: "Pendiente" }
+        ];
+        despachos = [];
+        guardarDatos();
+        renderAll();
+        mostrarMensaje("📋 Datos de ejemplo cargados correctamente");
+    };
+
+    // ========================================================================
+    // 10. PESTAÑAS
+    // ========================================================================
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active-pane"));
+            btn.classList.add("active");
+            document.getElementById(btn.dataset.tab).classList.add("active-pane");
+        };
+    });
+
+    // ========================================================================
+    // 11. DASHBOARD NAVEGACIÓN
+    // ========================================================================
+    document.querySelectorAll(".card").forEach(card => {
+        card.onclick = () => {
+            const accion = card.dataset.accion;
+            let tabId = "consumibles";
+            if (accion === "equipos") tabId = "equipos";
+            if (accion === "solicitudes") tabId = "solicitudes";
+            if (accion === "despachos") tabId = "despachos";
+            document.querySelector(`.tab-btn[data-tab="${tabId}"]`).click();
+        };
+    });
+
+    // ========================================================================
+    // 12. INICIALIZACIÓN
+    // ========================================================================
+    cargarDatos();
+
+    // Fix para el typo en mostrarMensaje (se usa dentro de eliminarConsumible)
+    window.mostrarMensage = window.mostrarMensaje;
+</script>
+</body>
+</html>
