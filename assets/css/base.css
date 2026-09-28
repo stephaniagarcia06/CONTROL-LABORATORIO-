@@ -1,0 +1,110 @@
+/* ============================================================
+   RENTELCOM - Estilos base compartidos
+   ============================================================ */
+
+:root {
+    /* Colores corporativos */
+    --primary: #0a2b4e;
+    --primary-dark: #051a30;
+    --primary-light: #1e4a76;
+    --secondary: #e8f0fe;
+    
+    /* Grises */
+    --gray-border: #e2e8f0;
+    --gray-light: #f5f7fa;
+    --gray-medium: #cbd5e1;
+    
+    /* Texto */
+    --text-dark: #1e293b;
+    --text-gray: #64748b;
+    --text-light: #94a3b8;
+    
+    /* Semánticos */
+    --danger: #dc2626;
+    --danger-dark: #b91c1c;
+    --warning: #f59e0b;
+    --warning-dark: #d97706;
+    --success: #10b981;
+    --success-dark: #059669;
+    --info: #3b82f6;
+    --info-dark: #2563eb;
+    
+    /* Fondo */
+    --bg-body: #f0f2f5;
+    --bg-card: #ffffff;
+    --white: #ffffff;
+}
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-body);
+    color: var(--text-dark);
+    line-height: 1.5;
+    min-height: 100vh;
+}
+
+/* Tipografía */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary);
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.4rem; }
+h3 { font-size: 1.1rem; margin-bottom: 16px; }
+h4 { font-size: 1rem; }
+
+small { font-size: 0.75rem; }
+
+/* Links */
+a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: var(--primary-light);
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--gray-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gray-medium);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-gray);
+}
+
+/* Utilidades */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.hidden { display: none !important; }
